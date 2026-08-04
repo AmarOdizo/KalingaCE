@@ -21,6 +21,7 @@ export default function NoteTable({ notes, onDelete }) {
                 alt={note.noteTitle}
                 width={80}
                 height={80}
+                unoptimized
                 className="h-20 w-20 rounded-lg object-cover"
               />
 
@@ -119,6 +120,7 @@ export default function NoteTable({ notes, onDelete }) {
                     alt={note.noteTitle}
                     width={60}
                     height={60}
+                    unoptimized
                     className="h-14 w-14 rounded-lg object-cover"
                   />
                 </td>

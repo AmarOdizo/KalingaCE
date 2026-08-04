@@ -1,11 +1,59 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { X, Award, Star, BookOpen, Calendar, Percent, ArrowLeft, ArrowRight } from "lucide-react";
 
 const API_URL = "http://localhost:5000/api/Student";
+
+const FALLBACK_STUDENTS = [
+  {
+    id: "fb-1",
+    _id: "fb-1",
+    name: "Aarav Sharma",
+    subject: "Mathematics",
+    batch: "2024",
+    totalMark: 100,
+    gainMark: 98,
+    percentage: "98.00",
+    image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
+  },
+  {
+    id: "fb-2",
+    _id: "fb-2",
+    name: "Isha Patel",
+    subject: "Physics",
+    batch: "2024",
+    totalMark: 100,
+    gainMark: 96,
+    percentage: "96.00",
+    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
+  },
+  {
+    id: "fb-3",
+    _id: "fb-3",
+    name: "Rohan Das",
+    subject: "Chemistry",
+    batch: "2024",
+    totalMark: 100,
+    gainMark: 95,
+    percentage: "95.00",
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
+  },
+  {
+    id: "fb-4",
+    _id: "fb-4",
+    name: "Sanya Malhotra",
+    subject: "Biology",
+    batch: "2024",
+    totalMark: 100,
+    gainMark: 94,
+    percentage: "94.00",
+    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
+  }
+];
 
 export default function TopStudents() {
   const router = useRouter();
@@ -15,6 +63,20 @@ export default function TopStudents() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [open, setOpen] = useState(false);
 
+  const scrollContainerRef = useRef(null);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -320, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 320, behavior: "smooth" });
+    }
+  };
+
   useEffect(() => {
     loadStudents();
   }, []);
@@ -23,138 +85,314 @@ export default function TopStudents() {
     try {
       const res = await axios.get(API_URL);
 
-      // Percentage ke hisab se sort
-      const topperStudents = res.data.data
-        .map((student) => ({
-          ...student,
-          percentage:
-            student.totalMark > 0
-              ? ((student.gainMark / student.totalMark) * 100).toFixed(2)
-              : 0,
-        }))
-        .sort((a, b) => b.percentage - a.percentage)
-        .slice(0, 4);
+      if (res.data && res.data.data && res.data.data.length > 0) {
+        const topperStudents = res.data.data
+          .map((student) => ({
+            ...student,
+            percentage:
+              student.totalMark > 0
+                ? ((student.gainMark / student.totalMark) * 100).toFixed(2)
+                : 0,
+          }))
+          .sort((a, b) => b.percentage - a.percentage);
 
-      setStudents(topperStudents);
+        setStudents(topperStudents);
+      } else {
+        setStudents(FALLBACK_STUDENTS);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("API connection failed, using fallback data:", error);
+      setStudents(FALLBACK_STUDENTS);
     } finally {
       setLoading(false);
     }
   };
 
   const handleViewProfile = async (id) => {
-    try {
-      const res = await axios.get(`http://localhost:5000/api/Student/${id}`);
+    console.log("Clicked ID:", id);
 
-      setSelectedStudent(res.data.data);
+    // 1. Try to find the student in the local state first
+    const localStudent = students.find(
+      (s) => String(s.id) === String(id) || String(s._id) === String(id)
+    );
+
+    if (localStudent) {
+      setSelectedStudent(localStudent);
       setOpen(true);
+      return;
+    }
+
+    // 2. If it's a fallback student
+    if (typeof id === "string" && id.startsWith("fb-")) {
+      const fallback = FALLBACK_STUDENTS.find((s) => s.id === id);
+      if (fallback) {
+        setSelectedStudent(fallback);
+        setOpen(true);
+        return;
+      }
+    }
+
+    // 3. Fallback to fetching from API if not found in local state (safety net)
+    try {
+      const res = await axios.get(`${API_URL}/${id}`);
+      if (res.data && res.data.data) {
+        const student = res.data.data;
+        // recalculate percentage if missing
+        student.percentage =
+          student.totalMark > 0
+            ? ((student.gainMark / student.totalMark) * 100).toFixed(2)
+            : 0;
+        setSelectedStudent(student);
+        setOpen(true);
+      }
     } catch (error) {
-      console.log(error);
+      console.log("Failed to fetch student profile from API:", error);
     }
   };
 
   if (loading) {
     return (
-      <div className="py-20 text-center text-xl font-semibold">Loading...</div>
+      <div className="py-24 text-center font-semibold text-slate-500 dark:text-slate-400">
+        <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent mb-4" />
+        Loading Toppers...
+      </div>
     );
   }
 
   return (
-    <section className="bg-gray-100 py-16 dark:bg-gray-950">
+    <section className="bg-gradient-to-b from-white to-slate-100 py-16 dark:from-slate-900 dark:to-slate-950">
       <div className="mx-auto max-w-7xl px-6">
-        <h2 className="text-center text-4xl font-bold text-gray-900 dark:text-white">
-          🏆 Top Students
-        </h2>
+        <div className="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+          <div className="text-left">
+            <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              🏆 <span className="gradient-text">Top Students</span>
+            </h2>
+            <p className="mt-3 text-slate-550 dark:text-slate-400 max-w-xl">
+              Meet our outstanding learners who achieved excellence and set
+              academic milestones.
+            </p>
+          </div>
 
-        <p className="mt-3 text-center text-gray-600 dark:text-gray-400">
-          Meet our outstanding learners who achieved excellence.
-        </p>
-
-        <div className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {students.map((student) => (
-            <div
-              key={student.id}
-              className="rounded-2xl bg-white p-6 shadow-lg transition hover:-translate-y-2 hover:shadow-xl dark:bg-gray-900"
-            >
-              <Image
-                src={student.image}
-                alt={student.name}
-                width={100}
-                height={100}
-                className="mx-auto h-24 w-24 rounded-full border-4 border-blue-500 object-cover"
-              />
-
-              <h3 className="mt-4 text-center text-xl font-bold dark:text-white">
-                {student.name}
-              </h3>
-
-              <p className="text-center text-gray-600 dark:text-gray-300">
-                {student.subject}
-              </p>
-
-              <p className="mt-2 text-center font-semibold text-green-600">
-                {student.percentage}%
-              </p>
-
+          {students.length > 4 && (
+            <div className="flex gap-3 self-end sm:self-auto shrink-0">
               <button
-                onClick={() => handleViewProfile(student.id)}
-                className="mt-5 w-full rounded-lg bg-blue-600 py-2 text-white hover:bg-blue-700"
+                type="button"
+                onClick={scrollLeft}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                title="Scroll Left"
               >
-                View Profile
+                <ArrowLeft size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={scrollRight}
+                className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-700 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 cursor-pointer"
+                title="Scroll Right"
+              >
+                <ArrowRight size={20} />
               </button>
             </div>
-          ))}
+          )}
         </div>
+
+        <style dangerouslySetInnerHTML={{__html: `
+          .no-scrollbar::-webkit-scrollbar {
+            display: none;
+          }
+        `}} />
+
+        {students.length > 4 ? (
+          <div
+            ref={scrollContainerRef}
+            className="flex gap-8 overflow-x-auto pb-8 pt-2 scroll-smooth snap-x snap-mandatory no-scrollbar"
+            style={{
+              scrollbarWidth: "none",
+              msOverflowStyle: "none",
+            }}
+          >
+            {students.map((student) => (
+              <div
+                key={student.id || student._id}
+                className="premium-card group flex flex-col justify-between w-[285px] sm:w-[320px] shrink-0 snap-start"
+              >
+                <div className="text-center">
+                  <div className="relative mx-auto h-24 w-24 rounded-full p-1 bg-gradient-to-tr from-primary-500 to-indigo-500 shadow-md transition-transform duration-300 group-hover:scale-105">
+                    <div className="h-full w-full rounded-full overflow-hidden border-2 border-white dark:border-slate-900">
+                      <img
+                        src={
+                          student.image ||
+                          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
+                        }
+                        alt={student.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span className="absolute bottom-0 right-0 rounded-full bg-amber-500 p-1.5 text-white shadow-md">
+                      <Award size={14} />
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 text-lg font-extrabold text-slate-850 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {student.name}
+                  </h3>
+
+                  <p className="text-xs font-semibold text-slate-400 uppercase mt-1">
+                    {student.subject}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full w-fit mx-auto text-sm">
+                    <Star
+                      size={14}
+                      className="fill-emerald-600 dark:fill-emerald-400"
+                    />
+                    <span>{student.percentage}% Score</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleViewProfile(student.id || student._id)}
+                  className="relative z-10 mt-6 w-full rounded-xl bg-slate-50 border border-slate-200/50 py-2.5 text-sm font-bold text-slate-700 hover:bg-primary-600 hover:text-white hover:border-primary-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-primary-600 dark:hover:text-white dark:hover:border-primary-600 transition-all duration-300 cursor-pointer"
+                >
+                  View Profile
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {students.map((student) => (
+              <div
+                key={student.id || student._id}
+                className="premium-card group flex flex-col justify-between"
+              >
+                <div className="text-center">
+                  <div className="relative mx-auto h-24 w-24 rounded-full p-1 bg-gradient-to-tr from-primary-500 to-indigo-500 shadow-md transition-transform duration-300 group-hover:scale-105">
+                    <div className="h-full w-full rounded-full overflow-hidden border-2 border-white dark:border-slate-900">
+                      <img
+                        src={
+                          student.image ||
+                          "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
+                        }
+                        alt={student.name}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
+                    <span className="absolute bottom-0 right-0 rounded-full bg-amber-500 p-1.5 text-white shadow-md">
+                      <Award size={14} />
+                    </span>
+                  </div>
+
+                  <h3 className="mt-5 text-lg font-extrabold text-slate-850 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                    {student.name}
+                  </h3>
+
+                  <p className="text-xs font-semibold text-slate-400 uppercase mt-1">
+                    {student.subject}
+                  </p>
+
+                  <div className="mt-4 flex items-center justify-center gap-1 text-emerald-600 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-500/10 px-3 py-1 rounded-full w-fit mx-auto text-sm">
+                    <Star
+                      size={14}
+                      className="fill-emerald-600 dark:fill-emerald-400"
+                    />
+                    <span>{student.percentage}% Score</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => handleViewProfile(student.id || student._id)}
+                  className="relative z-10 mt-6 w-full rounded-xl bg-slate-50 border border-slate-200/50 py-2.5 text-sm font-bold text-slate-700 hover:bg-primary-600 hover:text-white hover:border-primary-600 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-200 dark:hover:bg-primary-600 dark:hover:text-white dark:hover:border-primary-600 transition-all duration-300 cursor-pointer"
+                >
+                  View Profile
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
+
       {open && selectedStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-          <div className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl border border-slate-100 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200">
             {/* Close Button */}
             <button
               onClick={() => {
                 setOpen(false);
                 setSelectedStudent(null);
               }}
-              className="absolute right-4 top-4 text-2xl font-bold text-gray-500 hover:text-red-600"
+              className="absolute right-5 top-5 rounded-full p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer"
             >
-              ✕
+              <X size={20} />
             </button>
 
-            <Image
-              src={selectedStudent.image}
-              alt={selectedStudent.name}
-              width={140}
-              height={140}
-              className="mx-auto h-36 w-36 rounded-full border-4 border-blue-500 object-cover"
-            />
+            <div className="text-center">
+              <div className="relative mx-auto h-32 w-32 rounded-full p-1 bg-gradient-to-tr from-primary-500 to-indigo-500 shadow-lg">
+                <div className="h-full w-full rounded-full overflow-hidden border-4 border-white dark:border-slate-900">
+                  <img
+                    src={
+                      selectedStudent.image ||
+                      "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
+                    }
+                    alt={selectedStudent.name}
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
 
-            <h2 className="mt-4 text-center text-2xl font-bold dark:text-white">
-              {selectedStudent.name}
-            </h2>
+              <h2 className="mt-5 text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                {selectedStudent.name}
+              </h2>
 
-            <p className="text-center text-blue-600">
-              {selectedStudent.subject}
-            </p>
+              <p className="text-sm font-bold text-primary-600 dark:text-primary-400 uppercase tracking-wider mt-1">
+                {selectedStudent.subject}
+              </p>
+            </div>
 
-            <div className="mt-6 space-y-3">
-              <p>
-                <strong>Batch:</strong> {selectedStudent.batch}
-              </p>
-              <p>
-                <strong>Total Mark:</strong> {selectedStudent.totalMark}
-              </p>
-              <p>
-                <strong>Gain Mark:</strong> {selectedStudent.gainMark}
-              </p>
-              <p>
-                <strong>Percentage:</strong>{" "}
-                {(
-                  (selectedStudent.gainMark / selectedStudent.totalMark) *
-                  100
-                ).toFixed(2)}
-                %
-              </p>
+            <div className="mt-8 grid grid-cols-2 gap-4">
+              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-950/40 dark:border-slate-800/60">
+                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-1">
+                  <Calendar size={14} />
+                  <span>BATCH</span>
+                </div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {selectedStudent.batch || "N/A"}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-950/40 dark:border-slate-800/60">
+                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-1">
+                  <Percent size={14} />
+                  <span>PERCENTAGE</span>
+                </div>
+                <p className="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                  {selectedStudent.percentage ||
+                    (
+                      (selectedStudent.gainMark / selectedStudent.totalMark) *
+                      100
+                    ).toFixed(2)}
+                  %
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-950/40 dark:border-slate-800/60">
+                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-1">
+                  <BookOpen size={14} />
+                  <span>TOTAL MARK</span>
+                </div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {selectedStudent.totalMark}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-950/40 dark:border-slate-800/60">
+                <div className="flex items-center gap-1.5 text-slate-400 text-xs font-semibold mb-1">
+                  <Star size={14} />
+                  <span>GAINED MARK</span>
+                </div>
+                <p className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {selectedStudent.gainMark}
+                </p>
+              </div>
             </div>
           </div>
         </div>

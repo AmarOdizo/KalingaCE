@@ -1,4 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap');
+
 @import "tailwindcss";
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  
+  --color-primary-50: hsl(222 100% 97%);
+  --color-primary-100: hsl(221 100% 93%);
+  --color-primary-200: hsl(221 100% 86%);
+  --color-primary-300: hsl(221 89% 77%);
+  --color-primary-400: hsl(221 84% 68%);
+  --color-primary-500: hsl(221 84% 58%);
+  --color-primary-600: hsl(221 78% 48%);
+  --color-primary-700: hsl(221 78% 39%);
+  --color-primary-800: hsl(221 75% 30%);
+  --color-primary-900: hsl(221 70% 22%);
+  
+  --color-accent-blue: hsl(210 100% 50%);
+  --color-accent-teal: hsl(174 100% 41%);
+  --color-accent-indigo: hsl(250 95% 60%);
+  
+  --shadow-premium: 0 10px 30px -10px rgba(0, 0, 0, 0.08);
+  --shadow-premium-hover: 0 20px 40px -15px rgba(0, 0, 0, 0.15);
+  --shadow-glow-blue: 0 0 25px -5px rgba(59, 130, 246, 0.4);
+}
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -11,7 +36,61 @@ html.dark {
 }
 
 body {
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  font-family: var(--font-sans);
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  @apply bg-slate-50 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-50;
+}
+
+/* Glassmorphism helper class */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.dark .glass-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(51, 65, 85, 0.5);
+}
+
+/* Custom premium hover cards */
+.premium-card {
+  @apply relative overflow-hidden rounded-2xl bg-white p-6 border border-slate-200/80 shadow-premium transition-all duration-300 hover:shadow-premium-hover hover:-translate-y-1.5 dark:bg-slate-900/60 dark:border-slate-800/80 dark:shadow-none;
+}
+
+.premium-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(130deg, rgba(59, 130, 246, 0.05) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.premium-card:hover::before {
+  opacity: 1;
+}
+
+/* Subtle input styling */
+.premium-input {
+  @apply w-full rounded-xl border border-slate-200 bg-white/50 px-4 py-3 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 dark:border-slate-800 dark:bg-slate-900/40 dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-500/20;
+}
+
+/* Premium button stylings */
+.btn-primary {
+  @apply relative inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 font-semibold text-white transition-all duration-300 hover:from-primary-700 hover:to-indigo-700 hover:shadow-glow-blue active:scale-95;
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-3 font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 hover:text-slate-900 active:scale-95 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white;
+}
+
+/* Gradient text */
+.gradient-text {
+  @apply bg-gradient-to-r from-primary-600 via-indigo-500 to-cyan-500 bg-clip-text text-transparent dark:from-primary-400 dark:via-indigo-400 dark:to-cyan-400;
 }

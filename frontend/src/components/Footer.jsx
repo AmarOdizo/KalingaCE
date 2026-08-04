@@ -9,30 +9,32 @@ import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-100 text-gray-700 dark:bg-gray-950 dark:text-gray-300">
-      <div className="mx-auto max-w-7xl px-6 py-14">
+    <footer className="bg-slate-900 text-slate-400 dark:bg-slate-950 dark:text-slate-400 border-t border-slate-800">
+      <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
           {/* Company */}
           <div>
             <div className="flex items-center gap-3">
-              <Image
-                src="/klogo.png"
-                alt="Logo"
-                width={55}
-                height={55}
-                className="rounded-lg"
-              />
+              <div className="p-1 bg-white rounded-xl shadow-md">
+                <Image
+                  src="/klogo.png"
+                  alt="Logo"
+                  width={48}
+                  height={48}
+                  className="rounded-lg object-contain"
+                />
+              </div>
 
               <div>
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                <h2 className="text-lg font-extrabold text-white tracking-tight">
                   Kalinga Computer Education
                 </h2>
 
-                <p className="text-sm text-gray-500">Learn • Build • Grow</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-400">Learn • Build • Grow</p>
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-7">
+            <p className="mt-5 text-sm leading-6 text-slate-400 font-medium">
               We provide professional computer education with practical training
               in Web Development, Python, Java, AI, Tally, Graphic Design, DCA,
               PGDCA and many more.
@@ -41,24 +43,24 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
+            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
               Quick Links
             </h3>
 
-            <div className="space-y-3">
-              <Link href="/" className="block hover:text-blue-600">
+            <div className="space-y-3 font-semibold">
+              <Link href="/" className="block hover:text-primary-400 transition-colors">
                 Home
               </Link>
 
-              <Link href="/about" className="block hover:text-blue-600">
+              <Link href="/about" className="block hover:text-primary-400 transition-colors">
                 About
               </Link>
 
-              <Link href="/contact" className="block hover:text-blue-600">
+              <Link href="/contact" className="block hover:text-primary-400 transition-colors">
                 Contact
               </Link>
 
-              <Link href="/login" className="block hover:text-blue-600">
+              <Link href="/login" className="block hover:text-primary-400 transition-colors">
                 Login
               </Link>
             </div>
@@ -66,29 +68,29 @@ export default function Footer() {
 
           {/* Courses */}
           <div>
-            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
+            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
               Popular Courses
             </h3>
 
-            <div className="space-y-3">
-              <p>Full Stack Development</p>
-              <p>React.js & Next.js</p>
-              <p>Python Programming</p>
-              <p>Java Programming</p>
-              <p>Artificial Intelligence</p>
-              <p>Tally Prime</p>
+            <div className="space-y-3 font-semibold text-slate-400">
+              <p className="hover:text-primary-400 cursor-default transition-colors">Full Stack Development</p>
+              <p className="hover:text-primary-400 cursor-default transition-colors">React.js & Next.js</p>
+              <p className="hover:text-primary-400 cursor-default transition-colors">Python Programming</p>
+              <p className="hover:text-primary-400 cursor-default transition-colors">Java Programming</p>
+              <p className="hover:text-primary-400 cursor-default transition-colors">Artificial Intelligence</p>
+              <p className="hover:text-primary-400 cursor-default transition-colors">Tally Prime</p>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="mb-5 text-xl font-semibold text-gray-900 dark:text-white">
+            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
               Contact Us
             </h3>
 
-            <div className="space-y-4">
+            <div className="space-y-4 font-semibold text-slate-400 text-sm">
               <div className="flex items-start gap-3">
-                <MapPin className="mt-1 text-blue-600" size={20} />
+                <MapPin className="mt-0.5 text-primary-500" size={18} />
                 <p>
                   Athagarh, Cuttack,
                   <br />
@@ -97,59 +99,57 @@ export default function Footer() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Phone className="text-green-600" size={20} />
+                <Phone className="text-emerald-500" size={18} />
                 <p>+91 9876543210</p>
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="text-red-500" size={20} />
+                <Mail className="text-rose-500" size={18} />
                 <p>info@kalingacomputer.com</p>
               </div>
             </div>
 
             {/* Social Icons */}
-            {/* Social Icons */}
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex gap-3.5">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full bg-blue-600 p-3 text-white transition duration-300 hover:scale-110"
+                className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-primary-600 hover:text-white active:scale-95 cursor-pointer"
               >
-                <FaFacebookF size={18} />
+                <FaFacebookF size={16} />
               </a>
 
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full bg-pink-600 p-3 text-white transition duration-300 hover:scale-110"
+                className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-pink-600 hover:text-white active:scale-95 cursor-pointer"
               >
-                <FaInstagram size={18} />
+                <FaInstagram size={16} />
               </a>
 
               <a
                 href="https://youtube.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full bg-red-600 p-3 text-white transition duration-300 hover:scale-110"
+                className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-red-600 hover:text-white active:scale-95 cursor-pointer"
               >
-                <FaYoutube size={18} />
+                <FaYoutube size={16} />
               </a>
             </div>
           </div>
         </div>
 
         {/* Bottom */}
-
-        <div className="mt-10 border-t border-gray-300 pt-6 text-center dark:border-gray-800">
-          <p className="text-sm">
+        <div className="mt-12 border-t border-slate-800 pt-6 text-center text-xs font-semibold text-slate-500">
+          <p>
             © {new Date().getFullYear()}{" "}
-            <span className="font-semibold">Kalinga Computer Education</span>.
+            <span className="text-slate-400">Kalinga Computer Education</span>.
             All Rights Reserved.
           </p>
 
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-[10px] text-slate-600">
             Designed & Developed with ❤️ using Next.js & Tailwind CSS
           </p>
         </div>

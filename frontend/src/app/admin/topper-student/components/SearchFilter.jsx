@@ -4,11 +4,11 @@ import { Search } from "lucide-react";
 
 export default function SearchFilter({ search, setSearch }) {
   return (
-    <div className="mb-6 rounded-2xl bg-white p-5 shadow">
+    <div className="glass-panel mb-6 rounded-2xl p-5 shadow-premium transition-all duration-300">
       <div className="relative">
         <Search
           size={20}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors"
         />
 
         <input
@@ -16,7 +16,7 @@ export default function SearchFilter({ search, setSearch }) {
           placeholder="Search by Name, Subject or Batch..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full rounded-xl border border-gray-300 py-3 pl-12 pr-4 outline-none transition focus:border-blue-600"
+          className="premium-input pl-12"
         />
       </div>
     </div>

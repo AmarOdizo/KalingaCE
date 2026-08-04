@@ -62,16 +62,16 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-gray-200 bg-white px-4 shadow md:hidden dark:border-gray-700 dark:bg-gray-900">
-        <h2 className="text-lg font-bold text-gray-900 dark:text-white">
-          Admin Panel
+      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-5 shadow-sm md:hidden dark:border-slate-800/80 dark:bg-slate-900/95 backdrop-blur-md">
+        <h2 className="text-md font-extrabold text-slate-800 dark:text-white uppercase tracking-wider">
+          Admin Dashboard
         </h2>
 
         <button
           onClick={() => setOpen(true)}
-          className="rounded-lg p-2 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="rounded-xl border border-slate-200/60 p-2 text-slate-600 dark:border-slate-800 dark:text-slate-300 cursor-pointer"
         >
-          <Menu className="h-6 w-6 text-gray-700 dark:text-white" />
+          <Menu className="h-5 w-5" />
         </button>
       </div>
 
@@ -79,72 +79,71 @@ export default function AdminSidebar() {
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-40 bg-black/40 md:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs md:hidden"
         />
       )}
 
       {/* Sidebar */}
       <aside
         className={`
-    fixed top-0 left-0 z-50
-    h-screen w-72
-    bg-white dark:bg-gray-900
-    border-r border-gray-200 dark:border-gray-700
-    shadow-xl
-    transition-transform duration-300
-
-    ${open ? "translate-x-0" : "-translate-x-full"}
-
-    md:translate-x-0
-    md:static
-    md:w-64
-  `}
+          fixed top-0 left-0 z-50
+          h-screen w-72 flex flex-col justify-between
+          bg-white dark:bg-slate-900/90
+          border-r border-slate-200/80 dark:border-slate-800/80
+          shadow-lg backdrop-blur-md
+          transition-transform duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+          md:static
+          md:w-64
+        `}
       >
-        {/* Logo */}
-        <div className="flex items-center justify-between border-b border-gray-200 px-5 py-4 dark:border-gray-700">
-          <div>
-            <h1 className="text-xl font-bold dark:text-white">Admin Panel</h1>
+        <div>
+          {/* Logo / Title */}
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5.5 dark:border-slate-800/60">
+            <div>
+              <h1 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">Admin Panel</h1>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-500">Kalinga Computer</p>
+            </div>
 
-            <p className="text-xs text-gray-500">Kalinga Computer Education</p>
+            <button className="md:hidden text-slate-400 hover:text-slate-600" onClick={() => setOpen(false)}>
+              <X size={20} />
+            </button>
           </div>
 
-          <button className="md:hidden" onClick={() => setOpen(false)}>
-            <X size={24} />
-          </button>
+          {/* Menu */}
+          <div className="space-y-1.5 p-4">
+            {menus.map((item) => {
+              const Icon = item.icon;
+              const active = pathname.startsWith(item.href);
+
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
+                  className={`flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 font-semibold text-sm cursor-pointer
+                    ${
+                      active
+                        ? "bg-gradient-to-r from-primary-600 to-indigo-600 text-white shadow-md shadow-primary-500/15"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800/50 dark:hover:text-primary-400"
+                    }`}
+                >
+                  <Icon size={18} />
+                  <span>{item.name}</span>
+                </Link>
+              );
+            })}
+          </div>
         </div>
 
-        {/* Menu */}
-        <div className="flex-1 space-y-2 p-4 overflow-y-auto">
-          {menus.map((item) => {
-            const Icon = item.icon;
-            const active = pathname === item.href;
-
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                onClick={() => setOpen(false)}
-                className={`flex items-center gap-3 rounded-xl px-4 py-3 transition
-                  ${
-                    active
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-500 text-white"
-                      : "hover:bg-blue-50 dark:hover:bg-gray-800"
-                  }`}
-              >
-                <Icon size={20} />
-                <span>{item.name}</span>
-              </Link>
-            );
-          })}
-        </div>
-
-        {/* Logout */}
-        <div className="border-t border-gray-200 p-4 dark:border-gray-700">
+        {/* Logout Button */}
+        <div className="border-t border-slate-100 p-4 dark:border-slate-800/60">
           <button
             onClick={logout}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-red-500 to-rose-500 px-4 py-3 font-semibold text-white"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-500 px-4 py-3 text-sm font-bold text-white shadow-sm hover:from-rose-600 hover:to-red-600 transition-all duration-300 active:scale-98 cursor-pointer"
           >
-            <LogOut size={20} />
+            <LogOut size={16} />
             Logout
           </button>
         </div>

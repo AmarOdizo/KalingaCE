@@ -26,6 +26,7 @@ export default function NoteCard({ note }) {
           alt={note.noteTitle}
           width={600}
           height={350}
+          unoptimized
           className="h-52 w-full object-cover transition-transform duration-300 hover:scale-105 sm:h-64 lg:h-80"
         />
       </div>

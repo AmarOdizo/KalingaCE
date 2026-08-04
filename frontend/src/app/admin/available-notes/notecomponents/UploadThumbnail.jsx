@@ -43,6 +43,7 @@ export default function UploadThumbnail({ value, onUpload }) {
               alt="Thumbnail"
               width={220}
               height={220}
+              unoptimized
               className="h-40 w-40 object-cover sm:h-48 sm:w-48 lg:h-56 lg:w-56"
             />
           </div>

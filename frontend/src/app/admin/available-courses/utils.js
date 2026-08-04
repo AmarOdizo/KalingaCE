@@ -17,16 +17,16 @@ export const formatFees = (fees) => {
 export const getStatusColor = (status) => {
   switch (status) {
     case "Admission Open":
-      return "bg-green-100 text-green-700";
+      return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-450";
 
     case "Closed":
-      return "bg-red-100 text-red-700";
+      return "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400";
 
     case "Coming Soon":
-      return "bg-yellow-100 text-yellow-700";
+      return "bg-amber-55/70 text-amber-800 dark:bg-amber-500/15 dark:text-amber-400";
 
     default:
-      return "bg-gray-100 text-gray-700";
+      return "bg-slate-100 text-slate-700 dark:bg-slate-800/80 dark:text-slate-350";
   }
 };
 

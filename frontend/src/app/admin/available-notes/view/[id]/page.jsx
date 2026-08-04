@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 
 import { getNote } from "../../data";
 
@@ -16,15 +17,10 @@ export default function ViewNotePage() {
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // ==========================
-  // Load Note
-  // ==========================
   const loadNote = async () => {
     try {
       setLoading(true);
-
       const data = await getNote(params.id);
-
       setNote(data);
     } catch (error) {
       console.log(error);
@@ -47,35 +43,42 @@ export default function ViewNotePage() {
 
   if (!note) {
     return (
-      <div className="p-8 text-center">
-        <h2 className="text-2xl font-bold">Note Not Found</h2>
+      <div className="mx-auto max-w-7xl p-6 md:p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="text-2xl font-bold text-red-600">Note Not Found</h2>
+          <button
+            onClick={() => router.push("/admin/available-notes")}
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 font-semibold text-white shadow hover:from-primary-700 hover:to-indigo-700 transition"
+          >
+            <ArrowLeft size={16} />
+            Back to Notes
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 transition-colors duration-300 dark:bg-gray-950">
-      <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-50 p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
+      <div className="mx-auto w-full max-w-7xl">
         {/* Header */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl lg:text-4xl">
-                View Note
-              </h1>
-
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 sm:text-base">
-                Complete Note Information
-              </p>
-            </div>
-
-            <button
-              onClick={() => router.back()}
-              className="w-full rounded-xl bg-gray-700 px-5 py-3 text-sm font-medium text-white transition hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 sm:w-auto"
-            >
-              ← Back
-            </button>
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              View Note
+            </h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Read uploaded PDF document and subject notes details.
+            </p>
           </div>
+
+          <button
+            onClick={() => router.back()}
+            className="btn-secondary py-2.5 px-4 text-sm font-semibold cursor-pointer"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </button>
         </div>
 
         {/* Content */}

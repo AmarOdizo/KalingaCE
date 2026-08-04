@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Plus } from "lucide-react";
 
 import { getStudents, deleteStudent } from "./data";
@@ -16,104 +16,82 @@ import ExportCSV from "./components/ExportCSV";
 
 export default function TopperStudent() {
   const [students, setStudents] = useState([]);
-  const [filteredStudents, setFilteredStudents] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [search, setSearch] = useState("");
-
   const [deleteOpen, setDeleteOpen] = useState(false);
-
   const [selectedStudent, setSelectedStudent] = useState(null);
 
-  // =============================
-  // Load Students
-  // =============================
-
-  const loadStudents = async () => {
+  const loadStudents = useCallback(async () => {
     try {
       setLoading(true);
-
       const response = await getStudents();
-
       setStudents(response.data || []);
-
-      setFilteredStudents(response.data || []);
     } catch (error) {
       console.log(error);
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    loadStudents();
   }, []);
 
-  // =============================
-  // Search
-  // =============================
-
   useEffect(() => {
-    setFilteredStudents(searchStudents(students, search));
-  }, [search, students]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadStudents();
+  }, [loadStudents]);
 
-  // =============================
-  // Delete
-  // =============================
+  const filteredStudents = useMemo(() => {
+    return searchStudents(students, search);
+  }, [students, search]);
 
   const handleDeleteClick = (student) => {
     setSelectedStudent(student);
-
     setDeleteOpen(true);
   };
 
   const confirmDelete = async () => {
     try {
       await deleteStudent(selectedStudent.id);
-
       setDeleteOpen(false);
-
       loadStudents();
     } catch (error) {
       console.log(error);
     }
   };
 
-  // =============================
-  // Loading
-  // =============================
-
   if (loading) {
     return <Loading />;
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 p-8">
+    <div className="mx-auto max-w-7xl p-6 md:p-8 transition-colors duration-300">
       {/* Header */}
-
       <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
         <div>
-          <h1 className="text-3xl font-bold text-slate-800">Topper Student</h1>
-
-          <p className="mt-2 text-slate-500">Manage topper students.</p>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+            <span className="gradient-text">Topper Students</span>
+          </h1>
+          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+            View, search, and manage student topper certificates and grades.
+          </p>
         </div>
-        <ExportCSV students={filteredStudents} />
-        <Link
-          href="/admin/topper-student/add"
-          className="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 font-semibold text-white shadow hover:bg-blue-700"
-        >
-          <Plus size={20} />
-          Add Student
-        </Link>
+        
+        <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
+          <ExportCSV students={filteredStudents} />
+          <Link
+            href="/admin/topper-student/add"
+            className="btn-primary"
+          >
+            <Plus size={18} />
+            Add Topper
+          </Link>
+        </div>
       </div>
 
       {/* Search */}
-
-      <SearchFilter search={search} setSearch={setSearch} />
+      <div className="mb-6">
+        <SearchFilter search={search} setSearch={setSearch} />
+      </div>
 
       {/* Table */}
-
       {filteredStudents.length === 0 ? (
         <EmptyState />
       ) : (
@@ -123,14 +101,15 @@ export default function TopperStudent() {
         />
       )}
 
-      {/* Delete */}
-
-      <DeleteModal
-        isOpen={deleteOpen}
-        onClose={() => setDeleteOpen(false)}
-        onConfirm={confirmDelete}
-        student={selectedStudent}
-      />
+      {/* Delete Confirmation */}
+      {deleteOpen && selectedStudent && (
+        <DeleteModal
+          isOpen={deleteOpen}
+          onClose={() => setDeleteOpen(false)}
+          onConfirm={confirmDelete}
+          student={selectedStudent}
+        />
+      )}
     </div>
   );
 }

@@ -47,92 +47,96 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-100 via-white to-indigo-100 p-5 dark:from-gray-950 dark:via-gray-900 dark:to-black">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-100 via-white to-slate-200 p-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 relative overflow-hidden">
+      {/* Decorative Glow Elements */}
+      <div className="absolute top-[-10%] left-[-10%] h-[40%] w-[40%] rounded-full bg-primary-500/10 blur-[80px]" />
+      <div className="absolute bottom-[-10%] right-[-10%] h-[40%] w-[40%] rounded-full bg-indigo-500/10 blur-[80px]" />
+
       {/* Theme Button */}
       <button
         onClick={toggleTheme}
-        className="absolute right-6 top-6 rounded-full bg-white p-3 shadow-lg dark:bg-gray-800"
+        className="absolute right-6 top-6 rounded-xl border border-slate-200/60 bg-white/80 p-2.5 shadow-md dark:border-slate-800 dark:bg-slate-900/80 transition-all hover:scale-105 cursor-pointer text-slate-700 dark:text-slate-200"
       >
         {darkMode ? (
-          <Sun className="text-yellow-400" size={22} />
+          <Sun className="text-amber-500" size={20} />
         ) : (
-          <Moon className="text-gray-700" size={22} />
+          <Moon size={20} />
         )}
       </button>
 
-      <div className="w-full max-w-md rounded-3xl bg-white p-8 shadow-2xl dark:bg-gray-900">
-        <h1 className="mb-8 text-center text-3xl font-bold text-gray-800 dark:text-white">
-          Login
-        </h1>
+      <div className="w-full max-w-md rounded-3xl bg-white p-8 border border-slate-100 shadow-2xl dark:bg-slate-900 dark:border-slate-800/85 relative z-10">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Welcome Back
+          </h1>
+          <p className="text-sm font-semibold text-slate-400 mt-1.5">
+            Log in to access your Kalinga workspace
+          </p>
+        </div>
 
         {/* Role Selection */}
-
         <div className="mb-6 grid grid-cols-2 gap-4">
           <button
             type="button"
             onClick={() => setRole("student")}
-            className={`rounded-xl border p-4 transition ${
+            className={`rounded-2xl border p-4 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
               role === "student"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                ? "bg-gradient-to-br from-primary-600 to-indigo-600 border-primary-500 text-white shadow-md shadow-primary-500/15"
+                : "bg-slate-50/50 border-slate-200 text-slate-600 hover:bg-slate-100/50 dark:bg-slate-950/20 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-950/50"
             }`}
           >
-            <User className="mx-auto mb-2 h-7 w-7" />
-            Student
+            <User className="mb-2 h-6 w-6" />
+            <span className="text-sm font-bold">Student</span>
           </button>
 
           <button
             type="button"
             onClick={() => setRole("admin")}
-            className={`rounded-xl border p-4 transition ${
+            className={`rounded-2xl border p-4 transition-all duration-300 flex flex-col items-center justify-center cursor-pointer ${
               role === "admin"
-                ? "bg-indigo-600 text-white"
-                : "bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+                ? "bg-gradient-to-br from-primary-600 to-indigo-600 border-primary-500 text-white shadow-md shadow-primary-500/15"
+                : "bg-slate-50/50 border-slate-200 text-slate-600 hover:bg-slate-100/50 dark:bg-slate-950/20 dark:border-slate-800 dark:text-slate-300 dark:hover:bg-slate-950/50"
             }`}
           >
-            <ShieldCheck className="mx-auto mb-2 h-7 w-7" />
-            Admin
+            <ShieldCheck className="mb-2 h-6 w-6" />
+            <span className="text-sm font-bold">Admin</span>
           </button>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Email
+            <label className="mb-1.5 block text-xs font-bold text-slate-400 uppercase tracking-wider">
+              Email Address
             </label>
 
             <input
               type="email"
-              placeholder="Enter Email"
+              placeholder="name@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border p-3 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              className="premium-input"
               required
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300">
+            <label className="mb-1.5 block text-xs font-bold text-slate-400 uppercase tracking-wider">
               Password
             </label>
 
             <input
               type="password"
-              placeholder="Enter Password"
+              placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border p-3 outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+              className="premium-input"
               required
             />
           </div>
 
           <button
             type="submit"
-            className={`w-full rounded-xl py-3 font-semibold text-white transition ${
-              role === "admin"
-                ? "bg-indigo-600 hover:bg-indigo-700"
-                : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            className="w-full btn-primary py-3.5 text-sm font-bold shadow-md cursor-pointer mt-2"
           >
             Login as {role === "admin" ? "Admin" : "Student"}
           </button>

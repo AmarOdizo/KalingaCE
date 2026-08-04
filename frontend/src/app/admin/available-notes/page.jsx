@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Plus } from "lucide-react";
 
 import { getNotes, deleteNote } from "./data";
 
@@ -13,19 +14,13 @@ import EmptyState from "./notecomponents/EmptyState";
 export default function AvailableNotesPage() {
   const [notes, setNotes] = useState([]);
   const [filteredNotes, setFilteredNotes] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
-  // ==============================
-  // Load Notes
-  // ==============================
   const loadNotes = async () => {
     try {
       setLoading(true);
-
       const data = await getNotes();
-
       setNotes(data || []);
       setFilteredNotes(data || []);
     } catch (error) {
@@ -39,9 +34,6 @@ export default function AvailableNotesPage() {
     loadNotes();
   }, []);
 
-  // ==============================
-  // Search
-  // ==============================
   useEffect(() => {
     if (!search.trim()) {
       setFilteredNotes(notes);
@@ -49,7 +41,6 @@ export default function AvailableNotesPage() {
     }
 
     const value = search.toLowerCase();
-
     const filtered = notes.filter(
       (note) =>
         note.subjectName?.toLowerCase().includes(value) ||
@@ -59,9 +50,6 @@ export default function AvailableNotesPage() {
     setFilteredNotes(filtered);
   }, [search, notes]);
 
-  // ==============================
-  // Delete
-  // ==============================
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this note?",
@@ -71,58 +59,50 @@ export default function AvailableNotesPage() {
 
     try {
       await deleteNote(id);
-
       loadNotes();
     } catch (error) {
       alert(error.message);
     }
   };
 
-  // ==============================
-  // Loading
-  // ==============================
   if (loading) {
     return <LoadingSpinner />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 transition-colors duration-300 dark:bg-gray-950">
-      <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="mb-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-lg dark:border-gray-700 dark:bg-gray-900 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl lg:text-4xl">
-                Available Notes
-              </h1>
-
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 sm:text-base">
-                Manage all study notes
-              </p>
-            </div>
-
-            <Link
-              href="/admin/available-notes/add"
-              className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-blue-700 hover:shadow-lg sm:w-auto"
-            >
-              + Add Note
-            </Link>
-          </div>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
+      {/* Header */}
+      <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+            Available Notes
+          </h1>
+          <p className="mt-2 text-slate-500 dark:text-slate-400 font-semibold text-sm">
+            Upload, remove, and manage student learning notes and study documents.
+          </p>
         </div>
 
-        {/* Search */}
-        <div className="mb-6">
-          <SearchFilter search={search} setSearch={setSearch} />
-        </div>
+        <Link
+          href="/admin/available-notes/add"
+          className="btn-primary py-3 px-6 shadow-md"
+        >
+          <Plus size={18} />
+          Add Note
+        </Link>
+      </div>
 
-        {/* Content */}
-        <div className="rounded-2xl">
-          {filteredNotes.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <NoteTable notes={filteredNotes} onDelete={handleDelete} />
-          )}
-        </div>
+      {/* Search */}
+      <div className="mb-6">
+        <SearchFilter search={search} setSearch={setSearch} />
+      </div>
+
+      {/* Content */}
+      <div className="rounded-2xl">
+        {filteredNotes.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <NoteTable notes={filteredNotes} onDelete={handleDelete} />
+        )}
       </div>
     </div>
   );

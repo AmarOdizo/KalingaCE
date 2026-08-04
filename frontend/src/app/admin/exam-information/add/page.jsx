@@ -2,19 +2,19 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 import ExamForm from "../components/ExamForm";
 import { createExamInformation } from "../data";
 
 export default function AddExamInformation() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (formData) => {
     try {
       setLoading(true);
-
       const payload = new FormData();
 
       payload.append("examName", formData.examName);
@@ -25,16 +25,11 @@ export default function AddExamInformation() {
       payload.append("venue", formData.venue);
       payload.append("description", formData.description);
       payload.append("status", formData.status);
+      payload.append("image", formData.image || "");
 
       formData.batch.forEach((item) => {
         payload.append("batch", item);
       });
-
-      if (formData.image instanceof File) {
-        payload.append("image", formData.image);
-      } else {
-        payload.append("image", formData.image);
-      }
 
       const res = await createExamInformation(payload);
 
@@ -42,7 +37,7 @@ export default function AddExamInformation() {
         alert("Exam Information Added Successfully");
         router.push("/admin/exam-information");
       } else {
-        alert(res.message);
+        alert(res.message || "Failed to create exam schedule.");
       }
     } catch (error) {
       console.error(error);
@@ -53,10 +48,29 @@ export default function AddExamInformation() {
   };
 
   return (
-    <div className="mx-auto max-w-5xl rounded-xl bg-white p-6 shadow-lg dark:bg-gray-900">
-      <h1 className="mb-6 text-2xl font-bold">Add Exam Information</h1>
+    <div className="mx-auto max-w-4xl p-6 md:p-8 transition-colors duration-300">
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+            <span className="gradient-text">Add Exam Information</span>
+          </h1>
+          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+            Create a new exam schedule.
+          </p>
+        </div>
 
-      <ExamForm loading={loading} onSubmit={handleSubmit} />
+        <Link
+          href="/admin/exam-information"
+          className="btn-secondary py-2.5 px-4 text-sm cursor-pointer shrink-0"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </Link>
+      </div>
+
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 md:p-10 shadow-premium dark:border-slate-800 dark:bg-slate-900/60">
+        <ExamForm loading={loading} onSubmit={handleSubmit} />
+      </div>
     </div>
   );
 }

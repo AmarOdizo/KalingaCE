@@ -16,24 +16,26 @@ export default function ViewCoursePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCourse();
-  }, []);
+    const fetchCourse = async () => {
+      try {
+        const data = await getCourseById(params.id);
+        setCourse(data);
+      } catch (error) {
+        console.error(error);
+        alert("Failed to load course.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const fetchCourse = async () => {
-    try {
-      const data = await getCourseById(params.id);
-      setCourse(data);
-    } catch (error) {
-      console.error(error);
-      alert("Failed to load course.");
-    } finally {
-      setLoading(false);
+    if (params.id) {
+      fetchCourse();
     }
-  };
+  }, [params.id]);
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl p-6">
+      <div className="mx-auto max-w-5xl p-6 md:p-8">
         <Loading />
       </div>
     );
@@ -41,19 +43,19 @@ export default function ViewCoursePage() {
 
   if (!course) {
     return (
-      <div className="mx-auto max-w-7xl p-6">
-        <div className="rounded-xl bg-white p-10 text-center shadow">
+      <div className="mx-auto max-w-5xl p-6 md:p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow dark:border-slate-800 dark:bg-slate-900">
           <h2 className="text-2xl font-bold text-red-600">Course Not Found</h2>
 
-          <p className="mt-3 text-gray-500">
+          <p className="mt-3 text-slate-500 dark:text-slate-400">
             The requested course does not exist.
           </p>
 
           <Link
-            href="/available-courses"
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-white hover:bg-blue-700"
+            href="/admin/available-courses"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 font-semibold text-white shadow hover:from-primary-700 hover:to-indigo-700 transition"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={16} />
             Back to Courses
           </Link>
         </div>
@@ -62,28 +64,30 @@ export default function ViewCoursePage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-6">
+    <div className="mx-auto max-w-5xl p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
       {/* Header */}
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Course Details</h1>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+            Course Details
+          </h1>
 
-          <p className="mt-2 text-gray-500">
-            View complete course information.
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+            View full syllabus, details, fee structures, and course metadata.
           </p>
         </div>
 
         <Link
-          href="/available-courses"
-          className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-100"
+          href="/admin/available-courses"
+          className="btn-secondary"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={16} />
           Back
         </Link>
       </div>
 
       {/* Course Details */}
-      <div className="rounded-xl bg-white p-6 shadow-lg">
+      <div className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-premium dark:border-slate-800 dark:bg-slate-900/60">
         <CourseDetails course={course} />
       </div>
     </div>

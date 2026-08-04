@@ -1,10 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 import ExamForm from "../../components/ExamForm";
 import { getExamInformationById, updateExamInformation } from "../../data";
+import Loading from "../../components/Loading";
 
 export default function EditExamInformation() {
   const { id } = useParams();
@@ -14,11 +17,7 @@ export default function EditExamInformation() {
   const [loading, setLoading] = useState(false);
   const [pageLoading, setPageLoading] = useState(true);
 
-  useEffect(() => {
-    loadExam();
-  }, []);
-
-  const loadExam = async () => {
+  const loadExam = useCallback(async () => {
     try {
       const data = await getExamInformationById(id);
       setExamData(data);
@@ -28,12 +27,15 @@ export default function EditExamInformation() {
     } finally {
       setPageLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadExam();
+  }, [loadExam]);
 
   const handleSubmit = async (formData) => {
     try {
       setLoading(true);
-
       const payload = new FormData();
 
       payload.append("examName", formData.examName);
@@ -44,16 +46,11 @@ export default function EditExamInformation() {
       payload.append("venue", formData.venue);
       payload.append("description", formData.description);
       payload.append("status", formData.status);
+      payload.append("image", formData.image || "");
 
       formData.batch.forEach((item) => {
         payload.append("batch", item);
       });
-
-      if (formData.image instanceof File) {
-        payload.append("image", formData.image);
-      } else {
-        payload.append("image", formData.image);
-      }
 
       const res = await updateExamInformation(id, payload);
 
@@ -61,7 +58,7 @@ export default function EditExamInformation() {
         alert("Exam Information Updated Successfully");
         router.push("/admin/exam-information");
       } else {
-        alert(res.message);
+        alert(res.message || "Failed to update exam schedule.");
       }
     } catch (error) {
       console.log(error);
@@ -72,22 +69,37 @@ export default function EditExamInformation() {
   };
 
   if (pageLoading) {
-    return (
-      <div className="flex h-64 items-center justify-center text-lg">
-        Loading...
-      </div>
-    );
+    return <Loading />;
   }
 
   return (
-    <div className="mx-auto max-w-5xl rounded-xl bg-white p-6 shadow-lg dark:bg-gray-900">
-      <h1 className="mb-6 text-2xl font-bold">Edit Exam Information</h1>
+    <div className="mx-auto max-w-4xl p-6 md:p-8 transition-colors duration-300">
+      <div className="mb-8 flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+            <span className="gradient-text">Edit Exam Information</span>
+          </h1>
+          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+            Update existing exam configurations and details.
+          </p>
+        </div>
 
-      <ExamForm
-        initialData={examData}
-        loading={loading}
-        onSubmit={handleSubmit}
-      />
+        <Link
+          href="/admin/exam-information"
+          className="btn-secondary py-2.5 px-4 text-sm cursor-pointer shrink-0"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </Link>
+      </div>
+
+      <div className="rounded-3xl border border-slate-200/80 bg-white p-6 md:p-10 shadow-premium dark:border-slate-800 dark:bg-slate-900/60">
+        <ExamForm
+          initialData={examData}
+          loading={loading}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </div>
   );
 }

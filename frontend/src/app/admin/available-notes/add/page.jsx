@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 import { createNote } from "../data";
 import NoteForm from "../notecomponents/NoteForm";
 
 export default function AddNotePage() {
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -29,7 +30,6 @@ export default function AddNotePage() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -61,11 +61,8 @@ export default function AddNotePage() {
 
     try {
       setLoading(true);
-
       await createNote(formData);
-
       alert("Note Added Successfully");
-
       router.push("/admin/available-notes");
     } catch (error) {
       alert(error.message);
@@ -75,19 +72,30 @@ export default function AddNotePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
-      <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
-        <div className="mb-6 rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 p-5 sm:p-6">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white">
-            Add New Note
-          </h1>
+    <div className="min-h-screen bg-slate-50 p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
+      <div className="mx-auto max-w-5xl">
+        {/* Header */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Add New Note
+            </h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Create a new study note file upload.
+            </p>
+          </div>
 
-          <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
-            Create a new study note.
-          </p>
+          <Link
+            href="/admin/available-notes"
+            className="btn-secondary py-2.5 px-4 text-sm font-semibold"
+          >
+            <ArrowLeft size={16} />
+            Back
+          </Link>
         </div>
 
-        <div className="rounded-xl bg-white dark:bg-gray-900 shadow-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 lg:p-8">
+        {/* Form Card */}
+        <div className="rounded-2xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-premium dark:border-slate-800 dark:bg-slate-900/60">
           <NoteForm
             formData={formData}
             loading={loading}

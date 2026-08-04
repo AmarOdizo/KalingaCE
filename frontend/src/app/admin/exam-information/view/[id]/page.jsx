@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
-
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Pencil } from "lucide-react";
 
 import { getExamInformationById } from "../../data";
-import { formatBatch, formatDate, getStatusColor } from "../../utils";
+import { formatBatch, formatDate } from "../../utils";
 import StatusBadge from "../../components/StatusBadge";
+import Loading from "../../components/Loading";
 
 export default function ViewExamInformation() {
   const { id } = useParams();
@@ -17,11 +16,7 @@ export default function ViewExamInformation() {
   const [exam, setExam] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadExam();
-  }, []);
-
-  const loadExam = async () => {
+  const loadExam = useCallback(async () => {
     try {
       const data = await getExamInformationById(id);
       setExam(data);
@@ -30,100 +25,124 @@ export default function ViewExamInformation() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    loadExam();
+  }, [loadExam]);
 
   if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">Loading...</div>
-    );
+    return <Loading />;
   }
 
   if (!exam) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        Exam Information Not Found
+      <div className="mx-auto max-w-4xl p-6 md:p-8">
+        <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-premium dark:border-slate-800 dark:bg-slate-900">
+          <h2 className="text-2xl font-bold text-rose-600">
+            Exam Record Not Found
+          </h2>
+          <p className="mt-3 text-slate-550 dark:text-slate-400">
+            The requested exam schedule does not exist.
+          </p>
+          <Link
+            href="/admin/exam-information"
+            className="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 font-semibold text-white shadow hover:from-primary-700 hover:to-indigo-700 transition"
+          >
+            <ArrowLeft size={16} />
+            Back to Exams
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-5xl rounded-xl bg-white p-8 shadow dark:bg-gray-900">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Exam Information</h1>
+    <div className="mx-auto max-w-4xl p-6 md:p-8 transition-colors duration-300">
+      <div className="rounded-3xl border border-slate-200/80 bg-white shadow-premium dark:border-slate-800 dark:bg-slate-900/60 overflow-hidden transition-all duration-300">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-slate-100 p-6 md:p-8 dark:border-slate-800/60 gap-4">
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <span className="gradient-text">Exam Details</span>
+            </h1>
+            <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+              Complete exam details, dates, venue, and status info.
+            </p>
+          </div>
 
-        <Link
-          href="/admin/exam-information"
-          className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800"
-        >
-          <ArrowLeft size={18} />
-          Back
-        </Link>
-      </div>
+          <div className="flex gap-3 w-full sm:w-auto">
+            <Link
+              href="/admin/exam-information"
+              className="btn-secondary py-2.5 px-4 text-sm font-semibold flex-1 sm:flex-initial cursor-pointer"
+            >
+              <ArrowLeft size={16} />
+              Back
+            </Link>
 
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="flex justify-center">
-          <Image
-            src={exam.image || "/no-image.png"}
-            alt={exam.examName}
-            width={350}
-            height={250}
-            className="rounded-xl object-cover"
-          />
+            <Link
+              href={`/admin/exam-information/edit/${exam.id}`}
+              className="btn-primary py-2.5 px-4 text-sm font-semibold flex-1 sm:flex-initial cursor-pointer"
+            >
+              <Pencil size={16} />
+              Edit
+            </Link>
+          </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="grid gap-8 p-6 md:p-8 md:grid-cols-3">
+          {/* Image */}
           <div>
-            <strong>Exam Name :</strong>
-            <p>{exam.examName}</p>
+            <div className="aspect-[4/3] w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 shadow-sm relative transition-transform duration-300 hover:scale-[1.02]">
+              <img
+                src={exam.image || "/no-image.png"}
+                alt={exam.examName}
+                className="h-full w-full object-cover"
+              />
+            </div>
           </div>
 
-          <div>
-            <strong>Course :</strong>
-            <p>{exam.course}</p>
-          </div>
-
-          <div>
-            <strong>Batch :</strong>
-            <p>{formatBatch(exam.batch)}</p>
-          </div>
-
-          <div>
-            <strong>Exam Date :</strong>
-            <p>{formatDate(exam.examDate)}</p>
-          </div>
-
-          <div>
-            <strong>Exam Time :</strong>
-            <p>{exam.examTime}</p>
-          </div>
-
-          <div>
-            <strong>Duration :</strong>
-            <p>{exam.duration}</p>
-          </div>
-
-          <div>
-            <strong>Venue :</strong>
-            <p>{exam.venue}</p>
-          </div>
-
-          <div>
-            <strong>Status :</strong>
-
-            <div className="mt-2">
+          {/* Details */}
+          <div className="space-y-4 md:col-span-2">
+            <InfoRow title="Exam Name" value={exam.examName} />
+            <InfoRow title="Course Name" value={exam.course} />
+            <InfoRow title="Assigned Batch" value={formatBatch(exam.batch)} />
+            <InfoRow title="Exam Date" value={formatDate(exam.examDate)} />
+            <InfoRow title="Exam Time" value={exam.examTime} />
+            <InfoRow title="Duration" value={exam.duration} />
+            <InfoRow title="Venue" value={exam.venue} />
+            <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 dark:border-slate-800/40 dark:bg-slate-900/40 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/20">
+              <span className="font-semibold text-slate-550 dark:text-slate-400 text-sm">
+                Status
+              </span>
               <StatusBadge status={exam.status} />
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="mt-8">
-        <h3 className="mb-2 text-lg font-semibold">Description</h3>
-
-        <p className="rounded-lg border p-4">
-          {exam.description || "No Description"}
-        </p>
+        {/* Description */}
+        <div className="border-t border-slate-100 p-6 md:p-8 dark:border-slate-800/60">
+          <h3 className="mb-3 text-lg font-bold text-slate-800 dark:text-white">
+            Exam Guidelines & Description
+          </h3>
+          <p className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 dark:border-slate-800/40 dark:bg-slate-900/40 text-slate-650 dark:text-slate-300 leading-relaxed text-sm">
+            {exam.description || "No specific exam guidelines provided."}
+          </p>
+        </div>
       </div>
+    </div>
+  );
+}
+
+function InfoRow({ title, value }) {
+  return (
+    <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 dark:border-slate-800/40 dark:bg-slate-900/40 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/20">
+      <span className="font-semibold text-slate-550 dark:text-slate-400 text-sm">
+        {title}
+      </span>
+      <span className="text-sm font-bold text-slate-900 dark:text-white">
+        {value}
+      </span>
     </div>
   );
 }

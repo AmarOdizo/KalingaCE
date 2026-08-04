@@ -33,7 +33,7 @@ export default function Statistics() {
   ];
 
   return (
-    <section className="py-14 bg-gray-100 dark:bg-gray-950 transition-colors duration-300">
+    <section className="py-16 bg-slate-50/50 dark:bg-slate-950/20 border-y border-slate-100 dark:border-slate-900/60 transition-colors duration-300">
       <div className="mx-auto max-w-7xl px-6">
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {stats.map((item, index) => {
@@ -42,19 +42,24 @@ export default function Statistics() {
             return (
               <div
                 key={index}
-                className="rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-lg hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 p-6"
+                className="premium-card group"
               >
-                <div
-                  className={`h-10 w-10 rounded-xl ${item.bg} flex items-center justify-center`}
-                >
-                  <Icon size={20} className={item.color} />
+                <div className="flex items-center justify-between">
+                  <div
+                    className={`h-12 w-12 rounded-2xl ${item.bg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}
+                  >
+                    <Icon size={22} className={item.color} />
+                  </div>
+                  
+                  {/* Subtle indicator dot */}
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-800 transition-colors duration-300 group-hover:bg-primary-500" />
                 </div>
 
-                <h3 className="mt-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <h3 className="mt-5 text-sm font-semibold text-slate-500 dark:text-slate-400">
                   {item.title}
                 </h3>
 
-                <p className="mt-1 text-xl font-bold text-gray-900 dark:text-white">
+                <p className="mt-1.5 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors duration-300 group-hover:text-primary-600 dark:group-hover:text-primary-400">
                   {item.value}
                 </p>
               </div>

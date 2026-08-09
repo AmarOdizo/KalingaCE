@@ -28,7 +28,10 @@ export default function ViewExamInformation() {
   }, [id]);
 
   useEffect(() => {
-    loadExam();
+    const timer = setTimeout(() => {
+      loadExam();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadExam]);
 
   if (loading) {

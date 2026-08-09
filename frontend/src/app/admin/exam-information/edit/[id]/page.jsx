@@ -30,7 +30,10 @@ export default function EditExamInformation() {
   }, [id]);
 
   useEffect(() => {
-    loadExam();
+    const timer = setTimeout(() => {
+      loadExam();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadExam]);
 
   const handleSubmit = async (formData) => {

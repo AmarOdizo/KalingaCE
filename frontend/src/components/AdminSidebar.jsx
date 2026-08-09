@@ -13,6 +13,7 @@ import {
   GalleryHorizontal,
   Menu,
   X,
+  Contact,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -20,7 +21,6 @@ export default function AdminSidebar() {
   const router = useRouter();
 
   const [open, setOpen] = useState(false);
-
   const menus = [
     {
       name: "Topper Student",
@@ -50,7 +50,12 @@ export default function AdminSidebar() {
     {
       name: "Posters",
       icon: GalleryHorizontal,
-      href: "/admin/posters",
+      href: "/admin/poster",
+    },
+    {
+      name: "Enrolled Students",
+      icon: Contact,
+      href: "/admin/contact",
     },
   ];
 
@@ -62,7 +67,7 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Mobile Header */}
-      <div className="fixed top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-5 shadow-sm md:hidden dark:border-slate-800/80 dark:bg-slate-900/95 backdrop-blur-md">
+      <div className="absolute top-0 left-0 right-0 z-40 flex h-16 items-center justify-between border-b border-slate-200/80 bg-white/95 px-5 shadow-sm sm:hidden dark:border-slate-800/80 dark:bg-slate-900/95 backdrop-blur-md">
         <h2 className="text-md font-extrabold text-slate-800 dark:text-white uppercase tracking-wider">
           Admin Dashboard
         </h2>
@@ -79,7 +84,7 @@ export default function AdminSidebar() {
       {open && (
         <div
           onClick={() => setOpen(false)}
-          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs md:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/40 backdrop-blur-xs sm:hidden"
         />
       )}
 
@@ -93,26 +98,38 @@ export default function AdminSidebar() {
           shadow-lg backdrop-blur-md
           transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-          md:static
-          md:w-64
+          sm:translate-x-0
+          sm:static
+          sm:h-full
+          sm:w-56
+          md:w-60
+          lg:w-64
+          xl:w-72
+          2xl:w-80
         `}
       >
-        <div>
+        <div className="flex flex-col flex-1 overflow-y-auto min-h-0">
           {/* Logo / Title */}
-          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5.5 dark:border-slate-800/60">
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5.5 dark:border-slate-800/60 shrink-0">
             <div>
-              <h1 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">Admin Panel</h1>
-              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-500">Kalinga Computer</p>
+              <h1 className="text-lg font-black tracking-tight text-slate-950 dark:text-white">
+                Admin Panel
+              </h1>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-primary-500">
+                Kalinga Computer
+              </p>
             </div>
 
-            <button className="md:hidden text-slate-400 hover:text-slate-600" onClick={() => setOpen(false)}>
+            <button
+              className="sm:hidden text-slate-400 hover:text-slate-655"
+              onClick={() => setOpen(false)}
+            >
               <X size={20} />
             </button>
           </div>
 
           {/* Menu */}
-          <div className="space-y-1.5 p-4">
+          <div className="space-y-1.5 p-4 flex-1">
             {menus.map((item) => {
               const Icon = item.icon;
               const active = pathname.startsWith(item.href);
@@ -138,7 +155,7 @@ export default function AdminSidebar() {
         </div>
 
         {/* Logout Button */}
-        <div className="border-t border-slate-100 p-4 dark:border-slate-800/60">
+        <div className="border-t border-slate-100 p-4 dark:border-slate-800/60 shrink-0">
           <button
             onClick={logout}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-red-500 px-4 py-3 text-sm font-bold text-white shadow-sm hover:from-rose-600 hover:to-red-600 transition-all duration-300 active:scale-98 cursor-pointer"

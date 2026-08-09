@@ -4,56 +4,18 @@ import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { X, Award, Star, BookOpen, Calendar, Percent, ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  X,
+  Award,
+  Star,
+  BookOpen,
+  Calendar,
+  Percent,
+  ArrowLeft,
+  ArrowRight,
+} from "lucide-react";
 
 const API_URL = "http://localhost:5000/api/Student";
-
-const FALLBACK_STUDENTS = [
-  {
-    id: "fb-1",
-    _id: "fb-1",
-    name: "Aarav Sharma",
-    subject: "Mathematics",
-    batch: "2024",
-    totalMark: 100,
-    gainMark: 98,
-    percentage: "98.00",
-    image: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&h=200&fit=crop"
-  },
-  {
-    id: "fb-2",
-    _id: "fb-2",
-    name: "Isha Patel",
-    subject: "Physics",
-    batch: "2024",
-    totalMark: 100,
-    gainMark: 96,
-    percentage: "96.00",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
-  },
-  {
-    id: "fb-3",
-    _id: "fb-3",
-    name: "Rohan Das",
-    subject: "Chemistry",
-    batch: "2024",
-    totalMark: 100,
-    gainMark: 95,
-    percentage: "95.00",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-  },
-  {
-    id: "fb-4",
-    _id: "fb-4",
-    name: "Sanya Malhotra",
-    subject: "Biology",
-    batch: "2024",
-    totalMark: 100,
-    gainMark: 94,
-    percentage: "94.00",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
-  }
-];
 
 export default function TopStudents() {
   const router = useRouter();
@@ -77,10 +39,6 @@ export default function TopStudents() {
     }
   };
 
-  useEffect(() => {
-    loadStudents();
-  }, []);
-
   const loadStudents = async () => {
     try {
       const res = await axios.get(API_URL);
@@ -98,22 +56,29 @@ export default function TopStudents() {
 
         setStudents(topperStudents);
       } else {
-        setStudents(FALLBACK_STUDENTS);
+        setStudents([]);
       }
     } catch (error) {
-      console.log("API connection failed, using fallback data:", error);
-      setStudents(FALLBACK_STUDENTS);
+      console.log("API connection failed:", error);
+      setStudents([]);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      loadStudents();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleViewProfile = async (id) => {
     console.log("Clicked ID:", id);
 
-    // 1. Try to find the student in the local state first
+    // Try to find the student in the local state first
     const localStudent = students.find(
-      (s) => String(s.id) === String(id) || String(s._id) === String(id)
+      (s) => String(s.id) === String(id) || String(s._id) === String(id),
     );
 
     if (localStudent) {
@@ -122,17 +87,7 @@ export default function TopStudents() {
       return;
     }
 
-    // 2. If it's a fallback student
-    if (typeof id === "string" && id.startsWith("fb-")) {
-      const fallback = FALLBACK_STUDENTS.find((s) => s.id === id);
-      if (fallback) {
-        setSelectedStudent(fallback);
-        setOpen(true);
-        return;
-      }
-    }
-
-    // 3. Fallback to fetching from API if not found in local state (safety net)
+    // Fallback to fetching from API if not found in local state (safety net)
     try {
       const res = await axios.get(`${API_URL}/${id}`);
       if (res.data && res.data.data) {
@@ -157,6 +112,10 @@ export default function TopStudents() {
         Loading Toppers...
       </div>
     );
+  }
+
+  if (students.length === 0) {
+    return null;
   }
 
   return (
@@ -195,11 +154,15 @@ export default function TopStudents() {
           )}
         </div>
 
-        <style dangerouslySetInnerHTML={{__html: `
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
           .no-scrollbar::-webkit-scrollbar {
             display: none;
           }
-        `}} />
+        `,
+          }}
+        />
 
         {students.length > 4 ? (
           <div

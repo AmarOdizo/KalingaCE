@@ -37,10 +37,6 @@ export default function AvailableCourses() {
 
   const swiperRef = useRef(null);
 
-  useEffect(() => {
-    fetchCourses();
-  }, []);
-
   async function fetchCourses() {
     setLoading(true);
     try {
@@ -53,6 +49,13 @@ export default function AvailableCourses() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCourses();
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Format currency helper
   const formatFees = (amount) => {

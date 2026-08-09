@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 
@@ -13,7 +13,6 @@ import EmptyState from "./notecomponents/EmptyState";
 
 export default function AvailableNotesPage() {
   const [notes, setNotes] = useState([]);
-  const [filteredNotes, setFilteredNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -22,7 +21,6 @@ export default function AvailableNotesPage() {
       setLoading(true);
       const data = await getNotes();
       setNotes(data || []);
-      setFilteredNotes(data || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -31,23 +29,23 @@ export default function AvailableNotesPage() {
   };
 
   useEffect(() => {
-    loadNotes();
+    const timer = setTimeout(() => {
+      loadNotes();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
+  const filteredNotes = useMemo(() => {
     if (!search.trim()) {
-      setFilteredNotes(notes);
-      return;
+      return notes;
     }
 
     const value = search.toLowerCase();
-    const filtered = notes.filter(
+    return notes.filter(
       (note) =>
         note.subjectName?.toLowerCase().includes(value) ||
         note.noteTitle?.toLowerCase().includes(value),
     );
-
-    setFilteredNotes(filtered);
   }, [search, notes]);
 
   const handleDelete = async (id) => {

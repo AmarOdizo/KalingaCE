@@ -30,7 +30,10 @@ export default function ExamInformationPage() {
   }, []);
 
   useEffect(() => {
-    loadExamInformation();
+    const timer = setTimeout(() => {
+      loadExamInformation();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [loadExamInformation]);
 
   const filteredData = useMemo(() => {

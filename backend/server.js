@@ -20,9 +20,13 @@ app.use("/api/Student", require("./routes/studentRoutes"));
 app.use("/api/ExamInfo", require("./routes/examInfoRoutes"));
 app.use("/api/Note", require("./routes/noteRoutes"));
 app.use("/api/Course", require("./routes/courseRoutes"));
+app.use("/api/Poster", require("./routes/posterRoutes"));
+app.use("/api/CampusInformation", require("./routes/CampusInformationRoutes"));
+app.use("/api/Contact", require("./routes/ContactRoutes"));
+app.use("/api/Contact1", require("./routes/Contact1Routes"));
 
-// Home Route
-app.get("/", (req, res) => {
+// Home Routeo
+app.get("/api", (req, res) => {
   res.send("🚀 Backend Running Successfully...");
 });
 

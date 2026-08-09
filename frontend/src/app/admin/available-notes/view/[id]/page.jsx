@@ -33,7 +33,10 @@ export default function ViewNotePage() {
 
   useEffect(() => {
     if (params.id) {
-      loadNote();
+      const timer = setTimeout(() => {
+        loadNote();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [params.id]);
 

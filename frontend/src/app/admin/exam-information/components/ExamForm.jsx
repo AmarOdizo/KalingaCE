@@ -26,20 +26,23 @@ export default function ExamForm({
 
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
-      setFormData({
-        batch: initialData.batch || [],
-        examName: initialData.examName || "",
-        course: initialData.course || "",
-        image: initialData.image || "",
-        examDate: initialData.examDate
-          ? initialData.examDate.split("T")[0]
-          : "",
-        examTime: initialData.examTime || "",
-        duration: initialData.duration || "",
-        venue: initialData.venue || "",
-        description: initialData.description || "",
-        status: initialData.status || "Upcoming",
-      });
+      const timer = setTimeout(() => {
+        setFormData({
+          batch: initialData.batch || [],
+          examName: initialData.examName || "",
+          course: initialData.course || "",
+          image: initialData.image || "",
+          examDate: initialData.examDate
+            ? initialData.examDate.split("T")[0]
+            : "",
+          examTime: initialData.examTime || "",
+          duration: initialData.duration || "",
+          venue: initialData.venue || "",
+          description: initialData.description || "",
+          status: initialData.status || "Upcoming",
+        });
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [initialData]);
 

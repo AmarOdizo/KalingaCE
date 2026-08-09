@@ -20,8 +20,12 @@ export default function LoginPage() {
       (!savedTheme &&
         window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-    setDarkMode(isDark);
+    const timer = setTimeout(() => {
+      setDarkMode(isDark);
+    }, 0);
     document.documentElement.classList.toggle("dark", isDark);
+
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleTheme = () => {

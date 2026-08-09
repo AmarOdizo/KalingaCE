@@ -72,24 +72,27 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden items-center gap-8 md:flex">
           <Link
-            href="/"
+            href="/MCQ"
             className="font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200"
           >
-            Home
+            MCQ
           </Link>
 
           <Link
-            href="/contact"
+            href="/Courses"
             className="font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200"
           >
-            Contact
+            Courses
           </Link>
 
           <div className="relative group">
             <button className="flex items-center gap-1.5 font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200 cursor-pointer">
               <BookOpen size={16} />
               Learning Hub
-              <ChevronDown size={14} className="transition-transform duration-200 group-hover:rotate-180" />
+              <ChevronDown
+                size={14}
+                className="transition-transform duration-200 group-hover:rotate-180"
+              />
             </button>
 
             <div className="invisible absolute left-0 top-full mt-2 w-56 rounded-2xl bg-white/95 border border-slate-100 p-2 shadow-xl opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100 dark:bg-slate-900/95 dark:border-slate-800/80 backdrop-blur-md">
@@ -132,15 +135,11 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
-          onClick={() => setMenuOpen(!menuOpen)} 
+        <button
+          onClick={() => setMenuOpen(!menuOpen)}
           className="md:hidden rounded-xl border border-slate-200/60 p-2.5 text-slate-600 dark:border-slate-800 dark:text-slate-300 cursor-pointer"
         >
-          {menuOpen ? (
-            <X size={20} />
-          ) : (
-            <Menu size={20} />
-          )}
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </button>
       </div>
 
@@ -148,20 +147,20 @@ export default function Navbar() {
       {menuOpen && (
         <div className="border-t border-slate-100 bg-white/95 px-6 py-6 dark:border-slate-800 dark:bg-slate-950/95 backdrop-blur-md md:hidden animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-4">
-            <Link 
-              href="/" 
+            <Link
+              href="/MCQ"
               onClick={() => setMenuOpen(false)}
               className="rounded-xl px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-900"
             >
-              Home
+              MCQ
             </Link>
 
-            <Link 
-              href="/contact" 
+            <Link
+              href="/Courses"
               onClick={() => setMenuOpen(false)}
               className="rounded-xl px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-900"
             >
-              Contact
+              Courses
             </Link>
 
             <div className="rounded-xl px-4 py-1">
@@ -216,7 +215,11 @@ export default function Navbar() {
               }}
               className="flex items-center gap-2 rounded-xl bg-slate-50 border border-slate-200/50 px-4 py-2.5 font-semibold text-slate-700 dark:bg-slate-900 dark:border-slate-800 dark:text-slate-300"
             >
-              {darkMode ? <Sun className="text-amber-500" size={16} /> : <Moon size={16} />}
+              {darkMode ? (
+                <Sun className="text-amber-500" size={16} />
+              ) : (
+                <Moon size={16} />
+              )}
               Change Theme
             </button>
 

@@ -61,8 +61,10 @@ export default function AvailableCourses() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    fetchCourses();
+    const timer = setTimeout(() => {
+      fetchCourses();
+    }, 0);
+    return () => clearTimeout(timer);
   }, [fetchCourses]);
 
   // ==========================

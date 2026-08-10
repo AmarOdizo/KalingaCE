@@ -2,6 +2,7 @@ import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
 
 export const metadata = {
+  metadataBase: new URL("https://kalingacomputer.com"),
   title: {
     default: "Kalinga Computer Education | Premium Computer & Technical Training",
     template: "%s | Kalinga Computer Education",

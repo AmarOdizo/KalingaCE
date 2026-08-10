@@ -17,28 +17,28 @@ export default function ViewNotePage() {
   const [note, setNote] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const loadNote = async () => {
-    try {
-      setLoading(true);
-      const data = await getNote(params.id);
-      setNote(data);
-    } catch (error) {
-      console.log(error);
-      alert(error.message);
-      router.push("/admin/available-notes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadNote = async () => {
+      try {
+        setLoading(true);
+        const data = await getNote(params.id);
+        setNote(data);
+      } catch (error) {
+        console.log(error);
+        alert(error.message);
+        router.push("/admin/available-notes");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (params.id) {
       const timer = setTimeout(() => {
         loadNote();
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [params.id]);
+  }, [params.id, router]);
 
   if (loading) {
     return <LoadingSpinner />;

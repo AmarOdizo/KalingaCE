@@ -29,6 +29,7 @@ export default function EnrolledStudentsAdminPage() {
   // =====================================
   const fetchStudents = async () => {
     try {
+      await Promise.resolve();
       setLoading(true);
       const res = await fetch(API_URL, {
         cache: "no-store",
@@ -49,7 +50,10 @@ export default function EnrolledStudentsAdminPage() {
   };
 
   useEffect(() => {
-    fetchStudents();
+    const timer = setTimeout(() => {
+      fetchStudents();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // =====================================

@@ -26,6 +26,7 @@ export default function Contact1Page() {
   // =====================================
   const fetchContacts = async () => {
     try {
+      await Promise.resolve();
       setLoading(true);
 
       const res = await fetch(API_URL, {
@@ -47,7 +48,10 @@ export default function Contact1Page() {
   };
 
   useEffect(() => {
-    fetchContacts();
+    const timer = setTimeout(() => {
+      fetchContacts();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // =====================================

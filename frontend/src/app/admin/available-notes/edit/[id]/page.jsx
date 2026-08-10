@@ -32,43 +32,43 @@ export default function EditNotePage() {
     status: "Active",
   });
 
-  const loadNote = async () => {
-    try {
-      setLoading(true);
-      const data = await getNote(params.id);
-
-      setFormData({
-        subjectName: data.subjectName || "",
-        noteTitle: data.noteTitle || "",
-        description: data.description || "",
-        thumbnail: {
-          url: data.thumbnail?.url || "",
-          fileId: data.thumbnail?.fileId || "",
-        },
-        pdf: {
-          url: data.pdf?.url || "",
-          fileId: data.pdf?.fileId || "",
-        },
-        uploadedBy: data.uploadedBy || "",
-        status: data.status || "Active",
-      });
-    } catch (error) {
-      console.log(error);
-      alert(error.message);
-      router.push("/admin/available-notes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const loadNote = async () => {
+      try {
+        setLoading(true);
+        const data = await getNote(params.id);
+
+        setFormData({
+          subjectName: data.subjectName || "",
+          noteTitle: data.noteTitle || "",
+          description: data.description || "",
+          thumbnail: {
+            url: data.thumbnail?.url || "",
+            fileId: data.thumbnail?.fileId || "",
+          },
+          pdf: {
+            url: data.pdf?.url || "",
+            fileId: data.pdf?.fileId || "",
+          },
+          uploadedBy: data.uploadedBy || "",
+          status: data.status || "Active",
+        });
+      } catch (error) {
+        console.log(error);
+        alert(error.message);
+        router.push("/admin/available-notes");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     if (params.id) {
       const timer = setTimeout(() => {
         loadNote();
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [params.id]);
+  }, [params.id, router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

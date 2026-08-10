@@ -3,6 +3,10 @@ import AdminSidebar from "@/components/AdminSidebar";
 export const metadata = {
   title: "Admin Panel",
   description: "Admin Dashboard",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function AdminLayout({ children }) {

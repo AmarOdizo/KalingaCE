@@ -26,7 +26,7 @@ export default function Footer() {
 
         // Find primary head office campus or first active
         let primary = campuses.find((c) =>
-          c.campusName?.toLowerCase().includes("head office")
+          c?.campusName?.toLowerCase()?.includes("head office"),
         );
         if (!primary) {
           primary = campuses.find((c) => c.status === "Active");
@@ -126,27 +126,23 @@ export default function Footer() {
 
             <div className="space-y-3 font-semibold">
               <Link
-                href="/MCQ"
-                className="block hover:text-primary-400 transition-colors"
-              >
-                MCQ
-              </Link>
-
-              <Link
-                href="/Courses"
+                id="footer-nav-courses"
+                href="/courses"
                 className="block hover:text-primary-400 transition-colors"
               >
                 Courses
               </Link>
 
               <Link
+                id="footer-nav-contact"
                 href="/contact"
                 className="block hover:text-primary-400 transition-colors"
               >
-                Contact
+                Contact-Us
               </Link>
 
               <Link
+                id="footer-nav-login"
                 href="/login"
                 className="block hover:text-primary-400 transition-colors"
               >
@@ -198,7 +194,10 @@ export default function Footer() {
               <div className="flex items-center gap-3">
                 <Phone className="text-emerald-500" size={18} />
                 <p>
-                  <a href={`tel:${contactInfo.phone}`} className="hover:underline">
+                  <a
+                    href={`tel:${contactInfo.phone}`}
+                    className="hover:underline"
+                  >
                     {contactInfo.phone}
                   </a>
                 </p>
@@ -207,7 +206,10 @@ export default function Footer() {
               <div className="flex items-center gap-3">
                 <Mail className="text-rose-500" size={18} />
                 <p>
-                  <a href={`mailto:${contactInfo.email}`} className="hover:underline">
+                  <a
+                    href={`mailto:${contactInfo.email}`}
+                    className="hover:underline"
+                  >
                     {contactInfo.email}
                   </a>
                 </p>
@@ -218,20 +220,23 @@ export default function Footer() {
             <div className="mt-6 flex flex-wrap gap-3.5">
               {contactInfo.socialLinks.length > 0 ? (
                 contactInfo.socialLinks.map((item, idx) => {
-                  const helper = getSocialHelper(item.type);
+                  const helper = getSocialHelper(item?.type);
                   const Icon = helper.icon;
-                  const cleanedLink = item.link ? item.link.trim() : "";
+                  const cleanedLink = item?.link ? item.link.trim() : "";
                   if (!cleanedLink) return null;
-                  const href = cleanedLink.startsWith("http") ? cleanedLink : `https://${cleanedLink}`;
+                  const href = cleanedLink.startsWith("http")
+                    ? cleanedLink
+                    : `https://${cleanedLink}`;
 
                   return (
                     <a
                       key={idx}
+                      id={`footer-social-${item?.type?.toLowerCase() || idx}`}
                       href={href}
                       target="_blank"
                       rel="noopener noreferrer"
                       className={`rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all ${helper.hoverBg} hover:text-white active:scale-95 cursor-pointer`}
-                      title={item.type}
+                      title={item?.type}
                     >
                       <Icon size={16} />
                     </a>
@@ -240,6 +245,7 @@ export default function Footer() {
               ) : (
                 <>
                   <a
+                    id="footer-social-facebook"
                     href="https://facebook.com"
                     target="_blank"
                     rel="noopener noreferrer"
@@ -249,15 +255,17 @@ export default function Footer() {
                   </a>
 
                   <a
+                    id="footer-social-instagram"
                     href="https://instagram.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-pink-650 hover:text-white active:scale-95 cursor-pointer"
+                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-pink-600 hover:text-white active:scale-95 cursor-pointer"
                   >
                     <FaInstagram size={16} />
                   </a>
 
                   <a
+                    id="footer-social-youtube"
                     href="https://youtube.com"
                     target="_blank"
                     rel="noopener noreferrer"

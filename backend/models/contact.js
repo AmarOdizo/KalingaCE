@@ -27,11 +27,6 @@ const ContactSchema = new mongoose.Schema(
       trim: true,
     },
 
-    image: {
-      type: String,
-      default: "",
-    },
-
     courseName: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Course",

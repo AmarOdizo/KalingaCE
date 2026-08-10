@@ -23,6 +23,11 @@ export default function AdminSidebar() {
   const [open, setOpen] = useState(false);
   const menus = [
     {
+      name: "Contact Us",
+      icon: Contact,
+      href: "/admin/contact",
+    },
+    {
       name: "Topper Student",
       icon: Trophy,
       href: "/admin/topper-student",
@@ -55,7 +60,7 @@ export default function AdminSidebar() {
     {
       name: "Enrolled Students",
       icon: Contact,
-      href: "/admin/contact",
+      href: "/admin/enrolled-student",
     },
   ];
 

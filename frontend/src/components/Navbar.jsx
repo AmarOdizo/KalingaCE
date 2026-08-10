@@ -72,14 +72,7 @@ export default function Navbar() {
         {/* Desktop Menu */}
         <div className="hidden items-center gap-8 md:flex">
           <Link
-            href="/MCQ"
-            className="font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200"
-          >
-            MCQ
-          </Link>
-
-          <Link
-            href="/Courses"
+            href="/courses"
             className="font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200"
           >
             Courses
@@ -111,6 +104,12 @@ export default function Navbar() {
               </Link>
             </div>
           </div>
+          <Link
+            href="/contact"
+            className="font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200"
+          >
+            Contact Us
+          </Link>
         </div>
 
         {/* Desktop Right */}
@@ -148,15 +147,7 @@ export default function Navbar() {
         <div className="border-t border-slate-100 bg-white/95 px-6 py-6 dark:border-slate-800 dark:bg-slate-950/95 backdrop-blur-md md:hidden animate-in fade-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-4">
             <Link
-              href="/MCQ"
-              onClick={() => setMenuOpen(false)}
-              className="rounded-xl px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-900"
-            >
-              MCQ
-            </Link>
-
-            <Link
-              href="/Courses"
+              href="/courses"
               onClick={() => setMenuOpen(false)}
               className="rounded-xl px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-900"
             >
@@ -207,6 +198,14 @@ export default function Navbar() {
                 </div>
               )}
             </div>
+
+            <Link
+              href="/contact"
+              onClick={() => setMenuOpen(false)}
+              className="rounded-xl px-4 py-2.5 font-semibold text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-900"
+            >
+              Contact Us
+            </Link>
 
             <button
               onClick={() => {

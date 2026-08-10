@@ -9,13 +9,13 @@ const Contact1Counter = require("../models/Contact1Counter");
 // ==========================================
 router.post("/", async (req, res) => {
   try {
-    const { name, phone, email, subject } = req.body;
+    const { name, phone, email, subject, description } = req.body;
 
     // Required fields
-    if (!name || !phone || !email || !subject) {
+    if (!name || !phone || !email || !subject || !description) {
       return res.status(400).json({
         success: false,
-        message: "Name, phone, email and subject are required",
+        message: "Name, phone, email, subject and description are required",
       });
     }
 
@@ -40,6 +40,7 @@ router.post("/", async (req, res) => {
       phone,
       email,
       subject,
+      description,
     });
 
     res.status(201).json({
@@ -119,7 +120,7 @@ router.get("/:id", async (req, res) => {
 // ==========================================
 router.put("/:id", async (req, res) => {
   try {
-    const { name, phone, email, subject } = req.body;
+    const { name, phone, email, subject, description } = req.body;
 
     const contact = await Contact1.findOne({
       id: Number(req.params.id),
@@ -146,6 +147,10 @@ router.put("/:id", async (req, res) => {
 
     if (subject !== undefined) {
       contact.subject = subject;
+    }
+
+    if (description !== undefined) {
+      contact.description = description;
     }
 
     await contact.save();

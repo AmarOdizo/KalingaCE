@@ -45,7 +45,9 @@ export default function ExamInformation() {
   }
 
   return (
-    <section className="mx-auto max-w-7xl px-6 py-16">
+    <main className="mx-auto max-w-7xl px-6 py-16">
+      <title>Upcoming Exams & Information | Kalinga Computer Education</title>
+      <meta name="description" content="Stay updated with the latest exam timetables, schedules, upcoming computer certification tests, and results." />
       <div className="mb-10 text-center">
         <h2 className="text-4xl font-bold">Exam Information</h2>
 
@@ -63,6 +65,6 @@ export default function ExamInformation() {
       </div>
 
       <ExamModal exam={selectedExam} onClose={() => setSelectedExam(null)} />
-    </section>
+    </main>
   );
 }

@@ -58,7 +58,9 @@ export default function LearningNotePage() {
   }
 
   return (
-    <section className="bg-gray-50 py-16 dark:bg-gray-950">
+    <main className="bg-gray-50 py-16 dark:bg-gray-950">
+      <title>Learning Notes & Study Material | Kalinga Computer Education</title>
+      <meta name="description" content="Download high-quality study/course materials, guides, notes, and resource PDFs for Kalinga computer courses." />
       <div className="mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="mb-10 text-center">
@@ -85,6 +87,6 @@ export default function LearningNotePage() {
         {/* Modal */}
         <NoteModal open={open} note={selectedNote} onClose={handleClose} />
       </div>
-    </section>
+    </main>
   );
 }

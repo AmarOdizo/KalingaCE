@@ -1,84 +1,37 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   User,
-  Mail,
   Phone,
-  BookOpen,
-  Image as ImageIcon,
+  Mail,
+  MessageSquare,
   Send,
+  CheckCircle,
+  AlertCircle,
 } from "lucide-react";
-import Swal from "sweetalert2";
 
-const CONTACT_API = "http://localhost:5000/api/Contact";
-const COURSE_API = "http://localhost:5000/api/Course";
-const IMAGE_UPLOAD_API = "http://localhost:5000/api/Contact/upload";
+const API_URL = "http://localhost:5000/api/Contact1";
 
-export default function ContactPage() {
-  const [courses, setCourses] = useState([]);
-  const [loadingCourses, setLoadingCourses] = useState(true);
-
+export default function Contact1Page() {
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
     phone: "",
-    image: "",
-    courseName: "",
+    email: "",
+    subject: "",
+    description: "",
   });
 
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [submitting, setSubmitting] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  // ============================
-  // GET COURSES
-  // ============================
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const res = await fetch(COURSE_API, {
-          cache: "no-store",
-        });
+  const [message, setMessage] = useState({
+    type: "",
+    text: "",
+  });
 
-        const result = await res.json();
-
-        if (!res.ok) {
-          throw new Error(result.message || "Failed to fetch courses");
-        }
-
-        const loadedCourses = result.data || [];
-        setCourses(loadedCourses);
-
-        // Pre-select course from URL query param
-        if (typeof window !== "undefined") {
-          const params = new URLSearchParams(window.location.search);
-          const courseQuery = params.get("course");
-          if (courseQuery) {
-            const matched = loadedCourses.find(
-              (c) => c.courseName?.toLowerCase() === courseQuery.toLowerCase()
-            );
-            if (matched) {
-              setFormData((prev) => ({
-                ...prev,
-                courseName: matched._id,
-              }));
-            }
-          }
-        }
-      } catch (error) {
-        console.error("Course Fetch Error:", error);
-      } finally {
-        setLoadingCourses(false);
-      }
-    };
-
-    fetchCourses();
-  }, []);
-
-  // ============================
+  // ===============================
   // HANDLE INPUT
-  // ============================
+  // ===============================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -88,339 +41,297 @@ export default function ContactPage() {
     }));
   };
 
-  // ============================
-  // HANDLE IMAGE
-  // ============================
-  const handleImageChange = (e) => {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    setImageFile(file);
-
-    const preview = URL.createObjectURL(file);
-    setImagePreview(preview);
-  };
-
-  // ============================
-  // SUBMIT
-  // ============================
+  // ===============================
+  // SUBMIT FORM
+  // ===============================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
-      Swal.fire({
-        title: "Validation Error",
-        text: "Please enter your Full Name.",
-        icon: "warning",
-        confirmButtonColor: "#3b82f6",
-      });
-      return;
-    }
+    setMessage({
+      type: "",
+      text: "",
+    });
 
-    if (!formData.email.trim()) {
-      Swal.fire({
-        title: "Validation Error",
-        text: "Please enter your Email Address.",
-        icon: "warning",
-        confirmButtonColor: "#3b82f6",
+    // Basic validation
+    if (!formData.name.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter your name.",
       });
       return;
     }
 
     if (!formData.phone.trim()) {
-      Swal.fire({
-        title: "Validation Error",
-        text: "Please enter your Phone Number.",
-        icon: "warning",
-        confirmButtonColor: "#3b82f6",
+      setMessage({
+        type: "error",
+        text: "Please enter your phone number.",
       });
       return;
     }
 
-    if (!formData.courseName) {
-      Swal.fire({
-        title: "Validation Error",
-        text: "Please select a course you're interested in.",
-        icon: "warning",
-        confirmButtonColor: "#3b82f6",
+    if (!formData.email.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter your email.",
+      });
+      return;
+    }
+
+    if (!formData.subject.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter your subject.",
+      });
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter your message description.",
       });
       return;
     }
 
     try {
-      setSubmitting(true);
+      setLoading(true);
 
-      let imageUrl = "";
-
-      // ============================
-      // 1. UPLOAD IMAGE
-      // ============================
-      if (imageFile) {
-        const imageFormData = new FormData();
-        imageFormData.append("image", imageFile);
-
-        const imageRes = await fetch(IMAGE_UPLOAD_API, {
-          method: "POST",
-          body: imageFormData,
-        });
-
-        const imageResult = await imageRes.json();
-
-        if (!imageRes.ok) {
-          throw new Error(imageResult.message || "Image upload failed");
-        }
-
-        imageUrl = imageResult.data.url;
-      }
-
-      // ============================
-      // 2. SAVE CONTACT
-      // ============================
-      const contactRes = await fetch(CONTACT_API, {
+      const res = await fetch(API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          image: imageUrl,
-          courseName: formData.courseName,
-        }),
+        body: JSON.stringify(formData),
       });
 
-      const contactResult = await contactRes.json();
+      const result = await res.json();
 
-      if (!contactRes.ok) {
-        throw new Error(contactResult.message || "Failed to save contact");
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to submit contact form");
       }
 
-      // ============================
-      // SUCCESS
-      // ============================
-      Swal.fire({
-        title: "Enquiry Submitted!",
-        text: "Your contact information has been submitted successfully! We will get in touch with you shortly.",
-        icon: "success",
-        confirmButtonColor: "#10b981",
+      // Success
+      setMessage({
+        type: "success",
+        text: "Your message has been submitted successfully!",
       });
 
+      // Reset form
       setFormData({
         name: "",
-        email: "",
         phone: "",
-        image: "",
-        courseName: "",
+        email: "",
+        subject: "",
+        description: "",
       });
-
-      setImageFile(null);
-      setImagePreview("");
-
-      const fileInput = document.getElementById("contact-image");
-      if (fileInput) {
-        fileInput.value = "";
-      }
     } catch (error) {
-      console.error("Contact Submit Error:", error);
+      console.error("Contact1 Submit Error:", error);
 
-      Swal.fire({
-        title: "Submission Error",
-        text: error.message || "Something went wrong. Please try again later.",
-        icon: "error",
-        confirmButtonColor: "#ef4444",
+      setMessage({
+        type: "error",
+        text: error.message || "Something went wrong. Please try again.",
       });
     } finally {
-      setSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50 py-16 dark:from-slate-950 dark:to-slate-900/50 transition-colors duration-300">
-      <div className="mx-auto max-w-xl px-4">
-        {/* HEADER */}
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-16">
+      <title>Contact Us | Kalinga Computer Education</title>
+      <meta name="description" content="Get in touch with Kalinga Computer Education. Send us a message for queries, course details, or admissions." />
+      <div className="mx-auto max-w-6xl">
+        {/* =================================
+            HEADER
+        ================================= */}
         <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-primary-50 dark:bg-primary-500/10 px-4 py-1.5 text-xs font-bold text-primary-600 dark:text-primary-400 uppercase tracking-widest">
+          <span className="inline-block rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
             Contact Us
           </span>
 
-          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-            📩 Get In <span className="gradient-text">Touch</span>
+          <h1 className="mt-4 text-4xl font-bold text-gray-900 md:text-5xl">
+            Get In Touch
           </h1>
 
-          <p className="mt-3 text-sm text-slate-550 dark:text-slate-400 leading-relaxed">
-            Fill in the form below and our team will contact you shortly.
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+            Have a question or need more information? Send us a message and we
+            will get back to you.
           </p>
         </div>
 
-        {/* FORM CARD */}
-        <div className="glass-panel rounded-3xl p-6 md:p-8 shadow-premium border border-slate-200 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/50 backdrop-blur-md">
+        {/* =================================
+            FORM CARD
+        ================================= */}
+        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-6 shadow-xl md:p-10">
+          {/* MESSAGE */}
+          {message.text && (
+            <div
+              className={`mb-6 flex items-center gap-3 rounded-xl p-4 ${
+                message.type === "success"
+                  ? "bg-green-50 text-green-700"
+                  : "bg-red-50 text-red-700"
+              }`}
+            >
+              {message.type === "success" ? (
+                <CheckCircle size={22} />
+              ) : (
+                <AlertCircle size={22} />
+              )}
+
+              <p className="text-sm font-medium">{message.text}</p>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* NAME */}
+            {/* =================================
+                NAME
+            ================================= */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Full Name
               </label>
 
               <div className="relative">
                 <User
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors"
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 />
 
                 <input
+                  id="contact-name"
                   type="text"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
-                  className="w-full rounded-xl border border-slate-200 bg-white/50 py-3.5 pl-12 pr-4 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 dark:border-slate-800 dark:bg-slate-900/40 dark:text-white dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-500/20"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 />
               </div>
             </div>
 
-            {/* EMAIL */}
+            {/* =================================
+                PHONE
+            ================================= */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
-                Email Address
-              </label>
-
-              <div className="relative">
-                <Mail
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors"
-                />
-
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email"
-                  className="w-full rounded-xl border border-slate-200 bg-white/50 py-3.5 pl-12 pr-4 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 dark:border-slate-800 dark:bg-slate-900/40 dark:text-white dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-500/20"
-                />
-              </div>
-            </div>
-
-            {/* PHONE */}
-            <div>
-              <label className="mb-2 block text-xs font-bold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
                 Phone Number
               </label>
 
               <div className="relative">
                 <Phone
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors"
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 />
 
                 <input
+                  id="contact-phone"
                   type="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Enter your phone number"
-                  className="w-full rounded-xl border border-slate-200 bg-white/50 py-3.5 pl-12 pr-4 outline-none transition-all duration-200 placeholder:text-slate-400 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 dark:border-slate-800 dark:bg-slate-900/40 dark:text-white dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-500/20"
+                  maxLength={10}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
                 />
               </div>
             </div>
 
-            {/* COURSE */}
+            {/* =================================
+                EMAIL
+            ================================= */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
-                Select Course
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Email Address
               </label>
 
               <div className="relative">
-                <BookOpen
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 transition-colors"
+                <Mail
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
                 />
 
-                <select
-                  name="courseName"
-                  value={formData.courseName}
+                <input
+                  id="contact-email"
+                  type="email"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
-                  disabled={loadingCourses}
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white/50 py-3.5 pl-12 pr-10 outline-none transition-all duration-200 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10 dark:border-slate-800 dark:bg-slate-900/40 dark:text-white dark:focus:border-primary-500 dark:focus:bg-slate-900 dark:focus:ring-primary-500/20 cursor-pointer"
-                >
-                  <option value="" className="dark:bg-slate-900 dark:text-slate-300">
-                    {loadingCourses ? "Loading courses..." : "Select a course"}
-                  </option>
-
-                  {courses.map((course) => (
-                    <option key={course._id} value={course._id} className="dark:bg-slate-900 dark:text-slate-350">
-                      {course.courseName}
-                    </option>
-                  ))}
-                </select>
-
-                <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500">
-                  <svg className="h-4 w-4 fill-current" viewBox="0 0 20 20">
-                    <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                  </svg>
-                </div>
+                  placeholder="Enter your email address"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                />
               </div>
             </div>
 
-            {/* IMAGE */}
+            {/* =================================
+                SUBJECT
+            ================================= */}
             <div>
-              <label className="mb-2 block text-xs font-bold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
-                Student Image (Optional)
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Subject
               </label>
 
-              <div className="rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 p-5 bg-white/30 dark:bg-slate-900/20">
-                <div className="flex flex-col items-center justify-center">
-                  {imagePreview ? (
-                    <img
-                      src={imagePreview}
-                      alt="Preview"
-                      className="mb-4 h-24 w-24 rounded-full object-cover shadow-md border-2 border-white dark:border-slate-800"
-                    />
-                  ) : (
-                    <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400">
-                      <ImageIcon size={28} />
-                    </div>
-                  )}
+              <div className="relative">
+                <MessageSquare
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                />
 
-                  <label
-                    htmlFor="contact-image"
-                    className="cursor-pointer rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-5 py-2.5 text-xs font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95"
-                  >
-                    {imageFile ? "Change Image" : "Choose Image"}
-                  </label>
-
-                  <input
-                    id="contact-image"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
-
-                  <p className="mt-2 text-[10px] text-slate-400 dark:text-slate-500 uppercase font-bold tracking-wide">
-                    JPG, PNG or WEBP
-                  </p>
-                </div>
+                <input
+                  id="contact-subject"
+                  type="text"
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  placeholder="Enter subject of your message"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                />
               </div>
             </div>
 
-            {/* SUBMIT */}
+            {/* =================================
+                DESCRIPTION
+            ================================= */}
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">
+                Message Description
+              </label>
+
+              <div className="relative">
+                <MessageSquare
+                  size={20}
+                  className="absolute left-4 top-4 text-gray-400"
+                />
+
+                <textarea
+                  id="contact-description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  placeholder="Write your message..."
+                  rows={5}
+                  className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                />
+              </div>
+            </div>
+
+            {/* =================================
+                SUBMIT
+            ================================= */}
             <button
+              id="contact-submit-btn"
               type="submit"
-              disabled={submitting}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 py-3.5 px-6 font-bold text-sm text-white shadow-md hover:from-primary-700 hover:to-indigo-700 hover:shadow-glow-blue transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+              disabled={loading}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {submitting ? (
+              {loading ? (
                 <>
                   <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Submitting...
+                  Sending...
                 </>
               ) : (
                 <>
-                  <Send size={18} />
-                  Submit Contact
+                  <Send size={20} />
+                  Send Message
                 </>
               )}
             </button>

@@ -28,12 +28,23 @@ import {
 } from "lucide-react";
 
 import { getCourses, getCourseById } from "./courseData";
+import Swal from "sweetalert2";
 
 export default function AvailableCourses() {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [enrollLoading, setEnrollLoading] = useState(false);
+  const [enrollData, setEnrollData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [enrollMessage, setEnrollMessage] = useState({
+    type: "",
+    text: "",
+  });
 
   const swiperRef = useRef(null);
 
@@ -148,6 +159,84 @@ export default function AvailableCourses() {
   const closeDetails = () => {
     setSelectedCourse(null);
     setModalOpen(false);
+    setEnrollMessage({ type: "", text: "" });
+  };
+
+  const handleEnrollChange = (e) => {
+    const { name, value } = e.target;
+    setEnrollData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleEnrollSubmit = async (e) => {
+    e.preventDefault();
+    setEnrollLoading(true);
+    setEnrollMessage({ type: "", text: "" });
+
+    try {
+      const res = await fetch("http://localhost:5000/api/EnrolledStudent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: enrollData.name,
+          email: enrollData.email,
+          phone: enrollData.phone,
+          courseName: selectedCourse._id || selectedCourse.id,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to submit enrollment");
+      }
+
+      // Clear form and modal state
+      setEnrollData({
+        name: "",
+        email: "",
+        phone: "",
+      });
+      setModalOpen(false);
+      setSelectedCourse(null);
+      setEnrollMessage({ type: "", text: "" });
+
+      // Open SweetAlert success popup
+      Swal.fire({
+        title: "Enquiry Submitted!",
+        text: "Your enquiry details have been saved successfully.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#4f46e5",
+        background: "#ffffff",
+        customClass: {
+          popup: "rounded-3xl",
+          confirmButton: "rounded-xl px-6 py-3 font-bold"
+        }
+      }).then(() => {
+        window.location.href = "/";
+      });
+    } catch (err) {
+      console.error("Enrollment error:", err);
+      Swal.fire({
+        title: "Submission Failed",
+        text: err.message || "Failed to submit enrollment. Please try again.",
+        icon: "error",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#ef4444",
+        background: "#ffffff",
+        customClass: {
+          popup: "rounded-3xl",
+          confirmButton: "rounded-xl px-6 py-3 font-bold"
+        }
+      });
+    } finally {
+      setEnrollLoading(false);
+    }
   };
 
   // Render Skeleton cards during loading state
@@ -384,7 +473,7 @@ export default function AvailableCourses() {
                           onClick={() => openDetails(course)}
                           className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 py-3 px-4 text-sm font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95 hover:shadow-glow-blue cursor-pointer animate-fade-in"
                         >
-                          View Details
+                          Enquire Now
                           <ChevronRight size={15} />
                         </button>
                       </div>
@@ -400,7 +489,7 @@ export default function AvailableCourses() {
       {/* Course Detail Modal */}
       {modalOpen && selectedCourse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-2xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl border border-slate-150 dark:bg-slate-950 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+          <div className="relative w-full max-w-xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl border border-slate-155 dark:bg-slate-950 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={closeDetails}
@@ -410,206 +499,121 @@ export default function AvailableCourses() {
               <X size={20} />
             </button>
 
-            {/* Modal Title */}
-            <div className="mb-5 pr-8">
-              <span
-                className={`inline-flex rounded-full px-3.5 py-0.5 text-[10px] font-bold shadow-sm tracking-wide ${getStatusColor(selectedCourse.status)}`}
-              >
-                {selectedCourse.status}
-              </span>
-              <h3 className="mt-2 text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
-                {selectedCourse.courseName}
-              </h3>
-              {selectedCourse.courseCode && (
-                <p className="text-xs font-mono font-bold text-primary-505 mt-1 uppercase">
-                  Course Code: {selectedCourse.courseCode}
-                </p>
-              )}
-            </div>
-
-            {/* Content Body */}
-            <div className="space-y-6">
-              {/* Cover Image */}
-              <div className="relative h-48 md:h-64 w-full overflow-hidden rounded-2xl bg-slate-100 shadow-inner">
-                <Image
-                  src={getCourseImage(selectedCourse.image)}
-                  alt={selectedCourse.courseName}
-                  fill
-                  className="object-cover"
-                  unoptimized
-                />
-              </div>
-
-              {/* Grid Specifications */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <Clock size={14} className="text-primary-500" />
-                    <span>Duration</span>
-                  </div>
-                  <p className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
-                    {selectedCourse.duration}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <CreditCard size={14} className="text-indigo-500" />
-                    <span>Course Fee</span>
-                  </div>
-                  <p className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
-                    {formatFees(selectedCourse.fees)}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <Laptop size={14} className="text-purple-500" />
-                    <span>Class Mode</span>
-                  </div>
-                  <p className="text-sm font-extrabold text-slate-800 dark:text-slate-100">
-                    {selectedCourse.mode || "Offline"}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <GraduationCap size={14} className="text-emerald-500" />
-                    <span>Eligibility</span>
-                  </div>
-                  <p
-                    className="text-sm font-extrabold text-slate-850 dark:text-slate-100 truncate"
-                    title={selectedCourse.eligibility}
-                  >
-                    {selectedCourse.eligibility || "10th/12th Pass"}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <Award size={14} className="text-amber-500" />
-                    <span>Certification</span>
-                  </div>
-                  <p
-                    className="text-sm font-extrabold text-slate-850 dark:text-slate-100 truncate"
-                    title={selectedCourse.certificate}
-                  >
-                    {selectedCourse.certificate || "Institute Diploma"}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100 dark:bg-slate-900/40 dark:border-slate-800/40">
-                  <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold uppercase mb-1">
-                    <Sparkles size={14} className="text-rose-500" />
-                    <span>Available Seats</span>
-                  </div>
-                  <p className="text-sm font-extrabold text-slate-850 dark:text-slate-100">
-                    {selectedCourse.seats
-                      ? `${selectedCourse.seats} seats left`
-                      : "Filling Fast"}
-                  </p>
-                </div>
-              </div>
-
-              {/* Full Description */}
-              <div>
-                <h4 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider mb-2">
-                  Course Overview
-                </h4>
-                <p className="text-sm text-slate-650 dark:text-slate-400 leading-relaxed">
-                  {selectedCourse.fullDescription ||
-                    selectedCourse.shortDescription}
+            <div className="space-y-6 text-slate-900 dark:text-slate-100">
+              <div className="mb-4">
+                <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-tight">
+                  Enquire for {selectedCourse.courseName}
+                </h3>
+                <p className="text-sm text-slate-500 mt-1">
+                  Please fill in your details to submit your enquiry.
                 </p>
               </div>
 
-              {/* Technologies Covered */}
-              {selectedCourse.technologies &&
-                selectedCourse.technologies.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider mb-2">
-                      Technologies & Tools Covered
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {selectedCourse.technologies.map((tech, idx) => (
-                        <span
-                          key={idx}
-                          className="rounded-xl bg-primary-50 dark:bg-primary-500/10 px-3 py-1.5 text-xs font-bold text-primary-700 dark:text-primary-400"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {/* Syllabus Outline */}
-              {selectedCourse.syllabus &&
-                selectedCourse.syllabus.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-wider mb-2.5">
-                      Syllabus Outline
-                    </h4>
-                    <div className="grid gap-2.5 sm:grid-cols-2">
-                      {selectedCourse.syllabus.map((item, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-start gap-2.5 text-sm text-slate-600 dark:text-slate-400"
-                        >
-                          <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-900 dark:text-slate-450">
-                            {idx + 1}
-                          </span>
-                          <span className="font-semibold text-slate-700 dark:text-slate-350">
-                            {item}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-              {/* Batch timing and Instructor info */}
-              {(selectedCourse.batchTiming || selectedCourse.trainer) && (
-                <div className="border-t border-slate-100 dark:border-slate-900 pt-5 grid sm:grid-cols-2 gap-4">
-                  {selectedCourse.batchTiming && (
-                    <div className="text-xs">
-                      <span className="block text-slate-400 font-bold uppercase mb-0.5">
-                        Batch Timings
-                      </span>
-                      <span className="font-bold text-slate-750 dark:text-slate-300">
-                        {selectedCourse.batchTiming}
-                      </span>
-                    </div>
-                  )}
-                  {selectedCourse.trainer && (
-                    <div className="text-xs">
-                      <span className="block text-slate-400 font-bold uppercase mb-0.5">
-                        Expert Instructor
-                      </span>
-                      <span className="font-bold text-slate-750 dark:text-slate-300">
-                        {selectedCourse.trainer}
-                      </span>
-                    </div>
-                  )}
+              <form onSubmit={handleEnrollSubmit} className="space-y-4">
+                {/* Name Field */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Full Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={enrollData.name}
+                    onChange={handleEnrollChange}
+                    placeholder="Enter your full name"
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 text-slate-900 dark:text-white"
+                  />
                 </div>
-              )}
-            </div>
 
-            {/* Modal Actions */}
-            <div className="mt-8 border-t border-slate-100 dark:border-slate-900 pt-5 flex items-center justify-end gap-3.5">
-              <button
-                onClick={closeDetails}
-                className="rounded-xl border border-slate-200 bg-white/50 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80 transition cursor-pointer"
-              >
-                Close
-              </button>
+                {/* Email Field */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={enrollData.email}
+                    onChange={handleEnrollChange}
+                    placeholder="Enter your email address"
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 text-slate-900 dark:text-white"
+                  />
+                </div>
 
-              <Link
-                href={`/contact?course=${encodeURIComponent(selectedCourse.courseName)}`}
-                className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95 hover:shadow-glow-blue"
-              >
-                Enquire Now
-                <ArrowRight size={15} />
-              </Link>
+                {/* Phone Field */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={enrollData.phone}
+                    onChange={handleEnrollChange}
+                    placeholder="Enter your phone number"
+                    required
+                    maxLength={10}
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3 text-sm outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-100 text-slate-900 dark:text-white"
+                  />
+                </div>
+
+                {/* Selected Course Field */}
+                <div>
+                  <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                    Selected Course
+                  </label>
+                  <input
+                    type="text"
+                    value={selectedCourse.courseName}
+                    disabled
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 p-3 text-sm text-slate-500 dark:text-slate-400 outline-none cursor-not-allowed"
+                  />
+                </div>
+
+                {/* Message feedback */}
+                {enrollMessage.text && (
+                  <div
+                    className={`rounded-xl p-3.5 text-sm font-semibold flex items-center gap-2 ${
+                      enrollMessage.type === "success"
+                        ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
+                        : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-200 dark:border-rose-500/20"
+                    }`}
+                  >
+                    {enrollMessage.text}
+                  </div>
+                )}
+
+                {/* Form Buttons */}
+                <div className="pt-4 flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={closeDetails}
+                    className="rounded-xl border border-slate-200 bg-white/50 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={enrollLoading}
+                    className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {enrollLoading ? (
+                      <>
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        Submit
+                        <ChevronRight size={15} />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

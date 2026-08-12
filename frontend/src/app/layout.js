@@ -1,5 +1,13 @@
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import NavbarWrapper from "@/components/NavbarWrapper";
+
+const plusJakartaSans = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
+});
 
 export const metadata = {
   metadataBase: new URL("https://kalingacomputer.com"),
@@ -32,15 +40,75 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://kalingacomputer.com",
+    title: "Kalinga Computer Education | Premium Computer & Technical Training",
+    description: "Empower your career with specialized IT, computing, and professional courses at Kalinga Computer Education. Hands-on training, industry certifications, and top placement rates.",
+    siteName: "Kalinga Computer Education",
+    images: [
+      {
+        url: "https://kalingacomputer.com/opengraph-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Kalinga Computer Education",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kalinga Computer Education | Premium Computer & Technical Training",
+    description: "Empower your career with specialized IT, computing, and professional courses at Kalinga Computer Education. Hands-on training, industry certifications, and top placement rates.",
+    images: ["https://kalingacomputer.com/opengraph-image.png"],
+  },
 };
 
 export default function RootLayout({ children }) {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "EducationalOrganization",
+    "@id": "https://kalingacomputer.com/#organization",
+    "name": "Kalinga Computer Education",
+    "url": "https://kalingacomputer.com",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://kalingacomputer.com/klogo.png",
+    },
+    "image": "https://kalingacomputer.com/opengraph-image.png",
+    "description": "Empower your career with specialized IT, computing, and professional courses at Kalinga Computer Education. Hands-on training, industry certifications, and top placement rates.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Athagarh, Cuttack",
+      "addressLocality": "Athagarh",
+      "addressRegion": "Odisha",
+      "postalCode": "754029",
+      "addressCountry": "IN"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-9876543210",
+      "contactType": "admissions",
+      "areaServed": "IN",
+      "availableLanguage": ["en", "hi", "or"]
+    },
+    "sameAs": [
+      "https://www.facebook.com",
+      "https://www.instagram.com"
+    ]
+  };
+
   return (
-    <html lang="en">
+    <html lang="en" className={plusJakartaSans.variable}>
       <body>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
         <NavbarWrapper />
         {children}
       </body>
     </html>
   );
 }
+

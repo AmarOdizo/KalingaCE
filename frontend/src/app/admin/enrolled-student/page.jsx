@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 
-const API_URL = "http://localhost:5000/api/EnrolledStudent";
+const API_URL = "http://192.168.1.2:5000/api/EnrolledStudent";
 
 export default function EnrolledStudentsAdminPage() {
   const [students, setStudents] = useState([]);
@@ -132,6 +132,7 @@ export default function EnrolledStudentsAdminPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 transition-colors duration-300">
+      <title>Enrolled Students | Admin Panel</title>
       {/* =================================
           HEADER
       ================================= */}
@@ -347,7 +348,7 @@ export default function EnrolledStudentsAdminPage() {
       ================================= */}
       {selectedStudent && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={() => setSelectedStudent(null)}

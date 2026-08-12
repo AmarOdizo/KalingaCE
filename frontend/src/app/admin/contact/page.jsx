@@ -8,9 +8,11 @@ import {
   Mail,
   User,
   MessageSquare,
+  Eye,
+  X,
 } from "lucide-react";
 
-const API_URL = "http://localhost:5000/api/Contact1";
+const API_URL = "http://192.168.1.2:5000/api/Contact1";
 
 export default function Contact1Page() {
   const [contacts, setContacts] = useState([]);
@@ -20,6 +22,7 @@ export default function Contact1Page() {
 
   const [deleteId, setDeleteId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [selectedContact, setSelectedContact] = useState(null);
 
   // =====================================
   // GET ALL CONTACTS
@@ -101,6 +104,7 @@ export default function Contact1Page() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      <title>Contact Enquiries | Admin Panel</title>
       {/* =================================
           HEADER
       ================================= */}
@@ -247,6 +251,15 @@ export default function Contact1Page() {
                     {/* ACTIONS */}
                     <td className="px-5 py-4">
                       <div className="flex justify-center gap-2">
+                        {/* VIEW DETAILS */}
+                        <button
+                          onClick={() => setSelectedContact(contact)}
+                          title="View Details"
+                          className="rounded-lg bg-blue-50 p-2 text-blue-600 transition hover:bg-blue-150 hover:text-blue-700 dark:bg-blue-500/10 dark:text-blue-400 dark:hover:bg-blue-500 dark:hover:text-white cursor-pointer"
+                        >
+                          <Eye size={18} />
+                        </button>
+
                         {/* DELETE */}
                         <button
                           onClick={() => setDeleteId(contact.id)}
@@ -286,7 +299,7 @@ export default function Contact1Page() {
               <button
                 onClick={() => setDeleteId(null)}
                 disabled={deleteLoading}
-                className="rounded-xl border px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-50"
+                className="rounded-xl border px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -294,9 +307,90 @@ export default function Contact1Page() {
               <button
                 onClick={handleDelete}
                 disabled={deleteLoading}
-                className="rounded-xl bg-red-600 px-5 py-2.5 font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                className="rounded-xl bg-red-600 px-5 py-2.5 font-medium text-white hover:bg-red-700 disabled:opacity-50 cursor-pointer"
               >
                 {deleteLoading ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =================================
+          DETAIL MODAL
+      ================================= */}
+      {selectedContact && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
+            {/* Close Button */}
+            <button
+              onClick={() => setSelectedContact(null)}
+              className="absolute right-5 top-5 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="mb-6 flex flex-col items-center border-b border-slate-100 dark:border-slate-800/60 pb-5">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-extrabold text-2xl shadow-md border-4 border-white dark:border-slate-900">
+                {selectedContact.name ? selectedContact.name.charAt(0).toUpperCase() : <User size={24} />}
+              </div>
+              <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white">
+                {selectedContact.name}
+              </h3>
+              <p className="text-xs text-blue-500 font-bold uppercase tracking-wider mt-1">
+                Contact Enquiry Details
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              {/* Email */}
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Mail size={13} /> Email Address
+                </span>
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 break-all select-all">
+                  {selectedContact.email}
+                </span>
+              </div>
+
+              {/* Phone */}
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Phone size={13} /> Phone Number
+                </span>
+                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 select-all">
+                  {selectedContact.phone}
+                </span>
+              </div>
+
+              {/* Subject */}
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <MessageSquare size={13} /> Subject
+                </span>
+                <span className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                  {selectedContact.subject}
+                </span>
+              </div>
+
+              {/* Description Message */}
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-xs font-bold text-slate-400 uppercase">
+                  Message Description
+                </span>
+                <p className="text-sm text-slate-600 dark:text-slate-350 whitespace-pre-wrap leading-relaxed">
+                  {selectedContact.description || "N/A"}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setSelectedContact(null)}
+                className="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-850 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+              >
+                Close Details
               </button>
             </div>
           </div>

@@ -69,6 +69,7 @@ export default function AvailableNotesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
+      <title>Manage Notes | Admin Panel</title>
       {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
         <div>

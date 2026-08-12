@@ -22,7 +22,7 @@ export default function HeroSlider() {
 
     async function fetchPosters() {
       try {
-        const res = await fetch("http://localhost:5000/api/Poster", {
+        const res = await fetch("http://192.168.1.2:5000/api/Poster", {
           cache: "no-store",
         });
         if (res.ok) {

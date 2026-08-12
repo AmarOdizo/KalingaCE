@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/ExamInfo";
+const API_URL = "http://192.168.1.2:5000/api/ExamInfo";
 
 // ==============================
 // GET All Exam Information

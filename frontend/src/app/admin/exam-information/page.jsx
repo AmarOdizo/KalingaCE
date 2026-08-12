@@ -46,6 +46,7 @@ export default function ExamInformationPage() {
 
   return (
     <div className="mx-auto max-w-7xl p-6 md:p-8 transition-colors duration-300">
+      <title>Exam Schedules | Admin Panel</title>
       {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
         <div>

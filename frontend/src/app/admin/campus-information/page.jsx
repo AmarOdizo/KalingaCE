@@ -116,6 +116,7 @@ export default function CampusInformationPage() {
 
   return (
     <div className="mx-auto max-w-7xl p-4 sm:p-6 md:p-8 space-y-8 transition-colors duration-300">
+      <title>Campus Information | Admin Panel</title>
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>

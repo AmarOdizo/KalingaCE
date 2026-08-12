@@ -37,6 +37,7 @@ export default function PosterPage() {
 
   return (
     <div className="mx-auto max-w-7xl p-6 md:p-8 transition-colors duration-300">
+      <title>Poster Slides | Admin Panel</title>
       {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-center">
         <div>

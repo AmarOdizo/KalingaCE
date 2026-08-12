@@ -19,7 +19,7 @@ export default function Footer() {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/CampusInformation");
+        const res = await fetch("http://192.168.1.2:5000/api/CampusInformation");
         if (!res.ok) throw new Error("Failed to fetch contact details");
         const json = await res.json();
         const campuses = json.data || [];

@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 
 const upload = require("../middleware/upload");
-const Contact = require("../models/contact");
-const ContactCounter = require("../models/contactCounter");
+const Contact = require("../models/Contact");
+const ContactCounter = require("../models/ContactCounter");
 const imagekit = require("../config/imagekit");
 
 // ===============================

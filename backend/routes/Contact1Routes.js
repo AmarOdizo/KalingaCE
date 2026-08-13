@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const Contact1 = require("../models/contact1");
+const Contact1 = require("../models/Contact1");
 const Contact1Counter = require("../models/Contact1Counter");
 
 // ==========================================

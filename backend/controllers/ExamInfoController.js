@@ -19,7 +19,11 @@ exports.uploadExamInfoImage = async (req, res) => {
       success: true,
       message: "Image Uploaded Successfully",
       imageUrl: result.url,
-      fileId: result.fileId,
+      data: {
+        url: result.url,
+        fileId: result.fileId,
+        name: result.name,
+      },
     });
   } catch (error) {
     res.status(500).json({

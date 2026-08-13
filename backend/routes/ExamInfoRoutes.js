@@ -231,40 +231,6 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-// ==============================
-// Upload Exam Image
-// ==============================
-router.post("/upload", upload.single("image"), async (req, res) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Please select an image",
-      });
-    }
-
-    const result = await imagekit.upload({
-      file: req.file.buffer,
-      fileName: `${Date.now()}-${req.file.originalname}`,
-      folder: "/ExamInformation",
-    });
-
-    res.status(200).json({
-      success: true,
-      data: {
-        url: result.url,
-        fileId: result.fileId,
-        name: result.name,
-      },
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-  }
-});
+router.post("/upload", upload.single("image"), uploadExamInfoImage);
 
 module.exports = router;

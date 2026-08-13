@@ -1,28 +1,28 @@
 const imagekit = require("../config/imagekit");
 
-exports.uploadStudentImage = async (req, res) => {
+// Upload Contact Image
+exports.uploadContactImage = async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Please select an image",
+        message: "Please upload an image",
       });
     }
 
-    const result = await imagekit.upload({
+    const uploadedImage = await imagekit.upload({
       file: req.file.buffer,
-      fileName: Date.now() + "-" + req.file.originalname,
-      folder: "/Student",
+      fileName: `${Date.now()}-${req.file.originalname}`,
+      folder: "/contact",
     });
 
     res.status(200).json({
       success: true,
       message: "Image Uploaded Successfully",
-      imageUrl: result.url,
       data: {
-        url: result.url,
-        fileId: result.fileId,
-        name: result.name,
+        url: uploadedImage.url,
+        fileId: uploadedImage.fileId,
+        name: uploadedImage.name,
       },
     });
   } catch (error) {

@@ -31,9 +31,11 @@ app.get("/api", (req, res) => {
   res.send("🚀 Backend Running Successfully...");
 });
 
-// Server Start
+// ===============================
+// SERVER START
+// ===============================
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`✅ Server Running on http://localhost:${PORT}`);
+  console.log(`✅ Server Running on port ${PORT}`);
 });

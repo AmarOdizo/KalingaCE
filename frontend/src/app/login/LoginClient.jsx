@@ -44,7 +44,7 @@ export default function LoginClient() {
     setError("");
 
     try {
-      const res = await fetch("http://192.168.1.2:5000/api/Admin/login", {
+      const res = await fetch("https://kalingace-4.onrender.com/api/Admin/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

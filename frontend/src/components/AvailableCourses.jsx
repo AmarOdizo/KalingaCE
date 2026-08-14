@@ -176,7 +176,7 @@ export default function AvailableCourses() {
     setEnrollMessage({ type: "", text: "" });
 
     try {
-      const res = await fetch("http://192.168.1.2:5000/api/EnrolledStudent", {
+      const res = await fetch("https://kalingace-4.onrender.com/api/EnrolledStudent", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

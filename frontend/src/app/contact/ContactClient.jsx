@@ -11,7 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 
-const API_URL = "http://192.168.1.2:5000/api/Contact1";
+const API_URL = "https://kalingace-4.onrender.com/api/Contact1";
 
 export default function ContactClient() {
   const [formData, setFormData] = useState({

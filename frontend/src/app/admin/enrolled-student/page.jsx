@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import Swal from "sweetalert2";
 
-const API_URL = "http://192.168.1.2:5000/api/EnrolledStudent";
+const API_URL = "https://kalingace-4.onrender.com/api/EnrolledStudent";
 
 export default function EnrolledStudentsAdminPage() {
   const [students, setStudents] = useState([]);

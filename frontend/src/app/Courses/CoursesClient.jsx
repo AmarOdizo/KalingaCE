@@ -208,8 +208,35 @@ export default function CoursesClient() {
     }
   };
 
+  // Generate Course Schema (ItemList) for SEO
+  const courseSchema = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "name": "Computer & Technical Courses | Kalinga Computer Education",
+    "description": "Explore our wide range of computer courses including DCA, PGDCA, Python, Java, Tally, Web Development, and AI.",
+    "url": "https://kalingacomputer.com/courses",
+    "itemListElement": (courses || []).map((course, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "item": {
+        "@type": "Course",
+        "name": course.courseName || "Computer Course",
+        "description": course.shortDescription || "Computer education course",
+        "provider": {
+          "@type": "EducationalOrganization",
+          "name": "Kalinga Computer Education",
+          "sameAs": "https://kalingacomputer.com"
+        }
+      }
+    }))
+  }), [courses]);
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100/50 py-12 dark:from-slate-950 dark:to-slate-900/50 transition-colors duration-300">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema) }}
+      />
       <div className="mx-auto max-w-7xl px-6">
         {/* Hero Header */}
         <div className="mb-12 text-center max-w-3xl mx-auto">

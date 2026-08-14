@@ -40,6 +40,17 @@ export const metadata = {
     address: false,
     telephone: false,
   },
+  icons: {
+    icon: [
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/favicon.svg", type: "image/svg+xml" }
+    ],
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+    ]
+  },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -49,7 +60,7 @@ export const metadata = {
     siteName: "Kalinga Computer Education",
     images: [
       {
-        url: "https://kalingacomputer.com/opengraph-image.png",
+        url: "https://kalingacomputer.com/og-image.png",
         width: 1200,
         height: 630,
         alt: "Kalinga Computer Education",
@@ -60,7 +71,11 @@ export const metadata = {
     card: "summary_large_image",
     title: "Kalinga Computer Education | Premium Computer & Technical Training",
     description: "Empower your career with specialized IT, computing, and professional courses at Kalinga Computer Education. Hands-on training, industry certifications, and top placement rates.",
-    images: ["https://kalingacomputer.com/opengraph-image.png"],
+    images: ["https://kalingacomputer.com/og-image.png"],
+  },
+  other: {
+    "article:published_time": "2026-08-14T15:49:58.979Z",
+    "twitter:card": "summary",
   },
 };
 

@@ -33,6 +33,9 @@ app.use("/api/Contact1", require("./routes/Contact1Routes"));
 app.use("/api/Admin", require("./routes/AdminRoutes"));
 app.use("/api/MCQ", require("./routes/MCQ"));
 
+// otp routes
+app.use("/api/otp", require("./routes/otp"));
+
 // ===============================
 // Home Route
 // ===============================

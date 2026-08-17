@@ -14,6 +14,7 @@ import {
   Menu,
   X,
   Contact,
+  HelpCircle,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -61,6 +62,11 @@ export default function AdminSidebar() {
       name: "Enrolled Students",
       icon: Contact,
       href: "/admin/enrolled-student",
+    },
+    {
+      name: "Manage MCQs",
+      icon: HelpCircle,
+      href: "/admin/mcq",
     },
   ];
 

@@ -31,6 +31,7 @@ app.use("/api/CampusInformation", require("./routes/CampusInformationRoutes"));
 app.use("/api/EnrolledStudent", require("./routes/EnrolledStudentRoutes"));
 app.use("/api/Contact1", require("./routes/Contact1Routes"));
 app.use("/api/Admin", require("./routes/AdminRoutes"));
+app.use("/api/MCQ", require("./routes/MCQ"));
 
 // ===============================
 // Home Route

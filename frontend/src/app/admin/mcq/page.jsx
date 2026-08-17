@@ -22,12 +22,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-import {
-  getMCQs,
-  createMCQ,
-  updateMCQ,
-  deleteMCQ,
-} from "./data";
+import { getMCQs, createMCQ, updateMCQ, deleteMCQ } from "./data";
 
 export default function MCQAdminPage() {
   // State variables
@@ -36,11 +31,11 @@ export default function MCQAdminPage() {
   const [search, setSearch] = useState("");
   const [selectedSubject, setSelectedSubject] = useState("All");
   const [statusFilter, setStatusFilter] = useState("All");
-  
+
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMCQ, setEditingMCQ] = useState(null);
-  
+
   // Accordion state (expanded MCQs by ID)
   const [expandedMCQs, setExpandedMCQs] = useState({});
 
@@ -76,7 +71,6 @@ export default function MCQAdminPage() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchAllData();
   }, [fetchAllData]);
 
@@ -107,7 +101,8 @@ export default function MCQAdminPage() {
       // Filter by subject card
       if (
         selectedSubject !== "All" &&
-        item.subject?.toLowerCase().trim() !== selectedSubject.toLowerCase().trim()
+        item.subject?.toLowerCase().trim() !==
+          selectedSubject.toLowerCase().trim()
       ) {
         return false;
       }
@@ -122,7 +117,7 @@ export default function MCQAdminPage() {
         const sMatch = item.subject?.toLowerCase().includes(query);
         const eMatch = item.explanation?.toLowerCase().includes(query);
         const oMatch = item.options?.some((opt) =>
-          opt?.toLowerCase().includes(query)
+          opt?.toLowerCase().includes(query),
         );
         return qMatch || sMatch || eMatch || oMatch;
       }
@@ -176,7 +171,7 @@ export default function MCQAdminPage() {
     setOptionB(mcq.options[1] || "");
     setOptionC(mcq.options[2] || "");
     setOptionD(mcq.options[3] || "");
-    
+
     // Find index of correctAnswer to bind to A/B/C/D
     const idx = mcq.options.indexOf(mcq.correctAnswer);
     if (idx === 0) setCorrectOption("A");
@@ -184,7 +179,7 @@ export default function MCQAdminPage() {
     else if (idx === 2) setCorrectOption("C");
     else if (idx === 3) setCorrectOption("D");
     else setCorrectOption("A"); // fallback
-    
+
     setMarks(mcq.marks || 1);
     setExplanation(mcq.explanation || "");
     setStatus(mcq.status || "Active");
@@ -218,7 +213,7 @@ export default function MCQAdminPage() {
           timer: 2000,
           showConfirmButton: false,
         });
-        
+
         // Auto launch Add MCQ modal pre-filled with this subject
         setTimeout(() => {
           setEditingMCQ(null);
@@ -246,7 +241,9 @@ export default function MCQAdminPage() {
       const res = await updateMCQ(mcq.id, { status: newStatus });
       if (res.success) {
         setMcqs((prev) =>
-          prev.map((item) => (item.id === mcq.id ? { ...item, status: newStatus } : item))
+          prev.map((item) =>
+            item.id === mcq.id ? { ...item, status: newStatus } : item,
+          ),
         );
         Swal.fire({
           title: "Updated!",
@@ -311,8 +308,17 @@ export default function MCQAdminPage() {
       Swal.fire("Validation Error", "Question is required.", "warning");
       return;
     }
-    if (!optionA.trim() || !optionB.trim() || !optionC.trim() || !optionD.trim()) {
-      Swal.fire("Validation Error", "All four options are required.", "warning");
+    if (
+      !optionA.trim() ||
+      !optionB.trim() ||
+      !optionC.trim() ||
+      !optionD.trim()
+    ) {
+      Swal.fire(
+        "Validation Error",
+        "All four options are required.",
+        "warning",
+      );
       return;
     }
 
@@ -345,7 +351,7 @@ export default function MCQAdminPage() {
             confirmButtonColor: "#3b82f6",
           });
           setMcqs((prev) =>
-            prev.map((item) => (item.id === editingMCQ.id ? res.data : item))
+            prev.map((item) => (item.id === editingMCQ.id ? res.data : item)),
           );
           setIsModalOpen(false);
         } else {
@@ -385,7 +391,8 @@ export default function MCQAdminPage() {
             </span>
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Publish questions, categorize into subject cards, and review answers with explanations.
+            Publish questions, categorize into subject cards, and review answers
+            with explanations.
           </p>
         </div>
 
@@ -397,7 +404,7 @@ export default function MCQAdminPage() {
           >
             <RefreshCw size={18} className={loading ? "animate-spin" : ""} />
           </button>
-          
+
           <button
             onClick={handleOpenCreateModal}
             className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/10 hover:from-blue-700 hover:to-indigo-700 transition-all active:scale-95 cursor-pointer w-full sm:w-auto"
@@ -413,46 +420,76 @@ export default function MCQAdminPage() {
         <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md">
           <div className="flex items-center justify-between text-blue-550 dark:text-blue-450">
             <HelpCircle size={22} />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Total</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Total
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">{stats.total}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Questions Pool</p>
+          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">
+            {stats.total}
+          </p>
+          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+            Questions Pool
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md">
           <div className="flex items-center justify-between text-green-500">
             <CheckCircle2 size={22} />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Active</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Active
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">{stats.active}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Live MCQs</p>
+          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">
+            {stats.active}
+          </p>
+          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+            Live MCQs
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md">
           <div className="flex items-center justify-between text-red-500">
             <XCircle size={22} />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Inactive</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Inactive
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">{stats.inactive}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Drafted Questions</p>
+          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">
+            {stats.inactive}
+          </p>
+          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+            Drafted Questions
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md col-span-1">
           <div className="flex items-center justify-between text-purple-500">
             <Layers size={22} />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Subjects</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Subjects
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">{stats.uniqueSubjects}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Total Categories</p>
+          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">
+            {stats.uniqueSubjects}
+          </p>
+          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+            Total Categories
+          </p>
         </div>
 
         <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md col-span-2 sm:col-span-4 lg:col-span-1">
           <div className="flex items-center justify-between text-amber-500">
             <Sparkles size={22} />
-            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">Weightage</span>
+            <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Weightage
+            </span>
           </div>
-          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">{stats.totalMarks}</p>
-          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">Cumulative Marks</p>
+          <p className="mt-4 text-2xl font-black text-slate-800 dark:text-slate-100">
+            {stats.totalMarks}
+          </p>
+          <p className="text-[11px] font-semibold text-slate-400 mt-0.5">
+            Cumulative Marks
+          </p>
         </div>
       </div>
 
@@ -461,7 +498,7 @@ export default function MCQAdminPage() {
         <h2 className="mb-4 text-xs font-extrabold uppercase tracking-widest text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
           <Tag size={12} /> Filter by Subject Card
         </h2>
-        
+
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
           {/* Card: All Subjects */}
           <div
@@ -474,31 +511,39 @@ export default function MCQAdminPage() {
               }`}
           >
             <div className="flex items-start justify-between">
-              <div className={`rounded-xl p-2.5 transition-colors duration-300
+              <div
+                className={`rounded-xl p-2.5 transition-colors duration-300
                 ${
                   selectedSubject === "All"
                     ? "bg-blue-500 text-white"
                     : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 dark:group-hover:bg-blue-900/30"
-                }`}>
+                }`}
+              >
                 <Layers size={18} />
               </div>
-              
+
               {selectedSubject === "All" && (
                 <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-[10px] text-white">
                   <Check size={10} strokeWidth={3} />
                 </span>
               )}
             </div>
-            
-            <p className="mt-4.5 font-bold text-slate-800 dark:text-slate-200 truncate">All Subjects</p>
-            <p className="mt-1 text-xs text-slate-400 font-semibold">{mcqs.length} MCQs</p>
+
+            <p className="mt-4.5 font-bold text-slate-800 dark:text-slate-200 truncate">
+              All Subjects
+            </p>
+            <p className="mt-1 text-xs text-slate-400 font-semibold">
+              {mcqs.length} MCQs
+            </p>
           </div>
 
           {/* Dynamic Subject Cards */}
           {subjectsList.map((sub) => {
-            const isActive = selectedSubject.toLowerCase().trim() === sub.name.toLowerCase().trim();
+            const isActive =
+              selectedSubject.toLowerCase().trim() ===
+              sub.name.toLowerCase().trim();
             const initial = sub.name ? sub.name.charAt(0).toUpperCase() : "?";
-            
+
             return (
               <div
                 key={sub.name}
@@ -512,26 +557,33 @@ export default function MCQAdminPage() {
               >
                 <div className="flex items-start justify-between">
                   {/* First letter stylized avatar */}
-                  <div className={`flex h-10 w-10 items-center justify-center rounded-xl font-black text-sm transition-colors duration-300
+                  <div
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl font-black text-sm transition-colors duration-300
                     ${
                       isActive
                         ? "bg-blue-500 text-white"
                         : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-350 group-hover:bg-blue-50 group-hover:text-blue-500 dark:group-hover:bg-blue-900/30"
-                    }`}>
+                    }`}
+                  >
                     {initial}
                   </div>
-                  
+
                   {isActive && (
                     <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-[10px] text-white">
                       <Check size={10} strokeWidth={3} />
                     </span>
                   )}
                 </div>
-                
-                <p className="mt-4.5 font-bold text-slate-800 dark:text-slate-200 truncate" title={sub.name}>
+
+                <p
+                  className="mt-4.5 font-bold text-slate-800 dark:text-slate-200 truncate"
+                  title={sub.name}
+                >
                   {sub.name}
                 </p>
-                <p className="mt-1 text-xs text-slate-400 font-semibold">{sub.count} {sub.count === 1 ? "MCQ" : "MCQs"}</p>
+                <p className="mt-1 text-xs text-slate-400 font-semibold">
+                  {sub.count} {sub.count === 1 ? "MCQ" : "MCQs"}
+                </p>
               </div>
             );
           })}
@@ -571,7 +623,9 @@ export default function MCQAdminPage() {
 
           {/* Status selector */}
           <div className="flex items-center gap-2">
-            <label className="text-xs font-bold text-slate-400 dark:text-slate-550 whitespace-nowrap">Status:</label>
+            <label className="text-xs font-bold text-slate-400 dark:text-slate-550 whitespace-nowrap">
+              Status:
+            </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
@@ -587,8 +641,15 @@ export default function MCQAdminPage() {
         {/* Right side showing current selection descriptor */}
         <div className="flex items-center justify-between sm:justify-end gap-3 text-xs font-bold text-slate-400">
           <span>
-            Showing <strong className="text-slate-700 dark:text-slate-200">{filteredMCQs.length}</strong> of{" "}
-            <strong className="text-slate-700 dark:text-slate-200">{mcqs.length}</strong> MCQs
+            Showing{" "}
+            <strong className="text-slate-700 dark:text-slate-200">
+              {filteredMCQs.length}
+            </strong>{" "}
+            of{" "}
+            <strong className="text-slate-700 dark:text-slate-200">
+              {mcqs.length}
+            </strong>{" "}
+            MCQs
           </span>
           {selectedSubject !== "All" && (
             <button
@@ -617,13 +678,15 @@ export default function MCQAdminPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-500 dark:bg-blue-900/30 dark:text-blue-400">
             <BookOpenCheck size={26} />
           </div>
-          <h3 className="mt-5 text-lg font-bold text-slate-800 dark:text-slate-200">No Questions Found</h3>
+          <h3 className="mt-5 text-lg font-bold text-slate-800 dark:text-slate-200">
+            No Questions Found
+          </h3>
           <p className="mx-auto mt-2 max-w-sm text-sm text-slate-400">
             {selectedSubject !== "All"
               ? `No MCQs are registered under "${selectedSubject}" subject card matching filters. Add a question to get started.`
               : "No MCQs found matching your current search parameters. Clear filters to see full list."}
           </p>
-          
+
           <button
             onClick={handleOpenCreateModal}
             className="mt-6 flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 transition-colors shadow-sm"
@@ -635,7 +698,7 @@ export default function MCQAdminPage() {
         <div className="space-y-4">
           {filteredMCQs.map((item, index) => {
             const isExpanded = !!expandedMCQs[item.id];
-            
+
             return (
               <div
                 key={item.id}
@@ -662,7 +725,7 @@ export default function MCQAdminPage() {
                           <Tag size={10} />
                           {item.subject}
                         </span>
-                        
+
                         {/* Marks Badge */}
                         <span className="inline-flex items-center gap-1 rounded-lg bg-indigo-50 px-2 py-0.5 text-[10px] font-bold text-indigo-650 dark:bg-indigo-950/50 dark:text-indigo-400">
                           <Sparkles size={10} />
@@ -690,7 +753,7 @@ export default function MCQAdminPage() {
                           )}
                         </span>
                       </div>
-                      
+
                       {/* Question Content preview */}
                       <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-relaxed pr-6">
                         {item.question}
@@ -717,7 +780,11 @@ export default function MCQAdminPage() {
                     </button>
 
                     <div className="text-slate-400 dark:text-slate-500 pl-1.5 hidden sm:block">
-                      {isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                      {isExpanded ? (
+                        <ChevronUp size={18} />
+                      ) : (
+                        <ChevronDown size={18} />
+                      )}
                     </div>
                   </div>
                 </div>
@@ -734,7 +801,7 @@ export default function MCQAdminPage() {
                       {item.options?.map((opt, i) => {
                         const optLetter = String.fromCharCode(65 + i); // A, B, C, D
                         const isCorrect = opt === item.correctAnswer;
-                        
+
                         return (
                           <div
                             key={i}
@@ -745,15 +812,19 @@ export default function MCQAdminPage() {
                                   : "border-slate-200/50 bg-white text-slate-650 dark:border-slate-850 dark:bg-slate-950"
                               }`}
                           >
-                            <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold
+                            <span
+                              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold
                               ${
                                 isCorrect
                                   ? "bg-green-500 text-white"
                                   : "bg-slate-100 text-slate-550 dark:bg-slate-850 dark:text-slate-400"
-                              }`}>
+                              }`}
+                            >
                               {optLetter}
                             </span>
-                            <span className="text-sm font-semibold leading-relaxed break-words">{opt}</span>
+                            <span className="text-sm font-semibold leading-relaxed break-words">
+                              {opt}
+                            </span>
                             {isCorrect && (
                               <span className="ml-auto text-green-600 dark:text-green-500">
                                 <CheckCircle2 size={16} />
@@ -819,7 +890,8 @@ export default function MCQAdminPage() {
                       Subject Auto-populated
                     </p>
                     <p className="text-[11px] text-blue-600/85 dark:text-blue-300/80 mt-0.5">
-                      Because you clicked the <strong>{selectedSubject}</strong> card, this question is automatically linked.
+                      Because you clicked the <strong>{selectedSubject}</strong>{" "}
+                      card, this question is automatically linked.
                     </p>
                   </div>
                 </div>
@@ -865,7 +937,7 @@ export default function MCQAdminPage() {
                 <label className="block text-xs font-black uppercase tracking-wider text-slate-550 dark:text-slate-400">
                   Multiple Choice Options
                 </label>
-                
+
                 <div className="grid gap-3.5 sm:grid-cols-2">
                   {/* Option A */}
                   <div className="relative">
@@ -934,7 +1006,7 @@ export default function MCQAdminPage() {
                 <label className="mb-2 block text-xs font-black uppercase tracking-wider text-slate-550 dark:text-slate-400">
                   Mark Correct Option
                 </label>
-                
+
                 <div className="grid grid-cols-4 gap-2">
                   {["A", "B", "C", "D"].map((opt) => {
                     const isSelected = correctOption === opt;
@@ -955,15 +1027,17 @@ export default function MCQAdminPage() {
                               : "border-slate-200 bg-slate-55 hover:border-slate-350 dark:border-slate-850 dark:bg-slate-955 dark:hover:border-slate-700"
                           }`}
                       >
-                        <span className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-black
+                        <span
+                          className={`flex h-6 w-6 items-center justify-center rounded-lg text-xs font-black
                           ${
                             isSelected
                               ? "bg-green-500 text-white"
                               : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                          }`}>
+                          }`}
+                        >
                           {opt}
                         </span>
-                        
+
                         <p className="mt-1 text-[10px] font-semibold truncate max-w-full text-slate-400">
                           {boundText.trim() ? boundText : "Empty..."}
                         </p>
@@ -1029,7 +1103,7 @@ export default function MCQAdminPage() {
                 >
                   Cancel
                 </button>
-                
+
                 <button
                   type="submit"
                   className="rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-blue-500/10 hover:from-blue-700 hover:to-indigo-700 transition-all cursor-pointer"

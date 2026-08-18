@@ -108,29 +108,13 @@ export default function ViewExamInformation() {
           {/* Details */}
           <div className="space-y-4 md:col-span-2">
             <InfoRow title="Exam Name" value={exam.examName} />
-            <InfoRow title="Course Name" value={exam.course} />
+            <InfoRow title="Exam Mode" value={exam.mode || "Offline"} />
             <InfoRow title="Assigned Batch" value={formatBatch(exam.batch)} />
             <InfoRow title="Exam Date" value={formatDate(exam.examDate)} />
             <InfoRow title="Exam Time" value={exam.examTime} />
             <InfoRow title="Duration" value={exam.duration} />
             <InfoRow title="Venue" value={exam.venue} />
-            <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 dark:border-slate-800/40 dark:bg-slate-900/40 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/20">
-              <span className="font-semibold text-slate-550 dark:text-slate-400 text-sm">
-                Status
-              </span>
-              <StatusBadge status={exam.status} />
-            </div>
           </div>
-        </div>
-
-        {/* Description */}
-        <div className="border-t border-slate-100 p-6 md:p-8 dark:border-slate-800/60">
-          <h3 className="mb-3 text-lg font-bold text-slate-800 dark:text-white">
-            Exam Guidelines & Description
-          </h3>
-          <p className="rounded-2xl border border-slate-100 bg-slate-50/50 p-5 dark:border-slate-800/40 dark:bg-slate-900/40 text-slate-650 dark:text-slate-300 leading-relaxed text-sm">
-            {exam.description || "No specific exam guidelines provided."}
-          </p>
         </div>
       </div>
     </div>

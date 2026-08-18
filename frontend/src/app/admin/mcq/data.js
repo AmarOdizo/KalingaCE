@@ -1,18 +1,30 @@
-const API_URL =
-  typeof window !== "undefined" &&
-  (window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1" ||
-    window.location.hostname.startsWith("192.168.") ||
-    window.location.hostname.startsWith("10.") ||
-    window.location.hostname.startsWith("172."))
-    ? "http://localhost:5000/api/MCQ"
-    : "https://kalingace-4.onrender.com/api/MCQ";
+const LOCAL_URL = "http://localhost:5000/api/MCQ";
+const PROD_URL = "https://kalingace-4.onrender.com/api/MCQ";
+
+async function customFetch(urlPath, options = {}) {
+  const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+  if (isLocal) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(`${LOCAL_URL}${urlPath}`, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (err) {
+      console.warn("Local backend port 5000 is not active or timed out. Falling back to Render URL.");
+    }
+  }
+  return fetch(`${PROD_URL}${urlPath}`, options);
+}
 
 // ==============================
 // GET All MCQs
 // ==============================
 export const getMCQs = async () => {
-  const response = await fetch(API_URL, {
+  const response = await customFetch("", {
     cache: "no-store",
   });
 
@@ -29,7 +41,7 @@ export const getMCQs = async () => {
 // GET Single MCQ By ID (Mongoose/Seq ID)
 // ==============================
 export const getMCQById = async (id) => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await customFetch(`/${id}`, {
     cache: "no-store",
   });
 
@@ -47,7 +59,7 @@ export const getMCQById = async (id) => {
 // ==============================
 export const getMCQsBySubject = async (subject) => {
   const encodedSubject = encodeURIComponent(subject);
-  const response = await fetch(`${API_URL}/subject/${encodedSubject}`, {
+  const response = await customFetch(`/subject/${encodedSubject}`, {
     cache: "no-store",
   });
 
@@ -64,7 +76,7 @@ export const getMCQsBySubject = async (subject) => {
 // GET All Subjects
 // ==============================
 export const getSubjects = async () => {
-  const response = await fetch(`${API_URL}/subjects/all`, {
+  const response = await customFetch("/subjects/all", {
     cache: "no-store",
   });
 
@@ -81,7 +93,7 @@ export const getSubjects = async () => {
 // CREATE MCQ
 // ==============================
 export const createMCQ = async (mcqData) => {
-  const response = await fetch(API_URL, {
+  const response = await customFetch("", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -96,7 +108,7 @@ export const createMCQ = async (mcqData) => {
 // UPDATE MCQ
 // ==============================
 export const updateMCQ = async (id, mcqData) => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await customFetch(`/${id}`, {
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
@@ -111,8 +123,23 @@ export const updateMCQ = async (id, mcqData) => {
 // DELETE MCQ
 // ==============================
 export const deleteMCQ = async (id) => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await customFetch(`/${id}`, {
     method: "DELETE",
+  });
+
+  return await response.json();
+};
+
+// ==============================
+// CREATE BULK MCQS
+// ==============================
+export const createBulkMCQs = async (mcqList) => {
+  const response = await customFetch("/bulk", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ mcqs: mcqList }),
   });
 
   return await response.json();

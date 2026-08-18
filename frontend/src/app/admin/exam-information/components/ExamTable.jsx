@@ -5,14 +5,14 @@ import Link from "next/link";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
 
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2, BookOpenCheck } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
 import { deleteExamInformation } from "../data";
 import { formatBatch, formatDate } from "../utils";
 import EmptyState from "./EmptyState";
 
-export default function ExamTable({ exams, refreshData }) {
+export default function ExamTable({ exams, mcqs = [], refreshData }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ export default function ExamTable({ exams, refreshData }) {
                   Exam & Venue
                 </th>
                 <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Course
+                  Mode
                 </th>
                 <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
                   Batch
@@ -73,7 +73,7 @@ export default function ExamTable({ exams, refreshData }) {
                   Date
                 </th>
                 <th className="px-6 py-4.5 text-center text-xs font-bold uppercase tracking-wider">
-                  Status
+                  MCQs
                 </th>
                 <th className="px-6 py-4.5 text-center text-xs font-bold uppercase tracking-wider">
                   Actions
@@ -103,34 +103,71 @@ export default function ExamTable({ exams, refreshData }) {
                     <p className="font-bold text-slate-800 dark:text-slate-100">
                       {exam.examName}
                     </p>
-                    <p className="text-xs font-medium text-slate-400 dark:text-slate-500 mt-0.5">
+                    <p className="text-xs font-medium text-slate-400 dark:text-slate-400 mt-0.5">
                       {exam.venue}
                     </p>
                   </td>
 
-                  {/* Course */}
-                  <td className="px-6 py-4.5 text-slate-600 dark:text-slate-350 text-sm font-semibold">
-                    {exam.course}
+                  {/* Mode */}
+                  <td className="px-6 py-4.5 text-sm">
+                    <span
+                      className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold ${
+                        exam.mode?.toLowerCase() === "online"
+                          ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400"
+                          : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
+                      }`}
+                    >
+                      {exam.mode || "Offline"}
+                    </span>
                   </td>
 
                   {/* Batch */}
-                  <td className="px-6 py-4.5 text-slate-600 dark:text-slate-350 text-sm font-semibold">
+                  <td className="px-6 py-4.5 text-slate-600 dark:text-slate-300 text-sm font-semibold">
                     {formatBatch(exam.batch)}
                   </td>
 
                   {/* Date */}
-                  <td className="px-6 py-4.5 text-slate-650 dark:text-slate-300 text-sm font-bold">
+                  <td className="px-6 py-4.5 text-slate-600 dark:text-slate-300 text-sm font-bold">
                     {formatDate(exam.examDate)}
                   </td>
 
-                  {/* Status */}
+                  {/* MCQs count badge cell */}
                   <td className="px-6 py-4.5 text-center">
-                    <StatusBadge status={exam.status} />
+                    {exam.mode?.toLowerCase() === "online" ? (
+                      (() => {
+                        const examMcqs = mcqs.filter(m => (m.examId?._id || m.examId) === exam._id);
+                        const mcqCount = examMcqs.length;
+                        return (
+                          <Link
+                            href={`/admin/mcq?examId=${exam._id || exam.id}&launchCreate=true`}
+                            className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer transition-all hover:scale-105 ${
+                              mcqCount > 0
+                                ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400"
+                                : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
+                            }`}
+                          >
+                            {mcqCount} {mcqCount === 1 ? "Question" : "Questions"}
+                          </Link>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-slate-400 font-bold text-xs">-</span>
+                    )}
                   </td>
 
                   {/* Actions */}
                   <td className="px-6 py-4.5">
                     <div className="flex items-center justify-center gap-2">
+                      {exam.mode?.toLowerCase() === "online" && (
+                        <Link
+                          href={`/admin/mcq?examId=${exam._id || exam.id}&launchCreate=true`}
+                          className="rounded-xl bg-violet-50 p-2 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400 hover:bg-violet-600 hover:text-white dark:hover:bg-violet-500 dark:hover:text-white transition-all duration-200 active:scale-95"
+                          title="Manage MCQs"
+                        >
+                          <BookOpenCheck size={16} />
+                        </Link>
+                      )}
+
                       <Link
                         href={`/admin/exam-information/view/${exam.id}`}
                         className="rounded-xl bg-sky-50 p-2 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400 hover:bg-sky-600 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white transition-all duration-200 active:scale-95"
@@ -149,7 +186,7 @@ export default function ExamTable({ exams, refreshData }) {
 
                       <button
                         onClick={() => handleDeleteClick(exam)}
-                        className="rounded-xl bg-rose-50 p-2 text-rose-650 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
+                        className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-650 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
                         title="Delete Exam"
                       >
                         <Trash2 size={16} />

@@ -9,17 +9,16 @@ export default function ExamForm({
   onSubmit,
   loading = false,
 }) {
+  const isEdit = !!(initialData && Object.keys(initialData).length > 0);
   const [formData, setFormData] = useState({
-    batch: [],
+    batch: "",
     examName: "",
-    course: "",
+    mode: "Offline",
     image: "",
     examDate: "",
     examTime: "",
     duration: "",
     venue: "",
-    description: "",
-    status: "Upcoming",
   });
 
   const [uploading, setUploading] = useState(false);
@@ -28,9 +27,12 @@ export default function ExamForm({
     if (initialData && Object.keys(initialData).length > 0) {
       const timer = setTimeout(() => {
         setFormData({
-          batch: initialData.batch || [],
+          batch: initialData.batch || "",
           examName: initialData.examName || "",
-          course: initialData.course || "",
+          mode:
+            initialData.mode && initialData.mode.toLowerCase() === "online"
+              ? "Online"
+              : "Offline",
           image: initialData.image || "",
           examDate: initialData.examDate
             ? initialData.examDate.split("T")[0]
@@ -38,8 +40,6 @@ export default function ExamForm({
           examTime: initialData.examTime || "",
           duration: initialData.duration || "",
           venue: initialData.venue || "",
-          description: initialData.description || "",
-          status: initialData.status || "Upcoming",
         });
       }, 0);
       return () => clearTimeout(timer);
@@ -104,12 +104,14 @@ export default function ExamForm({
     }));
   };
 
+  const [submitAction, setSubmitAction] = useState("save"); // "save" or "mcq"
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.batch.length === 0) {
-      return alert("Please select at least one batch.");
+    if (!formData.batch || !formData.batch.trim()) {
+      return alert("Please enter target batch.");
     }
-    onSubmit(formData);
+    onSubmit(formData, submitAction);
   };
 
   return (
@@ -119,37 +121,20 @@ export default function ExamForm({
         <label className="mb-3 block text-sm font-semibold text-slate-700 dark:text-slate-350">
           Target Batch
         </label>
-
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-5">
-          {batches.map((batch) => {
-            const isSelected = formData.batch.includes(batch);
-            return (
-              <button
-                type="button"
-                key={batch}
-                onClick={() => handleBatchChange(batch)}
-                className={`flex items-center justify-center gap-2 rounded-xl border py-3 px-4 text-sm font-semibold transition-all duration-200 cursor-pointer ${
-                  isSelected
-                    ? "border-primary-500 bg-primary-50/10 text-primary-600 dark:border-primary-500 dark:bg-primary-500/10 dark:text-primary-400 shadow-sm"
-                    : "border-slate-200 bg-white/50 text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-405 dark:hover:bg-slate-800/50"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={isSelected}
-                  readOnly
-                  className="h-4 w-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500 cursor-pointer accent-primary-600"
-                />
-                <span>{batch}</span>
-              </button>
-            );
-          })}
-        </div>
+        <input
+          type="text"
+          name="batch"
+          value={formData.batch}
+          onChange={handleChange}
+          className="premium-input"
+          placeholder="e.g. 2024-25"
+          required
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Exam Name */}
-        <div>
+        <div className="md:col-span-2">
           <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-350">
             Exam Name
           </label>
@@ -162,27 +147,6 @@ export default function ExamForm({
             placeholder="e.g. Term End Examination 2026"
             required
           />
-        </div>
-
-        {/* Course */}
-        <div>
-          <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-350">
-            Course
-          </label>
-          <select
-            name="course"
-            value={formData.course}
-            onChange={handleChange}
-            className="premium-input cursor-pointer"
-            required
-          >
-            <option value="">Select Course</option>
-            {courses.map((course) => (
-              <option key={course} value={course}>
-                {course}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Exam Date */}
@@ -206,12 +170,11 @@ export default function ExamForm({
             Exam Time
           </label>
           <input
-            type="text"
+            type="time"
             name="examTime"
             value={formData.examTime}
             onChange={handleChange}
-            placeholder="e.g. 10:00 AM"
-            className="premium-input"
+            className="premium-input cursor-pointer"
             required
           />
         </div>
@@ -221,15 +184,27 @@ export default function ExamForm({
           <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-350">
             Duration
           </label>
-          <input
-            type="text"
+          <select
             name="duration"
             value={formData.duration}
             onChange={handleChange}
-            placeholder="e.g. 3 Hours"
-            className="premium-input"
+            className="premium-input cursor-pointer"
             required
-          />
+          >
+            <option value="">Select Duration</option>
+            <option value="5 Minutes">5 Minutes</option>
+            <option value="10 Minutes">10 Minutes</option>
+            <option value="20 Minutes">20 Minutes</option>
+            <option value="30 Minutes">30 Minutes</option>
+            <option value="45 Minutes">45 Minutes</option>
+            <option value="1 Hour">1 Hour</option>
+            <option value="1.5 Hours">1.5 Hours</option>
+            <option value="2 Hours">2 Hours</option>
+            <option value="2.5 Hours">2.5 Hours</option>
+            <option value="3 Hours">3 Hours</option>
+            <option value="3.5 Hours">3.5 Hours</option>
+            <option value="4 Hours">4 Hours</option>
+          </select>
         </div>
 
         {/* Venue */}
@@ -249,38 +224,28 @@ export default function ExamForm({
         </div>
       </div>
 
-      {/* Description */}
-      <div>
-        <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-350">
-          Exam Guidelines & Description
-        </label>
-        <textarea
-          rows={4}
-          name="description"
-          value={formData.description}
-          onChange={handleChange}
-          placeholder="Enter detailed guidelines, instructions, or notes for the exam..."
-          className="premium-input"
-        />
-      </div>
-
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Status */}
+        {/* Mode */}
         <div>
           <label className="mb-2 block text-sm font-semibold text-slate-700 dark:text-slate-350">
-            Status
+            Exam Mode
           </label>
           <select
-            name="status"
-            value={formData.status}
+            name="mode"
+            value={formData.mode}
             onChange={handleChange}
             className="premium-input cursor-pointer"
             required
           >
-            <option value="Upcoming">Upcoming</option>
-            <option value="Ongoing">Ongoing</option>
-            <option value="Completed">Completed</option>
+            <option value="Offline">Offline</option>
+            <option value="Online">Online</option>
           </select>
+          {formData.mode === "Offline" && (
+            <p className="mt-1.5 text-[11px] text-amber-605 dark:text-amber-500 font-bold leading-normal">
+              Offline mode: Only institute students can take this exam at the
+              institute venue.
+            </p>
+          )}
         </div>
 
         {/* Image Upload */}
@@ -294,51 +259,27 @@ export default function ExamForm({
 
       {/* Action Buttons */}
       <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
-        <button
-          type="button"
-          onClick={() => {
-            if (initialData && Object.keys(initialData).length > 0) {
-              setFormData({
-                batch: initialData.batch || [],
-                examName: initialData.examName || "",
-                course: initialData.course || "",
-                image: initialData.image || "",
-                examDate: initialData.examDate
-                  ? initialData.examDate.split("T")[0]
-                  : "",
-                examTime: initialData.examTime || "",
-                duration: initialData.duration || "",
-                venue: initialData.venue || "",
-                description: initialData.description || "",
-                status: initialData.status || "Upcoming",
-              });
-            } else {
-              setFormData({
-                batch: [],
-                examName: "",
-                course: "",
-                image: "",
-                examDate: "",
-                examTime: "",
-                duration: "",
-                venue: "",
-                description: "",
-                status: "Upcoming",
-              });
-            }
-          }}
-          className="btn-secondary py-3 px-6 text-sm"
-        >
-          Reset
-        </button>
+        {(formData.mode !== "Online" || isEdit) && (
+          <button
+            type="submit"
+            onClick={() => setSubmitAction("save")}
+            disabled={loading || uploading}
+            className="btn-primary py-3 px-8 shadow-md"
+          >
+            {loading || uploading ? "Saving..." : "Save Exam"}
+          </button>
+        )}
 
-        <button
-          type="submit"
-          disabled={loading || uploading}
-          className="btn-primary py-3 px-8 shadow-md"
-        >
-          {loading || uploading ? "Saving..." : "Save Exam"}
-        </button>
+        {(formData.mode === "Online" && !isEdit) && (
+          <button
+            type="submit"
+            onClick={() => setSubmitAction("mcq")}
+            disabled={loading || uploading}
+            className="rounded-xl border border-indigo-200 bg-indigo-50/20 px-6 py-3 font-bold text-sm text-indigo-700 hover:bg-indigo-600 hover:text-white dark:border-indigo-900/40 dark:bg-indigo-950/10 dark:text-indigo-400 dark:hover:bg-indigo-500 dark:hover:text-white active:scale-95 cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+          >
+            Save & Add MCQ
+          </button>
+        )}
       </div>
     </form>
   );

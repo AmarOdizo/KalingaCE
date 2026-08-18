@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Eye, Calendar, BookOpen, Clock, MapPin, ClipboardList } from "lucide-react";
+import { Eye, Calendar, Clock, MapPin, ClipboardList } from "lucide-react";
 
 export default function ExamCard({ exam, onView }) {
   // Format the exam date
@@ -26,41 +26,13 @@ export default function ExamCard({ exam, onView }) {
       })
     : "Closed";
 
-  // Determine if online or offline mode based on venue
-  const isOnline = exam.venue?.toLowerCase()?.includes("online");
-  const examMode = isOnline ? "Online" : "Offline";
-
-  // Get status badge colors
-  const getStatusConfig = (status) => {
-    switch (status?.toLowerCase()) {
-      case "ongoing":
-        return {
-          bg: "bg-emerald-500/90 text-white dark:bg-emerald-500/20 dark:text-emerald-450",
-          label: "Ongoing",
-          dot: "bg-emerald-300 animate-ping",
-        };
-      case "completed":
-        return {
-          bg: "bg-slate-500/95 text-white dark:bg-slate-800/80 dark:text-slate-400",
-          label: "Completed",
-          dot: "bg-slate-400",
-        };
-      case "upcoming":
-      default:
-        return {
-          bg: "bg-blue-600/95 text-white dark:bg-blue-500/20 dark:text-blue-400",
-          label: "Upcoming",
-          dot: "bg-blue-300 animate-pulse",
-        };
-    }
-  };
-
-  const statusConfig = getStatusConfig(exam.status);
+  // Determine if online or offline mode based on database field or venue fallback
+  const examMode = exam.mode || (exam.venue?.toLowerCase()?.includes("online") ? "Online" : "Offline");
 
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-premium transition-all duration-300 hover:-translate-y-2 hover:shadow-premium-hover dark:border-slate-800/60 dark:bg-slate-900/60 backdrop-blur-md">
       {/* Banner / Hero Image */}
-      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-t-[24px] bg-slate-100 dark:bg-slate-950/40 select-none">
+      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-t-[24px] bg-slate-100 dark:bg-slate-955/40 select-none">
         <Image
           src={exam.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop"}
           alt={exam.examName}
@@ -71,12 +43,6 @@ export default function ExamCard({ exam, onView }) {
         
         {/* Soft shadow overlay for text contrast */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/20 via-transparent to-transparent z-10 pointer-events-none" />
-
-        {/* Status Badge */}
-        <div className={`absolute right-4 top-4 z-20 flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold shadow-md tracking-wide backdrop-blur-sm ${statusConfig.bg}`}>
-          <span className={`h-2 w-2 rounded-full ${statusConfig.dot}`} />
-          {statusConfig.label}
-        </div>
       </div>
 
       {/* Card Content Body */}
@@ -87,19 +53,8 @@ export default function ExamCard({ exam, onView }) {
             {exam.examName || "Untitled Examination"}
           </h3>
 
-          {/* Short Description */}
-          <p className="line-clamp-2 text-sm leading-relaxed text-slate-500 dark:text-slate-400">
-            {exam.description || "No description available for this examination. Please check course guidelines for details."}
-          </p>
-
           {/* Metadata Grid */}
           <div className="grid grid-cols-2 gap-y-3.5 gap-x-2 pt-2 text-sm font-semibold text-slate-600 dark:text-slate-350">
-            {/* Course */}
-            <div className="flex items-center gap-2.5">
-              <BookOpen size={16} className="text-blue-600 dark:text-blue-400 shrink-0" />
-              <span className="truncate">{exam.course || "General"}</span>
-            </div>
-
             {/* Exam Mode */}
             <div className="flex items-center gap-2.5">
               <MapPin size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />

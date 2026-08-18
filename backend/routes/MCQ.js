@@ -10,7 +10,7 @@ const MCQCounter = require("../models/MCQCounter");
 
 router.get("/", async (req, res) => {
   try {
-    const mcqs = await MCQ.find().sort({ id: 1 });
+    const mcqs = await MCQ.find().sort({ id: 1 }).populate("examId");
 
     res.status(200).json({
       success: true,
@@ -36,7 +36,7 @@ router.get("/:id", async (req, res) => {
   try {
     const mcq = await MCQ.findOne({
       id: Number(req.params.id),
-    });
+    }).populate("examId");
 
     if (!mcq) {
       return res.status(404).json({
@@ -74,8 +74,7 @@ router.get("/subject/:subject", async (req, res) => {
         $regex: `^${subject}$`,
         $options: "i",
       },
-      status: "Active",
-    }).sort({ id: 1 });
+    }).sort({ id: 1 }).populate("examId");
 
     res.status(200).json({
       success: true,
@@ -127,23 +126,23 @@ router.get("/subjects/all", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const {
+      examId,
       subject,
       question,
       options,
       correctAnswer,
       marks,
       explanation,
-      status,
     } = req.body;
 
     // -----------------------------
     // Required validation
     // -----------------------------
 
-    if (!subject || !question || !options || !correctAnswer) {
+    if (!examId || !subject || !question || !options || !correctAnswer) {
       return res.status(400).json({
         success: false,
-        message: "Subject, question, options and correctAnswer are required",
+        message: "Exam ID, subject, question, options and correctAnswer are required",
       });
     }
 
@@ -188,19 +187,21 @@ router.post("/", async (req, res) => {
 
     const mcq = await MCQ.create({
       id: counter.seq,
+      examId,
       subject: subject.trim(),
       question: question.trim(),
       options,
       correctAnswer: correctAnswer.trim(),
       marks: marks || 1,
       explanation: explanation || "",
-      status: status || "Active",
     });
+
+    const populatedMCQ = await MCQ.findById(mcq._id).populate("examId");
 
     res.status(201).json({
       success: true,
       message: "MCQ created successfully",
-      data: mcq,
+      data: populatedMCQ,
     });
   } catch (error) {
     console.error("CREATE MCQ ERROR:", error);
@@ -222,13 +223,13 @@ router.put("/:id", async (req, res) => {
     const mcqId = Number(req.params.id);
 
     const {
+      examId,
       subject,
       question,
       options,
       correctAnswer,
       marks,
       explanation,
-      status,
     } = req.body;
 
     const existingMCQ = await MCQ.findOne({
@@ -271,20 +272,21 @@ router.put("/:id", async (req, res) => {
     // Update
     // -----------------------------
 
+    existingMCQ.examId = examId || existingMCQ.examId;
     existingMCQ.subject = subject?.trim() || existingMCQ.subject;
     existingMCQ.question = question?.trim() || existingMCQ.question;
     existingMCQ.options = finalOptions;
     existingMCQ.correctAnswer = finalCorrectAnswer;
     existingMCQ.marks = marks ?? existingMCQ.marks;
     existingMCQ.explanation = explanation ?? existingMCQ.explanation;
-    existingMCQ.status = status || existingMCQ.status;
 
     await existingMCQ.save();
+    const populatedMCQ = await MCQ.findById(existingMCQ._id).populate("examId");
 
     res.status(200).json({
       success: true,
       message: "MCQ updated successfully",
-      data: existingMCQ,
+      data: populatedMCQ,
     });
   } catch (error) {
     console.error("UPDATE MCQ ERROR:", error);
@@ -327,6 +329,106 @@ router.delete("/:id", async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to delete MCQ",
+      error: error.message,
+    });
+  }
+});
+
+// GET MCQs BY EXAM SCHEDULE (examId)
+// =====================================================
+
+router.get("/exam/:examId", async (req, res) => {
+  try {
+    const examId = req.params.examId;
+
+    const mcqs = await MCQ.find({
+      examId,
+    }).sort({ id: 1 }).populate("examId");
+
+    res.status(200).json({
+      success: true,
+      count: mcqs.length,
+      data: mcqs,
+    });
+  } catch (error) {
+    console.error("GET EXAM MCQS ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch exam MCQs",
+      error: error.message,
+    });
+  }
+});
+
+// =====================================================
+// BULK CREATE MCQS
+// =====================================================
+router.post("/bulk", async (req, res) => {
+  try {
+    const { mcqs } = req.body;
+
+    if (!Array.isArray(mcqs) || mcqs.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Array of MCQs is required",
+      });
+    }
+
+    // Validate all items
+    for (const item of mcqs) {
+      if (!item.examId || !item.subject || !item.question || !item.options || !item.correctAnswer) {
+        return res.status(400).json({
+          success: false,
+          message: "All MCQs must contain examId, subject, question, options and correctAnswer",
+        });
+      }
+      if (!Array.isArray(item.options) || item.options.length !== 4) {
+        return res.status(400).json({
+          success: false,
+          message: "Each MCQ must have exactly 4 options",
+        });
+      }
+      if (!item.options.includes(item.correctAnswer)) {
+        return res.status(400).json({
+          success: false,
+          message: "Correct answer must match one of the options",
+        });
+      }
+    }
+
+    // Fetch counter to increment sequence safely
+    const counter = await MCQCounter.findOneAndUpdate(
+      { _id: "mcqId" },
+      { $inc: { seq: mcqs.length } },
+      { new: true, upsert: true }
+    );
+
+    const startSeq = counter.seq - mcqs.length;
+
+    const mcqsToInsert = mcqs.map((item, index) => ({
+      id: startSeq + index + 1,
+      examId: item.examId,
+      subject: item.subject.trim(),
+      question: item.question.trim(),
+      options: item.options.map(opt => opt.trim()),
+      correctAnswer: item.correctAnswer.trim(),
+      marks: Number(item.marks) || 1,
+      explanation: item.explanation?.trim() || "",
+    }));
+
+    const result = await MCQ.insertMany(mcqsToInsert);
+
+    res.status(201).json({
+      success: true,
+      message: `${result.length} MCQs published successfully`,
+      data: result,
+    });
+  } catch (error) {
+    console.error("BULK CREATE MCQ ERROR:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to bulk create MCQs",
       error: error.message,
     });
   }

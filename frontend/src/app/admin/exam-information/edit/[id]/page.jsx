@@ -36,30 +36,29 @@ export default function EditExamInformation() {
     return () => clearTimeout(timer);
   }, [loadExam]);
 
-  const handleSubmit = async (formData) => {
+  const handleSubmit = async (formData, submitAction = "save") => {
     try {
       setLoading(true);
       const payload = new FormData();
 
       payload.append("examName", formData.examName);
-      payload.append("course", formData.course);
+      payload.append("mode", formData.mode);
       payload.append("examDate", formData.examDate);
       payload.append("examTime", formData.examTime);
       payload.append("duration", formData.duration);
       payload.append("venue", formData.venue);
-      payload.append("description", formData.description);
-      payload.append("status", formData.status);
       payload.append("image", formData.image || "");
-
-      formData.batch.forEach((item) => {
-        payload.append("batch", item);
-      });
+      payload.append("batch", formData.batch);
 
       const res = await updateExamInformation(id, payload);
 
       if (res.success) {
         alert("Exam Information Updated Successfully");
-        router.push("/admin/exam-information");
+        if (submitAction === "mcq") {
+          router.push(`/admin/mcq?examId=${res.data?._id || res.data?.id || id}&launchCreate=true`);
+        } else {
+          router.push("/admin/exam-information");
+        }
       } else {
         alert(res.message || "Failed to update exam schedule.");
       }

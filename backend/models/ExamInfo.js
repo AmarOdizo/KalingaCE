@@ -8,7 +8,7 @@ const ExamInformationSchema = new mongoose.Schema(
     },
 
     batch: {
-      type: [String],
+      type: String,
       required: true,
       trim: true,
     },
@@ -19,10 +19,11 @@ const ExamInformationSchema = new mongoose.Schema(
       trim: true,
     },
 
-    course: {
+    mode: {
       type: String,
+      enum: ["Online", "Offline"],
+      default: "Offline",
       required: true,
-      trim: true,
     },
 
     // ImageKit Image URL
@@ -50,17 +51,6 @@ const ExamInformationSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
-    },
-
-    description: {
-      type: String,
-      default: "",
-    },
-
-    status: {
-      type: String,
-      enum: ["Upcoming", "Ongoing", "Completed"],
-      default: "Upcoming",
     },
   },
   {

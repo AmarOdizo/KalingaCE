@@ -108,14 +108,14 @@ export default function CampusInformationPage() {
 
   if (loading) {
     return (
-      <div className="mx-auto max-w-7xl p-4 sm:p-6 md:p-8">
+      <div className="w-full p-4 sm:p-6 md:p-8">
         <Loading />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4 sm:p-6 md:p-8 space-y-8 transition-colors duration-300">
+    <div className="w-full p-4 sm:p-6 md:p-8 space-y-8 transition-colors duration-300">
       <title>Campus Information | Admin Panel</title>
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

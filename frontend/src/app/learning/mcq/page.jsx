@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MCQClient from "./MCQClient";
 
 export const metadata = {
@@ -23,7 +24,9 @@ export default function MCQPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(assessmentSchema) }}
       />
-      <MCQClient />
+      <Suspense fallback={<div className="text-center py-20">Loading assessment portal...</div>}>
+        <MCQClient />
+      </Suspense>
     </>
   );
 }

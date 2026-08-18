@@ -44,7 +44,12 @@ export default function TopStudents() {
       const res = await axios.get(API_URL);
 
       if (res.data && res.data.data && res.data.data.length > 0) {
+        const presentYear = new Date().getFullYear().toString();
         const topperStudents = res.data.data
+          .filter((student) => {
+            const batchStr = (student.batch || "").toString();
+            return batchStr.includes(presentYear);
+          })
           .map((student) => ({
             ...student,
             percentage:

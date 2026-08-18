@@ -34,9 +34,16 @@ router.get("/", async (req, res) => {
 // ==============================
 router.get("/:id", async (req, res) => {
   try {
-    const exam = await ExamInformation.findOne({
-      id: Number(req.params.id),
-    });
+    const idParam = req.params.id;
+    let exam;
+
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({
+        id: Number(idParam),
+      });
+    }
 
     if (!exam) {
       return res.status(404).json({
@@ -64,19 +71,17 @@ router.post("/", upload.single("image"), async (req, res) => {
     const {
       batch,
       examName,
-      course,
+      mode,
       examDate,
       examTime,
       duration,
       venue,
-      description,
-      status,
     } = req.body;
 
     if (
       !batch ||
       !examName ||
-      !course ||
+      !mode ||
       !examDate ||
       !examTime ||
       !duration ||
@@ -108,18 +113,18 @@ router.post("/", upload.single("image"), async (req, res) => {
       { new: true, upsert: true },
     );
 
+    const sanitizedMode = (mode && mode.toLowerCase() === "online") ? "Online" : "Offline";
+
     const exam = new ExamInformation({
       id: counter.seq,
       batch,
       examName,
-      course,
+      mode: sanitizedMode,
       image: imageUrl,
       examDate,
       examTime,
       duration,
       venue,
-      description,
-      status,
     });
 
     await exam.save();
@@ -145,18 +150,23 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     const {
       batch,
       examName,
-      course,
+      mode,
       examDate,
       examTime,
       duration,
       venue,
-      description,
-      status,
     } = req.body;
 
-    const exam = await ExamInformation.findOne({
-      id: Number(req.params.id),
-    });
+    const idParam = req.params.id;
+    let exam;
+
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({
+        id: Number(idParam),
+      });
+    }
 
     if (!exam) {
       return res.status(404).json({
@@ -179,16 +189,16 @@ router.put("/:id", upload.single("image"), async (req, res) => {
       imageUrl = req.body.image;
     }
 
+    const sanitizedMode = (mode && mode.toLowerCase() === "online") ? "Online" : "Offline";
+
     exam.batch = batch;
     exam.examName = examName;
-    exam.course = course;
+    exam.mode = sanitizedMode;
     exam.image = imageUrl;
     exam.examDate = examDate;
     exam.examTime = examTime;
     exam.duration = duration;
     exam.venue = venue;
-    exam.description = description;
-    exam.status = status;
 
     await exam.save();
 
@@ -209,9 +219,16 @@ router.put("/:id", upload.single("image"), async (req, res) => {
 // ==============================
 router.delete("/:id", async (req, res) => {
   try {
-    const exam = await ExamInformation.findOneAndDelete({
-      id: Number(req.params.id),
-    });
+    const idParam = req.params.id;
+    let exam;
+
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findByIdAndDelete(idParam);
+    } else {
+      exam = await ExamInformation.findOneAndDelete({
+        id: Number(idParam),
+      });
+    }
 
     if (!exam) {
       return res.status(404).json({

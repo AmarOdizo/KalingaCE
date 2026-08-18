@@ -12,27 +12,23 @@ export default function ExportCSV({ exams }) {
     const headers = [
       "ID",
       "Exam Name",
-      "Course",
+      "Mode",
       "Batch",
       "Exam Date",
       "Exam Time",
       "Duration",
       "Venue",
-      "Status",
-      "Description",
     ];
 
     const rows = exams.map((exam) => [
       exam.id,
       exam.examName,
-      exam.course,
-      Array.isArray(exam.batch) ? exam.batch.join("; ") : exam.batch,
+      exam.mode || "Offline",
+      exam.batch,
       new Date(exam.examDate).toLocaleDateString(),
       exam.examTime,
       exam.duration,
       exam.venue,
-      exam.status,
-      exam.description || "",
     ]);
 
     const csvContent = [

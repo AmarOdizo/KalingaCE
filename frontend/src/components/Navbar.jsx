@@ -102,13 +102,6 @@ export default function Navbar() {
               >
                 📝 Notes
               </Link>
-
-              <Link
-                href="/learning/mcq"
-                className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
-              >
-                🎯 MCQs
-              </Link>
             </div>
           </div>
           <Link
@@ -201,17 +194,6 @@ export default function Navbar() {
                     }}
                   >
                     📝 Notes
-                  </Link>
-
-                  <Link
-                    href="/learning/mcq"
-                    className="rounded-lg py-2 text-sm font-medium text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setLearningOpen(false);
-                    }}
-                  >
-                    🎯 MCQs
                   </Link>
                 </div>
               )}

@@ -42,6 +42,18 @@ const StudentSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+
+    examId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExamInformation",
+      default: null,
+    },
+
+    attemptId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExamAttempt",
+      default: null,
+    },
   },
   {
     collection: "Student",

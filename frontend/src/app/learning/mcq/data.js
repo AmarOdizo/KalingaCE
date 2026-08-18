@@ -54,3 +54,119 @@ export const getMCQsBySubject = async (subject) => {
     throw error;
   }
 };
+
+// ==============================
+// GET Exam By ID
+// ==============================
+export const getExamById = async (examId) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamInfo");
+    const response = await fetch(`${baseUrl}/${examId}`, {
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || "Failed to fetch exam details");
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Fetch Exam By ID Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// GET MCQs By Exam ID
+// ==============================
+export const getMCQsByExam = async (examId) => {
+  try {
+    const response = await fetch(`${API_URL}/exam/${examId}`, {
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(result.message || "Failed to fetch exam MCQs");
+    }
+
+    return result.data;
+  } catch (error) {
+    console.error("Fetch Exam MCQs Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// CHECK Exam Attempt (Last 5 Minutes)
+// ==============================
+export const checkExamAttempt = async (examId, mobileNumber) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamAttempt");
+    const response = await fetch(`${baseUrl}/check`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ examId, mobileNumber }),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to check exam attempt");
+    }
+    return result;
+  } catch (error) {
+    console.error("Check Exam Attempt Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// SUBMIT Exam Attempt
+// ==============================
+export const submitExamAttempt = async (attemptData) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamAttempt");
+    const response = await fetch(baseUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(attemptData),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to submit exam attempt");
+    }
+    return result;
+  } catch (error) {
+    console.error("Submit Exam Attempt Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// GET All Exam Attempts (for admin)
+// ==============================
+export const getAllExamAttempts = async () => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamAttempt");
+    const response = await fetch(baseUrl, {
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to fetch all exam attempts");
+    }
+    return result.data;
+  } catch (error) {
+    console.error("Fetch All Exam Attempts Error:", error);
+    throw error;
+  }
+};

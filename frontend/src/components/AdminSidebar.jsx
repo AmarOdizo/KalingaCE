@@ -14,7 +14,6 @@ import {
   Menu,
   X,
   Contact,
-  HelpCircle,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -37,6 +36,11 @@ export default function AdminSidebar() {
       name: "Exam Information",
       icon: FileText,
       href: "/admin/exam-information",
+    },
+    {
+      name: "Exam Attempts",
+      icon: Trophy,
+      href: "/admin/exam-attempts",
     },
     {
       name: "Available Notes",
@@ -62,11 +66,6 @@ export default function AdminSidebar() {
       name: "Enrolled Students",
       icon: Contact,
       href: "/admin/enrolled-student",
-    },
-    {
-      name: "Manage MCQs",
-      icon: HelpCircle,
-      href: "/admin/mcq",
     },
   ];
 
@@ -110,8 +109,8 @@ export default function AdminSidebar() {
           transition-transform duration-300
           ${open ? "translate-x-0" : "-translate-x-full"}
           sm:translate-x-0
-          sm:static
-          sm:h-full
+          sm:sticky sm:top-0
+          sm:h-screen
           sm:w-56
           md:w-60
           lg:w-64

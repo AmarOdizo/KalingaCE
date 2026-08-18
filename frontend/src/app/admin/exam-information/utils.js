@@ -50,9 +50,8 @@ export const filterExamInformation = (data, search) => {
   return data.filter((item) => {
     return (
       item.examName?.toLowerCase().includes(keyword) ||
-      item.course?.toLowerCase().includes(keyword) ||
-      item.venue?.toLowerCase().includes(keyword) ||
-      item.status?.toLowerCase().includes(keyword)
+      item.mode?.toLowerCase().includes(keyword) ||
+      item.venue?.toLowerCase().includes(keyword)
     );
   });
 };

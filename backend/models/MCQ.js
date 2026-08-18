@@ -49,10 +49,12 @@ const MCQSchema = new mongoose.Schema(
       trim: true,
     },
 
-    status: {
-      type: String,
-      enum: ["Active", "Inactive"],
-      default: "Active",
+
+
+    examId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ExamInformation",
+      required: true,
     },
   },
   {

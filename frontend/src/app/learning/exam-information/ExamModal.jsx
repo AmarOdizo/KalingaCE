@@ -1,18 +1,127 @@
 "use client";
 
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   X,
   CalendarDays,
   Clock3,
-  BookOpen,
-  GraduationCap,
   MapPin,
   Timer,
   Layers3,
 } from "lucide-react";
 
+const parseExamStart = (examDate, examTime) => {
+  try {
+    const d = new Date(examDate);
+    const timeStr = examTime || "00:00";
+    let hours = 0;
+    let minutes = 0;
+    
+    if (timeStr.toLowerCase().includes("am") || timeStr.toLowerCase().includes("pm")) {
+      const match = timeStr.match(/(\d+):(\d+)\s*(am|pm)/i);
+      if (match) {
+        hours = Number(match[1]);
+        minutes = Number(match[2]);
+        const ampm = match[3].toLowerCase();
+        if (ampm === "pm" && hours < 12) hours += 12;
+        if (ampm === "am" && hours === 12) hours = 0;
+      }
+    } else {
+      const parts = timeStr.split(":");
+      hours = Number(parts[0]) || 0;
+      minutes = Number(parts[1]) || 0;
+    }
+    
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, minutes, 0);
+  } catch (err) {
+    console.error("Error parsing start time", err);
+    return new Date();
+  }
+};
+
+const parseDurationMinutes = (durationStr) => {
+  try {
+    const str = (durationStr || "").toLowerCase();
+    const num = parseFloat(str) || 0;
+    if (str.includes("minute")) {
+      return num;
+    }
+    if (str.includes("hour")) {
+      return num * 60;
+    }
+    return 60;
+  } catch (err) {
+    console.error("Error parsing duration", err);
+    return 60;
+  }
+};
+
 export default function ExamModal({ exam, onClose }) {
+  const router = useRouter();
+  const [timeStatus, setTimeStatus] = useState("checking"); // "checking", "NOT_STARTED", "ACTIVE", "EXPIRED"
+  const [timeRemainingText, setTimeRemainingText] = useState("");
+
+  useEffect(() => {
+    if (!exam) return;
+
+    const calculateTimeStatus = () => {
+      if (exam.mode !== "Online") {
+        setTimeStatus("OFFLINE");
+        return;
+      }
+      try {
+        const startDateTime = parseExamStart(exam.examDate, exam.examTime);
+        const durationMinutes = parseDurationMinutes(exam.duration);
+        const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60 * 1000);
+        
+        const now = new Date();
+        
+        if (now < startDateTime) {
+          setTimeStatus("NOT_STARTED");
+          const diffMs = startDateTime - now;
+          const diffHours = Math.floor(diffMs / (3600 * 1000));
+          const diffMins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
+          const diffSecs = Math.floor((diffMs % (60 * 1000)) / 1000);
+          
+          if (diffHours > 24) {
+            const examDateFormatted = new Date(exam.examDate).toLocaleDateString("en-IN", {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            });
+            setTimeRemainingText(`on ${examDateFormatted} at ${exam.examTime}`);
+          } else {
+            const hStr = diffHours > 0 ? `${diffHours}h ` : "";
+            const mStr = diffMins > 0 ? `${diffMins}m ` : "";
+            setTimeRemainingText(`starts in ${hStr}${mStr}${diffSecs}s`);
+          }
+        } else if (now > endDateTime) {
+          setTimeStatus("EXPIRED");
+          setTimeRemainingText("");
+        } else {
+          setTimeStatus("ACTIVE");
+          const diffMs = endDateTime - now;
+          const diffHours = Math.floor(diffMs / (3600 * 1000));
+          const diffMins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
+          const diffSecs = Math.floor((diffMs % (60 * 1000)) / 1000);
+          
+          const hStr = diffHours > 0 ? `${diffHours}h ` : "";
+          const mStr = diffMins > 0 ? `${diffMins}m ` : "";
+          setTimeRemainingText(`closes in ${hStr}${mStr}${diffSecs}s`);
+        }
+      } catch (err) {
+        console.error(err);
+        setTimeStatus("ACTIVE");
+      }
+    };
+
+    calculateTimeStatus();
+    const interval = setInterval(calculateTimeStatus, 1000);
+    return () => clearInterval(interval);
+  }, [exam]);
+
   if (!exam) return null;
 
   return (
@@ -45,22 +154,11 @@ export default function ExamModal({ exam, onClose }) {
 
           {/* Right Content */}
           <div className="p-8">
-            <span className="rounded-full bg-blue-100 px-4 py-1 text-sm font-semibold text-blue-700">
-              {exam.status}
-            </span>
-
             <h2 className="mt-4 text-3xl font-bold text-gray-900 dark:text-white">
               {exam.examName}
             </h2>
 
             <div className="mt-8 space-y-5">
-              <div className="flex items-center gap-3">
-                <BookOpen className="text-blue-600" size={20} />
-                <div>
-                  <p className="text-sm text-gray-500">Course</p>
-                  <p className="font-semibold">{exam.course}</p>
-                </div>
-              </div>
 
               <div className="flex items-center gap-3">
                 <Layers3 className="text-purple-600" size={20} />
@@ -109,22 +207,63 @@ export default function ExamModal({ exam, onClose }) {
               </div>
 
               <div className="flex items-center gap-3">
-                <GraduationCap className="text-indigo-600" size={20} />
+                <MapPin className="text-indigo-600" size={20} />
                 <div>
-                  <p className="text-sm text-gray-500">Description</p>
-                  <p className="font-semibold">
-                    {exam.description || "No description available."}
-                  </p>
+                  <p className="text-sm text-gray-500">Exam Mode</p>
+                  <p className="font-semibold">{exam.mode || "Offline"}</p>
                 </div>
               </div>
             </div>
 
-            <button
-              onClick={onClose}
-              className="mt-10 w-full rounded-xl bg-blue-600 py-3 font-semibold text-white transition hover:bg-blue-700"
-            >
-              Close
-            </button>
+            <div className="mt-8 space-y-3">
+              {timeStatus === "OFFLINE" && (
+                <div className="w-full text-center text-sm font-semibold text-slate-500 py-3 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 px-4">
+                  Offline Exam: Online testing is not available. Only institute students can take this exam at the institute.
+                </div>
+              )}
+
+              {timeStatus === "NOT_STARTED" && (
+                <button
+                  disabled
+                  className="w-full rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 py-3.5 px-4 font-bold text-slate-400 dark:text-slate-500 cursor-not-allowed flex flex-col items-center justify-center gap-0.5"
+                >
+                  <span className="text-sm">Exam Not Started Yet</span>
+                  <span className="text-xs font-semibold text-slate-500">
+                    Starts {timeRemainingText}
+                  </span>
+                </button>
+              )}
+
+              {timeStatus === "ACTIVE" && (
+                <button
+                  onClick={() => {
+                    router.push(`/learning/mcq?examId=${exam._id || exam.id}`);
+                  }}
+                  className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-3.5 px-4 font-bold text-white shadow-md active:scale-95 transition cursor-pointer flex flex-col items-center justify-center gap-0.5"
+                >
+                  <span className="text-sm">Start Online Exam</span>
+                  <span className="text-xs font-semibold text-indigo-200/90">
+                    Active ({timeRemainingText})
+                  </span>
+                </button>
+              )}
+
+              {timeStatus === "EXPIRED" && (
+                <button
+                  disabled
+                  className="w-full rounded-xl bg-red-50/50 dark:bg-red-950/10 border border-red-105 dark:border-red-900/30 py-3.5 px-4 font-bold text-red-500/80 cursor-not-allowed text-center text-sm"
+                >
+                  Exam Expired / Completed
+                </button>
+              )}
+
+              <button
+                onClick={onClose}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 py-3 px-4 font-bold text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 transition cursor-pointer text-center text-sm"
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       </div>

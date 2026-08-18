@@ -139,7 +139,7 @@ export default function AvailableCourses() {
   // UI
   // ==========================
   return (
-    <div className="mx-auto max-w-7xl p-6 md:p-8 transition-colors duration-300">
+    <div className="w-full p-6 md:p-8 transition-colors duration-300">
       <title>Manage Courses | Admin Panel</title>
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

@@ -42,7 +42,7 @@ export default function ViewStudent() {
       <div className="mx-auto max-w-3xl p-6 md:p-8">
         <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center shadow-premium dark:border-slate-800 dark:bg-slate-900">
           <h2 className="text-2xl font-bold text-rose-600">Student Not Found</h2>
-          <p className="mt-3 text-slate-550 dark:text-slate-400">
+          <p className="mt-3 text-slate-500 dark:text-slate-400">
             The requested student record does not exist.
           </p>
           <Link
@@ -69,7 +69,7 @@ export default function ViewStudent() {
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               <span className="gradient-text">Student Details</span>
             </h1>
-            <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               View topper student details and academic marks.
             </p>
           </div>
@@ -126,7 +126,7 @@ export default function ViewStudent() {
 function InfoCard({ title, value, isScore, isGrade, gradeVal }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 dark:border-slate-800/40 dark:bg-slate-900/40 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/20">
-      <span className="font-semibold text-slate-550 dark:text-slate-400 text-sm">{title}</span>
+      <span className="font-semibold text-slate-500 dark:text-slate-400 text-sm">{title}</span>
 
       {isScore ? (
         <span className="rounded-full bg-emerald-50 dark:bg-emerald-500/10 px-3.5 py-1 text-sm font-bold text-emerald-600 dark:text-emerald-400 animate-pulse">

@@ -14,7 +14,7 @@ export default function AddPosterPage() {
             <span className="gradient-text">Add Poster</span>
           </h1>
 
-          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Upload a new poster to be displayed on the website.
           </p>
         </div>

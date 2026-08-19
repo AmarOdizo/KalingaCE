@@ -89,7 +89,7 @@ export default function PosterTable({ posters, refreshData }) {
 
                       <Link
                         href={`/admin/poster/edit/${poster.id}`}
-                        className="rounded-xl bg-amber-50 p-2 text-amber-750 dark:bg-amber-500/10 dark:text-amber-400 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:hover:text-white transition-all duration-200 active:scale-95"
+                        className="rounded-xl bg-amber-50 p-2 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 hover:bg-amber-500 hover:text-white dark:hover:bg-amber-500 dark:hover:text-white transition-all duration-200 active:scale-95"
                         title="Edit Poster"
                       >
                         <Pencil size={16} />
@@ -100,7 +100,7 @@ export default function PosterTable({ posters, refreshData }) {
                           setSelectedId(poster.id);
                           setOpenDelete(true);
                         }}
-                        className="rounded-xl bg-rose-50 p-2 text-rose-650 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
+                        className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
                         title="Delete Poster"
                       >
                         <Trash2 size={16} />

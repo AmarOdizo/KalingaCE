@@ -92,7 +92,7 @@ export default function AvailableCourses() {
       case "Admission Open":
         return "bg-emerald-500/90 text-white dark:bg-emerald-500/20 dark:text-emerald-400";
       case "Closed":
-        return "bg-rose-500/90 text-white dark:bg-rose-500/20 dark:text-rose-450";
+        return "bg-rose-500/90 text-white dark:bg-rose-500/20 dark:text-rose-400";
       case "Coming Soon":
         return "bg-amber-500/90 text-white dark:bg-amber-500/20 dark:text-amber-400";
       default:
@@ -350,7 +350,7 @@ export default function AvailableCourses() {
           >
             {courses.map((course) => (
               <SwiperSlide key={course.id || course._id} className="h-full">
-                <div className="premium-card group flex flex-col justify-between h-[540px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-slate-850 dark:bg-slate-900/60">
+                <div className="premium-card group flex flex-col justify-between h-[540px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/60">
                   {/* Image & Floating Tags */}
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-slate-950">
                     <Image
@@ -390,7 +390,7 @@ export default function AvailableCourses() {
                   <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
                       {/* Course Title */}
-                      <h3 className="text-xl font-extrabold text-slate-850 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
+                      <h3 className="text-xl font-extrabold text-slate-800 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
                         {course.courseName}
                       </h3>
 
@@ -415,7 +415,7 @@ export default function AvailableCourses() {
                       </div>
 
                       {/* Short Description */}
-                      <p className="mt-3.5 text-sm text-slate-650 dark:text-slate-400 line-clamp-3 leading-relaxed">
+                      <p className="mt-3.5 text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
                         {course.shortDescription}
                       </p>
 
@@ -428,13 +428,13 @@ export default function AvailableCourses() {
                               .map((tech, idx) => (
                                 <span
                                   key={idx}
-                                  className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-650 dark:bg-slate-800 dark:text-slate-400"
+                                  className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold uppercase text-slate-600 dark:bg-slate-800 dark:text-slate-400"
                                 >
                                   {tech}
                                 </span>
                               ))}
                             {course.technologies.length > 3 && (
-                              <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-650 dark:bg-slate-800 dark:text-slate-400">
+                              <span className="rounded bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                                 +{course.technologies.length - 3} More
                               </span>
                             )}
@@ -461,7 +461,7 @@ export default function AvailableCourses() {
 
                       <div className="mt-5 flex items-center justify-between gap-4">
                         <div>
-                          <span className="block text-[10px] font-bold uppercase text-slate-450 tracking-wider">
+                          <span className="block text-[10px] font-bold uppercase text-slate-400 tracking-wider">
                             Course Fee
                           </span>
                           <span className="text-lg font-black text-slate-900 dark:text-white">
@@ -489,7 +489,7 @@ export default function AvailableCourses() {
       {/* Course Detail Modal */}
       {modalOpen && selectedCourse && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl border border-slate-155 dark:bg-slate-950 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+          <div className="relative w-full max-w-xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl border border-slate-200 dark:bg-slate-950 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
             {/* Close Button */}
             <button
               onClick={closeDetails}
@@ -578,7 +578,7 @@ export default function AvailableCourses() {
                     className={`rounded-xl p-3.5 text-sm font-semibold flex items-center gap-2 ${
                       enrollMessage.type === "success"
                         ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
-                        : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-200 dark:border-rose-500/20"
+                        : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20"
                     }`}
                   >
                     {enrollMessage.text}

@@ -15,7 +15,7 @@ export default function DeleteModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
       <div className="w-full max-w-md rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 shadow-2xl transform scale-100 animate-in zoom-in-95 duration-200">
         {/* Icon */}
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 text-red-650 dark:text-red-400">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 text-red-600 dark:text-red-400">
           <TriangleAlert className="h-8 w-8" />
         </div>
 
@@ -34,7 +34,7 @@ export default function DeleteModal({
           ?
         </p>
 
-        <p className="mt-1 text-center text-xs font-semibold text-red-500 dark:text-red-450 uppercase tracking-wider">
+        <p className="mt-1 text-center text-xs font-semibold text-red-500 dark:text-red-400 uppercase tracking-wider">
           This action cannot be undone.
         </p>
 

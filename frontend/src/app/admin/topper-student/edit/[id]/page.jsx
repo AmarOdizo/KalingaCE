@@ -62,7 +62,7 @@ export default function EditStudent() {
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
             <span className="gradient-text">Edit Topper Student</span>
           </h1>
-          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Update student mark sheets, images, and subjects.
           </p>
         </div>

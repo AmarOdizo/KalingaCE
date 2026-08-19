@@ -131,7 +131,7 @@ function ExamAttemptsContent() {
                   <td className="py-4.5 px-6 text-center">
                     <button
                       onClick={() => setSelectedAttempt(att)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-indigo-650 shadow-xs hover:bg-slate-50 cursor-pointer dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400 dark:hover:bg-slate-850"
+                      className="inline-flex items-center gap-1 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-indigo-600 shadow-xs hover:bg-slate-50 cursor-pointer dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400 dark:hover:bg-slate-800"
                     >
                       <Eye size={12} /> View Details
                     </button>
@@ -212,7 +212,7 @@ function ExamAttemptsContent() {
                         </span>
                       </div>
 
-                      <p className="text-xs font-bold text-slate-850 dark:text-white leading-relaxed">
+                      <p className="text-xs font-bold text-slate-800 dark:text-white leading-relaxed">
                         {ans.questionText}
                       </p>
 
@@ -220,7 +220,7 @@ function ExamAttemptsContent() {
                         <div className="rounded-xl bg-slate-100/60 p-2.5 dark:bg-slate-800/40">
                           <span className="block text-slate-400 font-semibold mb-0.5">Chosen:</span>
                           <span className={`font-bold ${
-                            ans.isCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-450"
+                            ans.isCorrect ? "text-emerald-600 dark:text-emerald-400" : "text-red-500 dark:text-red-400"
                           }`}>{ans.chosenAnswer}</span>
                         </div>
                         <div className="rounded-xl bg-emerald-500/5 p-2.5 border border-emerald-500/10">

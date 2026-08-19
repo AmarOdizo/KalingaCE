@@ -60,7 +60,7 @@ export default function CourseTable({ courses, onDelete, onView }) {
                   </div>
                 </td>
 
-                <td className="px-6 py-4 font-bold text-slate-850 dark:text-slate-100">
+                <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-100">
                   {course.courseName}
                 </td>
 

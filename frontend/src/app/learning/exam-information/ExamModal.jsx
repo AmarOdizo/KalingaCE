@@ -251,7 +251,7 @@ export default function ExamModal({ exam, onClose }) {
               {timeStatus === "EXPIRED" && (
                 <button
                   disabled
-                  className="w-full rounded-xl bg-red-50/50 dark:bg-red-950/10 border border-red-105 dark:border-red-900/30 py-3.5 px-4 font-bold text-red-500/80 cursor-not-allowed text-center text-sm"
+                  className="w-full rounded-xl bg-red-50/50 dark:bg-red-950/10 border border-red-100 dark:border-red-900/30 py-3.5 px-4 font-bold text-red-500/80 cursor-not-allowed text-center text-sm"
                 >
                   Exam Expired / Completed
                 </button>
@@ -259,7 +259,7 @@ export default function ExamModal({ exam, onClose }) {
 
               <button
                 onClick={onClose}
-                className="w-full rounded-xl border border-slate-200 dark:border-slate-750 py-3 px-4 font-bold text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-850 transition cursor-pointer text-center text-sm"
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-700 py-3 px-4 font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition cursor-pointer text-center text-sm"
               >
                 Close
               </button>

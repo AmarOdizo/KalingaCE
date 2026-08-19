@@ -39,7 +39,7 @@ export default function EditPosterPage() {
   if (!poster) {
     return (
       <div className="flex h-[60vh] flex-col items-center justify-center gap-4 transition-colors duration-300">
-        <p className="text-lg font-bold text-rose-600 dark:text-rose-450">
+        <p className="text-lg font-bold text-rose-600 dark:text-rose-400">
           Poster not found.
         </p>
         <Link href="/admin/poster" className="btn-secondary text-sm py-2 px-4">
@@ -58,7 +58,7 @@ export default function EditPosterPage() {
             <span className="gradient-text">Edit Poster</span>
           </h1>
 
-          <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Update the poster image.
           </p>
         </div>

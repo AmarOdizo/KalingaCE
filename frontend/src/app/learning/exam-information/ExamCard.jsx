@@ -32,7 +32,7 @@ export default function ExamCard({ exam, onView }) {
   return (
     <div className="group relative flex flex-col justify-between overflow-hidden rounded-[24px] border border-slate-100 bg-white shadow-premium transition-all duration-300 hover:-translate-y-2 hover:shadow-premium-hover dark:border-slate-800/60 dark:bg-slate-900/60 backdrop-blur-md">
       {/* Banner / Hero Image */}
-      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-t-[24px] bg-slate-100 dark:bg-slate-955/40 select-none">
+      <div className="relative aspect-[3/2] w-full overflow-hidden rounded-t-[24px] bg-slate-100 dark:bg-slate-900/40 select-none">
         <Image
           src={exam.image || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&h=400&fit=crop"}
           alt={exam.examName}
@@ -69,7 +69,7 @@ export default function ExamCard({ exam, onView }) {
 
             {/* Duration */}
             <div className="flex items-center gap-2.5">
-              <Clock size={16} className="text-amber-500 dark:text-amber-450 shrink-0" />
+              <Clock size={16} className="text-amber-500 dark:text-amber-400 shrink-0" />
               <span className="truncate">{exam.duration || "2 Hours"}</span>
             </div>
           </div>
@@ -77,7 +77,7 @@ export default function ExamCard({ exam, onView }) {
           {/* Registration Deadline banner */}
           <div className="flex items-center gap-2 rounded-xl bg-slate-50 dark:bg-slate-950/40 p-3 text-xs font-semibold text-slate-500 dark:text-slate-400 border border-slate-100/50 dark:border-slate-800/30">
             <ClipboardList size={14} className="text-rose-500 dark:text-rose-400" />
-            <span>Registration Deadline: <strong className="text-rose-600 dark:text-rose-450">{formattedDeadline}</strong></span>
+            <span>Registration Deadline: <strong className="text-rose-600 dark:text-rose-400">{formattedDeadline}</strong></span>
           </div>
         </div>
 

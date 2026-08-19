@@ -60,15 +60,15 @@ export default function CampusTable({
 
               {/* Card Details Grid */}
               <div className="grid grid-cols-2 gap-3 border-t border-b border-slate-100 dark:border-slate-800/60 py-3 text-xs">
-                <div className="flex items-center gap-2 text-slate-650 dark:text-slate-300">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                   <Phone size={14} className="text-slate-400" />
                   <span className="truncate">{campus.phone || "-"}</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-650 dark:text-slate-300">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
                   <Users size={14} className="text-slate-400" />
                   <span>{facultyCount || 0} Faculty</span>
                 </div>
-                <div className="flex items-center gap-2 text-slate-650 dark:text-slate-300 col-span-2">
+                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 col-span-2">
                   <GraduationCap size={14} className="text-slate-400" />
                   <span>{studentCount || 0} Active Students</span>
                 </div>
@@ -145,11 +145,11 @@ export default function CampusTable({
                       {campus.campusName}
                     </td>
 
-                    <td className="px-5 py-4 text-slate-650 dark:text-slate-300">
+                    <td className="px-5 py-4 text-slate-600 dark:text-slate-300">
                       {campus.city}
                     </td>
 
-                    <td className="px-5 py-4 text-slate-650 dark:text-slate-350 font-mono text-xs">
+                    <td className="px-5 py-4 text-slate-600 dark:text-slate-350 font-mono text-xs">
                       {campus.phone}
                     </td>
 

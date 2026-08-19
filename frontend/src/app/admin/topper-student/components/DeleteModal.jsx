@@ -8,7 +8,7 @@ export default function DeleteModal({ isOpen, onClose, onConfirm, student }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-4 transition-all duration-300">
       <div className="w-[420px] rounded-2xl border border-slate-200/80 bg-white p-6 shadow-premium dark:border-slate-800 dark:bg-slate-900/90 transition-all duration-300">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-450">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400">
           <Trash2 size={24} />
         </div>
 

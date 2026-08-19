@@ -96,7 +96,7 @@ export default function Statistics() {
       value: loading ? null : `${data.totalPassedOut.toLocaleString()}+`,
       desc: "Graduated alumni community",
       icon: GraduationCap,
-      color: "text-emerald-650 dark:text-emerald-400",
+      color: "text-emerald-600 dark:text-emerald-400",
       bg: "bg-emerald-50 dark:bg-emerald-950/40",
       gradient: "from-emerald-500 to-teal-500",
     },
@@ -116,7 +116,7 @@ export default function Statistics() {
       icon: Building2,
       color: "text-amber-600 dark:text-amber-400",
       bg: "bg-amber-50 dark:bg-amber-950/40",
-      gradient: "from-amber-550 to-orange-500",
+      gradient: "from-amber-500 to-orange-500",
     },
   ];
 
@@ -168,7 +168,7 @@ export default function Statistics() {
                   <span className="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-slate-800 transition-all duration-350 group-hover:bg-primary-500" />
                 </div>
 
-                <h3 className="mt-4 text-[10px] font-bold text-slate-450 dark:text-slate-500 uppercase tracking-wider">
+                <h3 className="mt-4 text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
                   {item.title}
                 </h3>
 

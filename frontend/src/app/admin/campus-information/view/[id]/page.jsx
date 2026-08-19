@@ -59,7 +59,7 @@ export default function ViewCampusPage() {
   if (!campus) {
     return (
       <div className="mx-auto max-w-md mt-12 p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-premium">
-        <h2 className="text-2xl font-bold text-red-650 dark:text-red-400">Campus Not Found</h2>
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Campus Not Found</h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
           The campus information you are trying to view does not exist.
         </p>
@@ -227,7 +227,7 @@ export default function ViewCampusPage() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-primary-500 dark:hover:text-primary-400 transition"
                         >
-                          <span className="text-[10px] uppercase font-bold text-slate-450 dark:text-slate-500">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500">
                             {item.type}:
                           </span>
                           {cleaned}
@@ -288,7 +288,7 @@ export default function ViewCampusPage() {
                 <MapPin size={22} />
               </div>
               <div>
-                <h4 className="font-semibold text-slate-850 dark:text-slate-200 text-sm">
+                <h4 className="font-semibold text-slate-800 dark:text-slate-200 text-sm">
                   Google Maps Location Link
                 </h4>
                 <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5 truncate max-w-md">

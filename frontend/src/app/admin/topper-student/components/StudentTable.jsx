@@ -117,7 +117,7 @@ export default function StudentTable({ students, onDelete }) {
 
                       <button
                         onClick={() => onDelete(student)}
-                        className="rounded-xl bg-rose-50 p-2 text-rose-650 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
+                        className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
                         title="Delete Student"
                       >
                         <Trash2 size={16} />

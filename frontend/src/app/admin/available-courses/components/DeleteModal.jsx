@@ -15,7 +15,7 @@ export default function DeleteModal({
       <div className="w-full max-w-md rounded-2xl bg-white/95 border border-slate-200/80 p-6 shadow-premium dark:bg-slate-900/95 dark:border-slate-800/80 backdrop-blur-md">
         <div className="flex flex-col items-center">
           <div className="rounded-full bg-rose-50 p-4 dark:bg-rose-500/10">
-            <TriangleAlert className="h-10 w-10 text-rose-600 dark:text-rose-450" />
+            <TriangleAlert className="h-10 w-10 text-rose-600 dark:text-rose-400" />
           </div>
 
           <h2 className="mt-5 text-xl font-extrabold text-slate-900 dark:text-white">Delete Course</h2>

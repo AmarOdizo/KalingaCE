@@ -547,7 +547,7 @@ export default function MCQClient() {
               <h2 className="mt-4 text-2xl font-bold text-slate-800 dark:text-white">
                 Enter Exam Credentials
               </h2>
-              <p className="mt-2 text-xs text-slate-550 dark:text-slate-400">
+              <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
                 Please provide your credentials to begin the exam <strong>{examDetails?.examName}</strong>.
               </p>
             </div>
@@ -693,7 +693,7 @@ export default function MCQClient() {
                   </button>
 
                   {isScheduledExam && (
-                    <div className="flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-xl text-rose-700 font-bold border border-rose-100 dark:bg-rose-955/20 dark:text-rose-400 dark:border-rose-900/30">
+                    <div className="flex items-center gap-2 bg-rose-50 px-4 py-2 rounded-xl text-rose-700 font-bold border border-rose-100 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-900/30">
                       <span className="animate-pulse">⏳ Time Remaining: {(() => {
                         const mins = Math.floor(timeRemaining / 60);
                         const secs = timeRemaining % 60;
@@ -755,7 +755,7 @@ export default function MCQClient() {
                           } else if (isOptionSelected) {
                             buttonStyle = "border-red-500 bg-red-50/20 text-red-800 dark:border-red-500/50 dark:bg-red-950/20 dark:text-red-400 font-bold";
                           } else {
-                            buttonStyle = "border-slate-100 bg-white/40 text-slate-400 dark:border-slate-850 dark:bg-slate-900/20 dark:text-slate-600 opacity-60";
+                            buttonStyle = "border-slate-100 bg-white/40 text-slate-400 dark:border-slate-800 dark:bg-slate-900/20 dark:text-slate-600 opacity-60";
                           }
                         } else if (isOptionSelected) {
                           buttonStyle = "border-primary-500 bg-primary-50/30 text-primary-900 dark:border-primary-500/80 dark:bg-primary-950/20 dark:text-primary-350 font-bold ring-2 ring-primary-500/20 shadow-sm";
@@ -866,7 +866,7 @@ export default function MCQClient() {
                     <div className="mt-2 text-sm text-slate-500 dark:text-slate-400 flex flex-col gap-1 items-center justify-center">
                       {isScheduledExam ? (
                         <>
-                          <p>Exam: <span className="font-bold text-indigo-650 dark:text-indigo-400">{examDetails?.examName}</span></p>
+                          <p>Exam: <span className="font-bold text-indigo-600 dark:text-indigo-400">{examDetails?.examName}</span></p>
                           <p className="text-xs text-slate-400">Student: <span className="font-bold">{studentName}</span> ({mobileNumber})</p>
                         </>
                       ) : (

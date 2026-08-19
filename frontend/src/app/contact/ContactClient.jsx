@@ -137,21 +137,21 @@ export default function ContactClient() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-16">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-16 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
       <div className="mx-auto max-w-6xl">
         {/* =================================
             HEADER
         ================================= */}
         <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
+          <span className="inline-block rounded-full bg-blue-100 dark:bg-blue-950/40 px-4 py-2 text-sm font-semibold text-blue-700 dark:text-blue-400">
             Contact Us
           </span>
 
-          <h1 className="mt-4 text-4xl font-bold text-gray-900 md:text-5xl">
+          <h1 className="mt-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
             Get In Touch
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600">
+          <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-slate-400">
             Have a question or need more information? Send us a message and we
             will get back to you.
           </p>
@@ -160,14 +160,14 @@ export default function ContactClient() {
         {/* =================================
             FORM CARD
         ================================= */}
-        <div className="mx-auto max-w-2xl rounded-3xl bg-white p-6 shadow-xl md:p-10">
+        <div className="mx-auto max-w-2xl rounded-3xl bg-white dark:bg-slate-900 p-6 shadow-xl border border-slate-100 dark:border-slate-800/80 md:p-10">
           {/* MESSAGE */}
           {message.text && (
             <div
               className={`mb-6 flex items-center gap-3 rounded-xl p-4 ${
                 message.type === "success"
-                  ? "bg-green-50 text-green-700"
-                  : "bg-red-50 text-red-700"
+                  ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400"
+                  : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400"
               }`}
             >
               {message.type === "success" ? (
@@ -185,14 +185,14 @@ export default function ContactClient() {
                 NAME
             ================================= */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
                 Full Name
               </label>
 
               <div className="relative">
                 <User
                   size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
 
                 <input
@@ -202,7 +202,7 @@ export default function ContactClient() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Enter your full name"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
                 />
               </div>
             </div>
@@ -211,14 +211,14 @@ export default function ContactClient() {
                 PHONE
             ================================= */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
                 Phone Number
               </label>
 
               <div className="relative">
                 <Phone
                   size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
 
                 <input
@@ -229,7 +229,7 @@ export default function ContactClient() {
                   onChange={handleChange}
                   placeholder="Enter your phone number"
                   maxLength={10}
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
                 />
               </div>
             </div>
@@ -238,14 +238,14 @@ export default function ContactClient() {
                 EMAIL
             ================================= */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
                 Email Address
               </label>
 
               <div className="relative">
                 <Mail
                   size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
 
                 <input
@@ -255,7 +255,7 @@ export default function ContactClient() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Enter your email address"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
                 />
               </div>
             </div>
@@ -264,14 +264,14 @@ export default function ContactClient() {
                 SUBJECT
             ================================= */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
                 Subject
               </label>
 
               <div className="relative">
                 <MessageSquare
                   size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
                 />
 
                 <input
@@ -281,7 +281,7 @@ export default function ContactClient() {
                   value={formData.subject}
                   onChange={handleChange}
                   placeholder="Enter subject of your message"
-                  className="w-full rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
                 />
               </div>
             </div>
@@ -290,14 +290,14 @@ export default function ContactClient() {
                 DESCRIPTION
             ================================= */}
             <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
+              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
                 Message Description
               </label>
 
               <div className="relative">
                 <MessageSquare
                   size={20}
-                  className="absolute left-4 top-4 text-gray-400"
+                  className="absolute left-4 top-4 text-gray-400 dark:text-slate-500"
                 />
 
                 <textarea
@@ -307,7 +307,7 @@ export default function ContactClient() {
                   onChange={handleChange}
                   placeholder="Write your message..."
                   rows={5}
-                  className="w-full resize-none rounded-xl border border-gray-200 bg-gray-50 py-3.5 pl-12 pr-4 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100"
+                  className="w-full resize-none rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
                 />
               </div>
             </div>
@@ -319,7 +319,7 @@ export default function ContactClient() {
               id="contact-submit-btn"
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
             >
               {loading ? (
                 <>

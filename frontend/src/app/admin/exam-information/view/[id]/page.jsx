@@ -45,7 +45,7 @@ export default function ViewExamInformation() {
           <h2 className="text-2xl font-bold text-rose-600">
             Exam Record Not Found
           </h2>
-          <p className="mt-3 text-slate-550 dark:text-slate-400">
+          <p className="mt-3 text-slate-500 dark:text-slate-400">
             The requested exam schedule does not exist.
           </p>
           <Link
@@ -69,7 +69,7 @@ export default function ViewExamInformation() {
             <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               <span className="gradient-text">Exam Details</span>
             </h1>
-            <p className="mt-2 text-sm text-slate-550 dark:text-slate-400">
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               Complete exam details, dates, venue, and status info.
             </p>
           </div>
@@ -124,7 +124,7 @@ export default function ViewExamInformation() {
 function InfoRow({ title, value }) {
   return (
     <div className="flex items-center justify-between rounded-2xl border border-slate-100 bg-slate-50/50 p-4.5 dark:border-slate-800/40 dark:bg-slate-900/40 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/20">
-      <span className="font-semibold text-slate-550 dark:text-slate-400 text-sm">
+      <span className="font-semibold text-slate-500 dark:text-slate-400 text-sm">
         {title}
       </span>
       <span className="text-sm font-bold text-slate-900 dark:text-white">

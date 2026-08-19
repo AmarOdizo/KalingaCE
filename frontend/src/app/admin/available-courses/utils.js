@@ -17,7 +17,7 @@ export const formatFees = (fees) => {
 export const getStatusColor = (status) => {
   switch (status) {
     case "Admission Open":
-      return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-450";
+      return "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-400";
 
     case "Closed":
       return "bg-rose-50 text-rose-700 dark:bg-rose-500/15 dark:text-rose-400";

@@ -45,7 +45,7 @@ export default function TechnologiesInput({ technologies, setTechnologies }) {
             <button
               type="button"
               onClick={() => removeTechnology(index)}
-              className="flex items-center justify-center rounded-xl bg-rose-50 p-2.5 text-rose-600 hover:bg-rose-600 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-650 dark:hover:text-white transition-all cursor-pointer"
+              className="flex items-center justify-center rounded-xl bg-rose-50 p-2.5 text-rose-600 hover:bg-rose-600 hover:text-white dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-600 dark:hover:text-white transition-all cursor-pointer"
             >
               <Trash2 size={16} />
             </button>

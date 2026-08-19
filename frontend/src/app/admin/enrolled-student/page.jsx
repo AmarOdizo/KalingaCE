@@ -217,7 +217,7 @@ export default function EnrolledStudentsAdminPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by student name, email, phone, or course..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-850 dark:bg-slate-950 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-500/10"
+            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-500/10"
           />
         </div>
       </div>
@@ -290,7 +290,7 @@ export default function EnrolledStudentsAdminPage() {
 
                     {/* Email */}
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-slate-650 dark:text-slate-350 text-sm">
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-350 text-sm">
                         <Mail size={15} className="text-slate-400 shrink-0" />
                         <span>{student.email}</span>
                       </div>
@@ -298,7 +298,7 @@ export default function EnrolledStudentsAdminPage() {
 
                     {/* Phone */}
                     <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-slate-650 dark:text-slate-350 text-sm">
+                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-350 text-sm">
                         <Phone size={15} className="text-slate-400 shrink-0" />
                         <span>{student.phone}</span>
                       </div>
@@ -320,7 +320,7 @@ export default function EnrolledStudentsAdminPage() {
                         <button
                           onClick={() => setSelectedStudent(student)}
                           title="View Details"
-                          className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-850 dark:hover:text-indigo-400 cursor-pointer"
+                          className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 cursor-pointer"
                         >
                           <Eye size={17} />
                         </button>
@@ -406,7 +406,7 @@ export default function EnrolledStudentsAdminPage() {
                   {selectedStudent.courseName?.courseName || "Unknown Course"}
                 </span>
                 {selectedStudent.courseName?.courseCode && (
-                  <span className="text-[10px] font-mono font-bold text-slate-450 dark:text-slate-500">
+                  <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500">
                     Code: {selectedStudent.courseName.courseCode}
                   </span>
                 )}
@@ -417,7 +417,7 @@ export default function EnrolledStudentsAdminPage() {
             <div className="mt-6 flex justify-end">
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-850 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
               >
                 Close Details
               </button>

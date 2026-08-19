@@ -103,13 +103,13 @@ export default function HeroSlider() {
 
         {/* Custom Navigation Buttons (Visible on hover of the section) */}
         <button
-          className="hero-swiper-prev absolute left-10 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 text-slate-850 dark:bg-slate-900/90 dark:text-slate-100 border border-slate-200/50 dark:border-slate-800/60 shadow-lg backdrop-blur-sm opacity-0 group-hover/section:opacity-100 translate-x-2 group-hover/section:translate-x-0 transition-all duration-300 hover:bg-white dark:hover:bg-slate-900 hover:scale-105 active:scale-95 cursor-pointer"
+          className="hero-swiper-prev absolute left-10 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 text-slate-800 dark:bg-slate-900/90 dark:text-slate-100 border border-slate-200/50 dark:border-slate-800/60 shadow-lg backdrop-blur-sm opacity-0 group-hover/section:opacity-100 translate-x-2 group-hover/section:translate-x-0 transition-all duration-300 hover:bg-white dark:hover:bg-slate-900 hover:scale-105 active:scale-95 cursor-pointer"
           aria-label="Previous Slide"
         >
           <ChevronLeft size={22} />
         </button>
         <button
-          className="hero-swiper-next absolute right-10 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 text-slate-850 dark:bg-slate-900/90 dark:text-slate-100 border border-slate-200/50 dark:border-slate-800/60 shadow-lg backdrop-blur-sm opacity-0 group-hover/section:opacity-100 -translate-x-2 group-hover/section:translate-x-0 transition-all duration-300 hover:bg-white dark:hover:bg-slate-900 hover:scale-105 active:scale-95 cursor-pointer"
+          className="hero-swiper-next absolute right-10 top-1/2 -translate-y-1/2 z-30 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/90 text-slate-800 dark:bg-slate-900/90 dark:text-slate-100 border border-slate-200/50 dark:border-slate-800/60 shadow-lg backdrop-blur-sm opacity-0 group-hover/section:opacity-100 -translate-x-2 group-hover/section:translate-x-0 transition-all duration-300 hover:bg-white dark:hover:bg-slate-900 hover:scale-105 active:scale-95 cursor-pointer"
           aria-label="Next Slide"
         >
           <ChevronRight size={22} />

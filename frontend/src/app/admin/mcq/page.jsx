@@ -439,7 +439,7 @@ function MCQAdminPageInner() {
           {/* Stats Cards Section */}
           <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-3">
             <div className="rounded-2xl border border-slate-100 bg-white p-4.5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60 transition-all hover:shadow-md">
-              <div className="flex items-center justify-between text-blue-550 dark:text-blue-455">
+              <div className="flex items-center justify-between text-blue-500 dark:text-blue-400">
                 <HelpCircle size={22} />
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   Total
@@ -496,7 +496,7 @@ function MCQAdminPageInner() {
                 placeholder="Search MCQs by statement, subject or exam..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-2xl border border-slate-200/80 bg-white py-3 pl-12 pr-4 text-xs text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 dark:border-slate-850 dark:bg-slate-900 dark:text-slate-200"
+                className="w-full rounded-2xl border border-slate-200/80 bg-white py-3 pl-12 pr-4 text-xs text-slate-700 outline-none transition-all focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
               />
             </div>
           </div>
@@ -580,7 +580,7 @@ function MCQAdminPageInner() {
 
                             {/* Exam Badge */}
                             {item.examId && (
-                              <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-650 dark:bg-blue-955/55 dark:text-blue-400">
+                              <span className="inline-flex items-center gap-1 rounded-lg bg-blue-50 px-2 py-0.5 text-[10px] font-bold text-blue-600 dark:bg-blue-900/55 dark:text-blue-400">
                                 <BookOpenCheck size={10} />
                                 {item.examId.examName || "Exam"}
                               </span>
@@ -611,7 +611,7 @@ function MCQAdminPageInner() {
                         </button>
                         <button
                           onClick={(e) => handleDeleteMCQ(item.id, e)}
-                          className="rounded-lg bg-rose-50 p-2 text-rose-650 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
+                          className="rounded-lg bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
                           title="Delete MCQ"
                         >
                           <Trash2 size={14} />
@@ -635,14 +635,14 @@ function MCQAdminPageInner() {
                                 className={`flex items-center gap-3 rounded-xl border px-4 py-3 text-xs font-semibold transition-all ${
                                   isCorrect
                                     ? "border-green-500/50 bg-green-500/5 text-green-700 dark:border-green-500/30 dark:bg-green-950/10 dark:text-green-400"
-                                    : "border-slate-150 bg-white text-slate-600 dark:border-slate-850 dark:bg-slate-900 dark:text-slate-350"
+                                    : "border-slate-200 bg-white text-slate-600 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-350"
                                 }`}
                               >
                                 <span
                                   className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[10px] font-black ${
                                     isCorrect
                                       ? "bg-green-500 text-white"
-                                      : "bg-slate-100 text-slate-550 dark:bg-slate-800 dark:text-slate-400"
+                                      : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                                   }`}
                                 >
                                   {optLetter}
@@ -660,7 +660,7 @@ function MCQAdminPageInner() {
 
                         {/* Explanation section */}
                         {item.explanation && (
-                          <div className="mt-5 rounded-xl border border-slate-100 bg-amber-500/5 p-4 dark:border-slate-855 dark:bg-amber-955/10">
+                          <div className="mt-5 rounded-xl border border-slate-100 bg-amber-500/5 p-4 dark:border-slate-855 dark:bg-amber-900/10">
                             <h4 className="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-2 flex items-center gap-1.5">
                               <AlertCircle size={12} /> Solution Explanation
                             </h4>
@@ -698,13 +698,13 @@ function MCQAdminPageInner() {
           <form onSubmit={handleFormSubmit} className="space-y-5">
             {/* Subject Info Pre-filled badge */}
             {selectedSubject !== "All" && !editingMCQ && (
-              <div className="rounded-xl bg-blue-55 p-3.5 dark:bg-blue-955/35 border border-blue-100 dark:border-blue-900/30 flex items-start gap-2.5">
+              <div className="rounded-xl bg-blue-55 p-3.5 dark:bg-blue-900/35 border border-blue-100 dark:border-blue-900/30 flex items-start gap-2.5">
                 <CheckCircle2 size={16} className="text-blue-555 mt-0.5" />
                 <div>
                   <p className="text-xs font-bold text-blue-700 dark:text-blue-400">
                     Subject Auto-populated
                   </p>
-                  <p className="text-[11px] text-blue-650/85 dark:text-blue-300/80 mt-0.5">
+                  <p className="text-[11px] text-blue-600/85 dark:text-blue-300/80 mt-0.5">
                     Because you clicked the <strong>{selectedSubject}</strong> card, this question is automatically linked.
                   </p>
                 </div>
@@ -718,7 +718,7 @@ function MCQAdminPageInner() {
               <select
                 value={examId}
                 onChange={(e) => setExamId(e.target.value)}
-                className="w-full rounded-xl border border-slate-200 bg-slate-55 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 dark:border-slate-850 dark:bg-slate-950 dark:text-slate-200"
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
                 required
               >
                 <option value="">Select Exam Schedule</option>
@@ -741,11 +741,11 @@ function MCQAdminPageInner() {
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 disabled={selectedSubject !== "All" && !editingMCQ}
-                className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-750 outline-none transition-all focus:border-blue-500
+                className={`w-full rounded-xl border px-4 py-2.5 text-sm text-slate-700 outline-none transition-all focus:border-blue-500
                   ${
                     selectedSubject !== "All" && !editingMCQ
-                      ? "border-slate-200 bg-slate-105 font-semibold text-slate-550 cursor-not-allowed dark:border-slate-800 dark:bg-slate-955 dark:text-slate-455"
-                      : "border-slate-200 bg-slate-50/50 focus:bg-white dark:border-slate-800 dark:bg-slate-955 dark:text-slate-200 dark:focus:border-blue-500"
+                      ? "border-slate-200 bg-slate-100 font-semibold text-slate-500 cursor-not-allowed dark:border-slate-800 dark:bg-slate-900 dark:text-slate-400"
+                      : "border-slate-200 bg-slate-50/50 focus:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-blue-500"
                   }`}
                 required
               />
@@ -753,7 +753,7 @@ function MCQAdminPageInner() {
 
             <div className="space-y-6">
               {questions.map((q, qIdx) => (
-                <div key={qIdx} className="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-850 bg-slate-50/20 dark:bg-slate-955/10 space-y-5 relative">
+                <div key={qIdx} className="p-5 rounded-2xl border border-slate-200/80 dark:border-slate-800 bg-slate-50/20 dark:bg-slate-900/10 space-y-5 relative">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-405 animate-pulse">
                       Question #{qIdx + 1}
@@ -764,7 +764,7 @@ function MCQAdminPageInner() {
                         onClick={() => {
                           setQuestions(prev => prev.filter((_, idx) => idx !== qIdx));
                         }}
-                        className="text-red-500 hover:text-red-750 text-xs font-bold transition-colors cursor-pointer"
+                        className="text-red-500 hover:text-red-700 text-xs font-bold transition-colors cursor-pointer"
                       >
                         ✕ Remove
                       </button>
@@ -785,7 +785,7 @@ function MCQAdminPageInner() {
                         const val = e.target.value;
                         setQuestions(prev => prev.map((item, idx) => idx === qIdx ? { ...item, question: val } : item));
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-55 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-955 dark:text-slate-200"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 placeholder-slate-400 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                       required
                     />
                   </div>
@@ -843,12 +843,12 @@ function MCQAdminPageInner() {
                             className={`flex flex-col items-center justify-center p-3 rounded-xl border text-center transition-all cursor-pointer select-none ${
                               isSelected
                                 ? "border-green-500 bg-green-500/5 text-green-700 dark:bg-green-950/20 dark:text-green-400"
-                                : "border-slate-200 bg-slate-55 hover:border-slate-350 dark:border-slate-850 dark:bg-slate-955"
+                                : "border-slate-200 bg-slate-50 hover:border-slate-350 dark:border-slate-800 dark:bg-slate-900"
                             }`}
                           >
                             <span
                               className={`flex h-5 w-5 items-center justify-center rounded text-[10px] font-black ${
-                                isSelected ? "bg-green-500 text-white" : "bg-slate-200 text-slate-655 dark:bg-slate-800 dark:text-slate-455"
+                                isSelected ? "bg-green-500 text-white" : "bg-slate-200 text-slate-655 dark:bg-slate-800 dark:text-slate-400"
                               }`}
                             >
                               {opt}
@@ -875,7 +875,7 @@ function MCQAdminPageInner() {
                         const val = Number(e.target.value) || 1;
                         setQuestions(prev => prev.map((item, idx) => idx === qIdx ? { ...item, marks: val } : item));
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-55 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-205"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-700 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-205"
                       required
                     />
                   </div>
@@ -893,7 +893,7 @@ function MCQAdminPageInner() {
                         const val = e.target.value;
                         setQuestions(prev => prev.map((item, idx) => idx === qIdx ? { ...item, explanation: val } : item));
                       }}
-                      className="w-full rounded-xl border border-slate-200 bg-slate-55 px-4 py-2 text-sm text-slate-750 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
+                      className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-sm text-slate-700 outline-none focus:border-blue-500 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-200"
                     />
                   </div>
                 </div>
@@ -909,7 +909,7 @@ function MCQAdminPageInner() {
                       { question: "", options: ["", "", "", ""], correctOption: "A", marks: 1, explanation: "" }
                     ]);
                   }}
-                  className="w-full py-4 rounded-xl border-2 border-dashed border-slate-250 hover:border-blue-500 text-xs font-bold text-slate-500 hover:text-blue-500 dark:border-slate-800 dark:hover:border-blue-500 transition-all cursor-pointer bg-slate-50/30 dark:bg-slate-955/20 flex items-center justify-center gap-1.5"
+                  className="w-full py-4 rounded-xl border-2 border-dashed border-slate-250 hover:border-blue-500 text-xs font-bold text-slate-500 hover:text-blue-500 dark:border-slate-800 dark:hover:border-blue-500 transition-all cursor-pointer bg-slate-50/30 dark:bg-slate-900/20 flex items-center justify-center gap-1.5"
                 >
                   <Plus size={14} />
                   Click here to add next question field

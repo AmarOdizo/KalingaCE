@@ -573,7 +573,7 @@ export default function CoursesClient() {
                     className={`rounded-xl p-3.5 text-sm font-semibold flex items-center gap-2 ${
                       enrollMessage.type === "success"
                         ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20"
-                        : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450 border border-rose-200 dark:border-rose-500/20"
+                        : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20"
                     }`}
                   >
                     {enrollMessage.text}

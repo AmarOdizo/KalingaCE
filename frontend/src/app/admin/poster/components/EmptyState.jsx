@@ -18,7 +18,7 @@ export default function EmptyState({
         {title}
       </h2>
 
-      <p className="mt-3 text-sm text-slate-550 dark:text-slate-400 max-w-sm mx-auto">
+      <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
         {description}
       </p>
 

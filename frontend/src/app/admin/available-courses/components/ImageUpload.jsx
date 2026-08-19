@@ -26,8 +26,8 @@ export default function ImageUpload({ preview, onChange }) {
         ) : (
           <div className="text-center">
             <UploadCloud className="mx-auto mb-3 h-10 w-10 text-slate-400 dark:text-slate-500" />
-            <p className="text-sm font-bold text-slate-650 dark:text-slate-300">Click to Upload Image</p>
-            <p className="text-xs text-slate-450 mt-1">PNG, JPG or WebP up to 5MB</p>
+            <p className="text-sm font-bold text-slate-600 dark:text-slate-300">Click to Upload Image</p>
+            <p className="text-xs text-slate-400 mt-1">PNG, JPG or WebP up to 5MB</p>
           </div>
         )}
 

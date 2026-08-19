@@ -281,7 +281,7 @@ export default function CampusForm({
                       <span className="font-semibold text-xs text-primary-500 uppercase tracking-wider">
                         {item.type}
                       </span>
-                      <p className="text-sm font-mono text-slate-650 dark:text-slate-300 mt-0.5">
+                      <p className="text-sm font-mono text-slate-600 dark:text-slate-300 mt-0.5">
                         {item.link}
                       </p>
                     </div>
@@ -294,7 +294,7 @@ export default function CampusForm({
                           website: (prev.website || []).filter((_, i) => i !== index),
                         }));
                       }}
-                      className="text-xs font-semibold text-red-650 hover:text-red-750 dark:text-red-400 dark:hover:text-red-300 transition"
+                      className="text-xs font-semibold text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition"
                     >
                       Remove
                     </button>

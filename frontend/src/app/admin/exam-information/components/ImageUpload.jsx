@@ -50,7 +50,7 @@ export default function ImageUpload({
               Click to Upload Image
             </p>
 
-            <p className="text-xs text-slate-450 dark:text-slate-500 font-medium">
+            <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">
               JPG, PNG, JPEG (Max 5MB)
             </p>
           </label>

@@ -131,7 +131,7 @@ export default function TopStudents() {
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
               🏆 <span className="gradient-text">Top Students</span>
             </h2>
-            <p className="mt-3 text-slate-550 dark:text-slate-400 max-w-xl">
+            <p className="mt-3 text-slate-500 dark:text-slate-400 max-w-xl">
               Meet our outstanding learners who achieved excellence and set
               academic milestones.
             </p>
@@ -200,7 +200,7 @@ export default function TopStudents() {
                     </span>
                   </div>
 
-                  <h3 className="mt-5 text-lg font-extrabold text-slate-850 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  <h3 className="mt-5 text-lg font-extrabold text-slate-800 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                     {student.name}
                   </h3>
 
@@ -250,7 +250,7 @@ export default function TopStudents() {
                     </span>
                   </div>
 
-                  <h3 className="mt-5 text-lg font-extrabold text-slate-850 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
+                  <h3 className="mt-5 text-lg font-extrabold text-slate-800 dark:text-white tracking-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors">
                     {student.name}
                   </h3>
 

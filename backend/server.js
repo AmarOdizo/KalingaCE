@@ -33,6 +33,7 @@ app.use("/api/Contact1", require("./routes/Contact1Routes"));
 app.use("/api/Admin", require("./routes/AdminRoutes"));
 app.use("/api/MCQ", require("./routes/MCQ"));
 app.use("/api/ExamAttempt", require("./routes/ExamAttemptRoutes"));
+app.use("/api/SQA", require("./routes/SQARoutes"));
 
 // otp routes
 app.use("/api/otp", require("./routes/otp"));

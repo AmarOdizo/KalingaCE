@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Trash2,
   Search,
@@ -15,6 +15,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import AdminAgGrid from "@/components/AdminAgGrid";
 
 const API_URL = "https://kalingace-4.onrender.com/api/EnrolledStudent";
 
@@ -23,6 +24,95 @@ export default function EnrolledStudentsAdminPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedStudent, setSelectedStudent] = useState(null);
+
+  const columnDefs = useMemo(() => [
+    {
+      headerName: "ID",
+      field: "id",
+      width: 90,
+      valueFormatter: (params) => `#${params.value}`,
+      cellClass: "font-semibold text-slate-800 dark:text-slate-350 flex items-center",
+    },
+    {
+      headerName: "Student Name",
+      field: "name",
+      flex: 1,
+      cellRenderer: (params) => {
+        const name = params.value || "";
+        return (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-650 dark:text-indigo-400 font-bold text-sm border border-indigo-500/20">
+              {name ? name.charAt(0).toUpperCase() : <User size={16} />}
+            </div>
+            <span className="font-bold text-slate-900 dark:text-white">
+              {name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Email",
+      field: "email",
+      flex: 1,
+      cellRenderer: (params) => (
+        <div className="flex items-center gap-2 text-slate-650 dark:text-slate-350 text-sm">
+          <Mail size={15} className="text-slate-400 shrink-0" />
+          <span>{params.value}</span>
+        </div>
+      ),
+    },
+    {
+      headerName: "Phone",
+      field: "phone",
+      flex: 1,
+      cellRenderer: (params) => (
+        <div className="flex items-center gap-2 text-slate-650 dark:text-slate-355 text-sm">
+          <Phone size={15} className="text-slate-400 shrink-0" />
+          <span>{params.value}</span>
+        </div>
+      ),
+    },
+    {
+      headerName: "Course Enquired",
+      valueGetter: (params) => params.data.courseName?.courseName || "Unknown Course",
+      flex: 1.5,
+      cellRenderer: (params) => (
+        <div className="flex items-center h-full">
+          <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-200/30 dark:border-indigo-500/10 max-w-xs truncate">
+            {params.value}
+          </div>
+        </div>
+      ),
+    },
+    {
+      headerName: "Actions",
+      cellRenderer: (params) => {
+        const student = params.data;
+        return (
+          <div className="flex items-center justify-center h-full gap-2 w-full">
+            <button
+              onClick={() => setSelectedStudent(student)}
+              title="View Details"
+              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-650 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 cursor-pointer"
+            >
+              <Eye size={17} />
+            </button>
+            <button
+              onClick={() => handleDelete(student.id)}
+              title="Delete"
+              className="rounded-xl border border-red-200/50 bg-red-50/30 p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-400 cursor-pointer"
+            >
+              <Trash2 size={17} />
+            </button>
+          </div>
+        );
+      },
+      width: 130,
+      sortable: false,
+      filter: false,
+    },
+  ], []);
 
   // =====================================
   // FETCH ALL ENROLLED STUDENTS
@@ -220,127 +310,17 @@ export default function EnrolledStudentsAdminPage() {
             className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-500/10"
           />
         </div>
-      </div>
-
-      {/* =================================
+      </div>      {/* =================================
           DATA TABLE
       ================================= */}
       <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px]">
-            <thead className="bg-slate-50 dark:bg-slate-950 border-b border-slate-200/60 dark:border-slate-800/80">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  ID
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Student Details
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Email
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Phone
-                </th>
-                <th className="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Course Enquired
-                </th>
-                <th className="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60">
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
-                    <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-indigo-600 border-t-transparent mb-2" />
-                    <p className="font-semibold">Loading student records...</p>
-                  </td>
-                </tr>
-              ) : filteredStudents.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-400 font-semibold">
-                    No student enquiries found
-                  </td>
-                </tr>
-              ) : (
-                filteredStudents.map((student) => (
-                  <tr
-                    key={student.id || student._id}
-                    className="transition hover:bg-slate-50/50 dark:hover:bg-slate-950/20"
-                  >
-                    {/* ID */}
-                    <td className="px-6 py-4 font-semibold text-slate-700 dark:text-slate-350">
-                      #{student.id}
-                    </td>
-
-                    {/* Student Name */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-sm border border-indigo-500/20">
-                          {student.name ? student.name.charAt(0).toUpperCase() : <User size={16} />}
-                        </div>
-                        <span className="font-bold text-slate-900 dark:text-white">
-                          {student.name}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Email */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-350 text-sm">
-                        <Mail size={15} className="text-slate-400 shrink-0" />
-                        <span>{student.email}</span>
-                      </div>
-                    </td>
-
-                    {/* Phone */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 text-slate-600 dark:text-slate-350 text-sm">
-                        <Phone size={15} className="text-slate-400 shrink-0" />
-                        <span>{student.phone}</span>
-                      </div>
-                    </td>
-
-                    {/* Course */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-200/30 dark:border-indigo-500/10 max-w-xs truncate">
-                          {student.courseName?.courseName || "Unknown Course"}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-6 py-4">
-                      <div className="flex justify-center gap-2">
-                        {/* View Details */}
-                        <button
-                          onClick={() => setSelectedStudent(student)}
-                          title="View Details"
-                          className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 cursor-pointer"
-                        >
-                          <Eye size={17} />
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => handleDelete(student.id)}
-                          title="Delete"
-                          className="rounded-xl border border-red-200/50 bg-red-50/30 p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-400 cursor-pointer"
-                        >
-                          <Trash2 size={17} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AdminAgGrid
+          rowData={students}
+          columnDefs={columnDefs}
+          quickFilterText={search}
+          rowHeight={56}
+          loading={loading}
+        />
       </div>
 
       {/* =================================

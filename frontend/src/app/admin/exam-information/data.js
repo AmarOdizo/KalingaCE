@@ -183,3 +183,42 @@ export const createBulkMCQs = async (mcqList) => {
 
   return await response.json();
 };
+
+// ==============================
+// SQA API INTEGRATION
+// ==============================
+const SQA_LOCAL_URL = "http://localhost:5000/api/SQA";
+const SQA_PROD_URL = "https://kalingace-4.onrender.com/api/SQA";
+
+async function customSQAFetch(urlPath, options = {}) {
+  const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+  if (isLocal) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const response = await fetch(`${SQA_LOCAL_URL}${urlPath}`, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (err) {
+      console.warn("Local backend port 5000 is not active. Falling back to Render URL.");
+    }
+  }
+  return fetch(`${SQA_PROD_URL}${urlPath}`, options);
+}
+
+export const getSQAs = async () => {
+  const response = await customSQAFetch("", {
+    cache: "no-store",
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message || "Failed to fetch SQAs");
+  }
+
+  return result.data;
+};

@@ -241,7 +241,7 @@ export default function ExamModal({ exam, onClose }) {
                   }}
                   className="w-full rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 py-3.5 px-4 font-bold text-white shadow-md active:scale-95 transition cursor-pointer flex flex-col items-center justify-center gap-0.5"
                 >
-                  <span className="text-sm">Start Online Exam</span>
+                  <span className="text-sm">Start Exam</span>
                   <span className="text-xs font-semibold text-indigo-200/90">
                     Active ({timeRemainingText})
                   </span>

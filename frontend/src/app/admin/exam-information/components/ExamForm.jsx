@@ -270,14 +270,14 @@ export default function ExamForm({
           </button>
         )}
 
-        {(formData.mode === "Online" && !isEdit) && (
+        {formData.mode === "Online" && (
           <button
             type="submit"
             onClick={() => setSubmitAction("mcq")}
             disabled={loading || uploading}
             className="rounded-xl border border-indigo-200 bg-indigo-50/20 px-6 py-3 font-bold text-sm text-indigo-700 hover:bg-indigo-600 hover:text-white dark:border-indigo-900/40 dark:bg-indigo-950/10 dark:text-indigo-400 dark:hover:bg-indigo-500 dark:hover:text-white active:scale-95 cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
           >
-            Save & Add MCQ
+            Add & Save Question
           </button>
         )}
       </div>

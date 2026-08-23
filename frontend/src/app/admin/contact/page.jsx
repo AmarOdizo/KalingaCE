@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import {
   Trash2,
   Search,
@@ -15,6 +15,7 @@ import {
   AlertCircle,
   Clock,
 } from "lucide-react";
+import AdminAgGrid from "@/components/AdminAgGrid";
 
 const API_URL = "https://kalingace-4.onrender.com/api/Contact1";
 
@@ -25,6 +26,98 @@ export default function Contact1Page() {
   const [deleteId, setDeleteId] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [selectedContact, setSelectedContact] = useState(null);
+
+  const columnDefs = useMemo(() => [
+    {
+      headerName: "Enquiry ID",
+      field: "id",
+      width: 110,
+      valueFormatter: (params) => `#${params.value}`,
+      cellClass: "font-bold text-slate-800 dark:text-slate-100 flex items-center",
+    },
+    {
+      headerName: "Sender",
+      field: "name",
+      flex: 1,
+      cellRenderer: (params) => {
+        const name = params.value || "";
+        return (
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold border border-blue-100/50 dark:border-blue-800/30">
+              {name ? name.charAt(0).toUpperCase() : <User size={16} />}
+            </div>
+            <span className="font-bold text-slate-900 dark:text-white">
+              {name}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
+      headerName: "Contact details",
+      cellRenderer: (params) => {
+        const contact = params.data;
+        return (
+          <div className="flex flex-col justify-center h-full gap-0.5">
+            <span className="flex items-center gap-1.5 text-xs text-slate-655 dark:text-slate-350 font-semibold leading-normal">
+              <Phone size={13} className="text-slate-400" />
+              {contact.phone}
+            </span>
+            <span className="flex items-center gap-1.5 text-xs text-slate-655 dark:text-slate-400 font-semibold leading-normal">
+              <Mail size={13} className="text-slate-400" />
+              {contact.email}
+            </span>
+          </div>
+        );
+      },
+      flex: 1.5,
+    },
+    {
+      headerName: "Subject",
+      field: "subject",
+      flex: 1.2,
+      cellRenderer: (params) => (
+        <div className="flex items-center gap-1.5 h-full">
+          <MessageSquare size={14} className="text-primary-500 shrink-0" />
+          <span className="truncate max-w-[150px] font-semibold text-slate-800 dark:text-slate-100">{params.value}</span>
+        </div>
+      ),
+    },
+    {
+      headerName: "Message Preview",
+      field: "description",
+      flex: 2,
+      cellClass: "text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center",
+      valueFormatter: (params) => params.value || "N/A",
+    },
+    {
+      headerName: "Actions",
+      cellRenderer: (params) => {
+        const contact = params.data;
+        return (
+          <div className="flex items-center justify-center h-full gap-2 w-full">
+            <button
+              onClick={() => setSelectedContact(contact)}
+              title="View Details"
+              className="rounded-xl bg-sky-50 p-2 text-sky-655 dark:bg-sky-500/10 dark:text-sky-400 hover:bg-sky-600 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center"
+            >
+              <Eye size={16} />
+            </button>
+            <button
+              onClick={() => setDeleteId(contact.id)}
+              title="Delete"
+              className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer flex items-center justify-center"
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        );
+      },
+      width: 120,
+      sortable: false,
+      filter: false,
+    },
+  ], []);
 
   // =====================================
   // GET ALL CONTACTS
@@ -188,125 +281,13 @@ export default function Contact1Page() {
           TABLE CONTAINER
       ================================= */}
       <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-premium dark:border-slate-800 dark:bg-slate-900/60 transition-all duration-300">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-slate-200/60 dark:divide-slate-800/50">
-            <thead className="bg-slate-50/75 dark:bg-slate-800/40 text-slate-600 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/80">
-              <tr>
-                <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Enquiry ID
-                </th>
-                <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Sender
-                </th>
-                <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Contact details
-                </th>
-                <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Subject
-                </th>
-                <th className="px-6 py-4.5 text-left text-xs font-bold uppercase tracking-wider">
-                  Message Preview
-                </th>
-                <th className="px-6 py-4.5 text-center text-xs font-bold uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40 bg-transparent">
-              {loading ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500 dark:text-slate-400 font-medium">
-                    <div className="flex items-center justify-center gap-2">
-                      <span className="h-5 w-5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-                      Loading contact entries...
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredContacts.length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-550 dark:text-slate-400 font-semibold">
-                    No matching enquiries found.
-                  </td>
-                </tr>
-              ) : (
-                filteredContacts.map((contact) => (
-                  <tr
-                    key={contact.id}
-                    className="transition-colors hover:bg-slate-50/50 dark:hover:bg-slate-800/20"
-                  >
-                    {/* ID */}
-                    <td className="px-6 py-4.5 font-bold text-slate-800 dark:text-slate-100">
-                      #{contact.id}
-                    </td>
-
-                    {/* NAME */}
-                    <td className="px-6 py-4.5">
-                      <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 font-bold border border-blue-100/50 dark:border-blue-800/30">
-                          {contact.name ? contact.name.charAt(0).toUpperCase() : <User size={16} />}
-                        </div>
-                        <span className="font-bold text-slate-900 dark:text-white">
-                          {contact.name}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* CONTACT DETAILS */}
-                    <td className="px-6 py-4.5">
-                      <div className="flex flex-col gap-1">
-                        <span className="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-350 font-semibold">
-                          <Phone size={13} className="text-slate-400" />
-                          {contact.phone}
-                        </span>
-                        <span className="flex items-center gap-1.5 text-xs text-slate-650 dark:text-slate-400 font-semibold">
-                          <Mail size={13} className="text-slate-400" />
-                          {contact.email}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* SUBJECT */}
-                    <td className="px-6 py-4.5 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                      <div className="flex items-center gap-1.5">
-                        <MessageSquare size={14} className="text-primary-500 shrink-0" />
-                        <span className="truncate max-w-[150px]">{contact.subject}</span>
-                      </div>
-                    </td>
-
-                    {/* DESCRIPTION */}
-                    <td className="px-6 py-4.5 max-w-[240px] truncate text-xs text-slate-500 dark:text-slate-400 font-medium" title={contact.description}>
-                      {contact.description || "N/A"}
-                    </td>
-
-                    {/* ACTIONS */}
-                    <td className="px-6 py-4.5">
-                      <div className="flex items-center justify-center gap-2">
-                        {/* VIEW DETAILS */}
-                        <button
-                          onClick={() => setSelectedContact(contact)}
-                          title="View Details"
-                          className="rounded-xl bg-sky-50 p-2 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400 hover:bg-sky-600 hover:text-white dark:hover:bg-sky-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
-                        >
-                          <Eye size={16} />
-                        </button>
-
-                        {/* DELETE */}
-                        <button
-                          onClick={() => setDeleteId(contact.id)}
-                          title="Delete"
-                          className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-450 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
+        <AdminAgGrid
+          rowData={contacts}
+          columnDefs={columnDefs}
+          quickFilterText={search}
+          rowHeight={60}
+          loading={loading}
+        />
       </div>
 
       {/* =================================

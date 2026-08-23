@@ -170,3 +170,74 @@ export const getAllExamAttempts = async () => {
     throw error;
   }
 };
+
+// ==============================
+// GET SQA By Exam ID
+// ==============================
+export const getSQAByExam = async (examId) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/SQA");
+    const response = await fetch(`${baseUrl}/exam/${examId}`, {
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to fetch SQA details");
+    }
+    return result.data;
+  } catch (error) {
+    console.error("Fetch SQA by Exam ID Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// SUBMIT SQA Answer
+// ==============================
+export const submitSQAAnswer = async (sqaId, questionId, studentAnswer, studentName, mobileNumber) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/SQA");
+    const response = await fetch(`${baseUrl}/${sqaId}/answer`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ questionId, studentAnswer, studentName, mobileNumber }),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to submit SQA answer");
+    }
+    return result;
+  } catch (error) {
+    console.error("Submit SQA Answer Error:", error);
+    throw error;
+  }
+};
+
+// ==============================
+// UPDATE Exam Attempt Score
+// ==============================
+export const updateExamAttemptScore = async (attemptId, score) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamAttempt");
+    const response = await fetch(`${baseUrl}/${attemptId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ score }),
+    });
+
+    const result = await response.json();
+    if (!result.success) {
+      throw new Error(result.message || "Failed to update attempt score");
+    }
+    return result;
+  } catch (error) {
+    console.error("Update Exam Attempt Score Error:", error);
+    throw error;
+  }
+};

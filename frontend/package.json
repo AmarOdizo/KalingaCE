@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "ag-charts-community": "^14.1.0",
+    "ag-charts-react": "^14.1.0",
+    "ag-grid-community": "^36.1.0",
+    "ag-grid-react": "^36.1.0",
     "antd": "^6.5.2",
     "axios": "^1.19.0",
     "dayjs": "^1.11.21",

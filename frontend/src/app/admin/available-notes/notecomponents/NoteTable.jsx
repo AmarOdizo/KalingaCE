@@ -2,10 +2,103 @@
 
 import Link from "next/link";
 import Image from "next/image";
-
 import StatusBadge from "./StatusBadge";
+import AdminAgGrid from "@/components/AdminAgGrid";
 
 export default function NoteTable({ notes, onDelete }) {
+  const columnDefs = [
+    {
+      headerName: "ID",
+      field: "id",
+      width: 90,
+      valueFormatter: (params) => `#${params.value}`,
+      cellClass: "font-semibold text-slate-800 dark:text-slate-100 flex items-center",
+    },
+    {
+      headerName: "Thumbnail",
+      field: "thumbnail",
+      width: 100,
+      cellRenderer: (params) => {
+        const url = params.value?.url || "/no-image.png";
+        return (
+          <div className="flex items-center h-full">
+            <Image
+              src={url}
+              alt={params.data.noteTitle}
+              width={60}
+              height={60}
+              unoptimized
+              className="h-14 w-14 rounded-lg object-cover border border-slate-200 dark:border-slate-800 shadow-sm"
+            />
+          </div>
+        );
+      },
+      sortable: false,
+      filter: false,
+    },
+    {
+      headerName: "Subject",
+      field: "subjectName",
+      flex: 1,
+      cellClass: "text-slate-700 dark:text-slate-305 flex items-center font-medium",
+    },
+    {
+      headerName: "Note Title",
+      field: "noteTitle",
+      flex: 1.5,
+      cellClass: "font-bold text-slate-900 dark:text-white flex items-center",
+    },
+    {
+      headerName: "Uploaded By",
+      field: "uploadedBy",
+      flex: 1,
+      cellClass: "text-slate-700 dark:text-slate-305 flex items-center font-medium",
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      width: 110,
+      cellRenderer: (params) => (
+        <div className="flex items-center h-full">
+          <StatusBadge status={params.value} />
+        </div>
+      ),
+    },
+    {
+      headerName: "Actions",
+      cellRenderer: (params) => {
+        const note = params.data;
+        return (
+          <div className="flex items-center justify-center h-full gap-2 w-full">
+            <Link
+              href={`/admin/available-notes/view/${note.id}`}
+              className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 transition"
+            >
+              View
+            </Link>
+
+            <Link
+              href={`/admin/available-notes/edit/${note.id}`}
+              className="rounded-lg bg-yellow-500 px-3 py-2 text-sm font-medium text-white hover:bg-yellow-600 transition"
+            >
+              Edit
+            </Link>
+
+            <button
+              onClick={() => onDelete(note.id)}
+              className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700 transition"
+            >
+              Delete
+            </button>
+          </div>
+        );
+      },
+      width: 240,
+      sortable: false,
+      filter: false,
+    },
+  ];
+
   return (
     <>
       {/* ================= Mobile Card View ================= */}
@@ -72,103 +165,12 @@ export default function NoteTable({ notes, onDelete }) {
       </div>
 
       {/* ================= Tablet/Desktop Table ================= */}
-      <div className="hidden overflow-x-auto rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900 md:block">
-        <table className="min-w-full">
-          <thead className="bg-gray-100 dark:bg-gray-800">
-            <tr>
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                ID
-              </th>
-
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Thumbnail
-              </th>
-
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Subject
-              </th>
-
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Note Title
-              </th>
-
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Uploaded By
-              </th>
-
-              <th className="px-4 py-4 text-left text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Status
-              </th>
-
-              <th className="px-4 py-4 text-center text-sm font-semibold text-gray-700 dark:text-gray-200">
-                Actions
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {notes.map((note) => (
-              <tr
-                key={note.id}
-                className="border-t border-gray-200 transition hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800"
-              >
-                <td className="px-4 py-4 dark:text-white">#{note.id}</td>
-
-                <td className="px-4 py-4">
-                  <Image
-                    src={note.thumbnail?.url || "/no-image.png"}
-                    alt={note.noteTitle}
-                    width={60}
-                    height={60}
-                    unoptimized
-                    className="h-14 w-14 rounded-lg object-cover"
-                  />
-                </td>
-
-                <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
-                  {note.subjectName}
-                </td>
-
-                <td className="px-4 py-4 font-medium text-gray-900 dark:text-white">
-                  {note.noteTitle}
-                </td>
-
-                <td className="px-4 py-4 text-gray-700 dark:text-gray-300">
-                  {note.uploadedBy}
-                </td>
-
-                <td className="px-4 py-4">
-                  <StatusBadge status={note.status} />
-                </td>
-
-                <td className="px-4 py-4">
-                  <div className="flex items-center justify-center gap-2">
-                    <Link
-                      href={`/admin/available-notes/view/${note.id}`}
-                      className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                    >
-                      View
-                    </Link>
-
-                    <Link
-                      href={`/admin/available-notes/edit/${note.id}`}
-                      className="rounded-lg bg-yellow-500 px-3 py-2 text-sm font-medium text-white hover:bg-yellow-600"
-                    >
-                      Edit
-                    </Link>
-
-                    <button
-                      onClick={() => onDelete(note.id)}
-                      className="rounded-lg bg-red-600 px-3 py-2 text-sm font-medium text-white hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="hidden overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900 md:block">
+        <AdminAgGrid
+          rowData={notes}
+          columnDefs={columnDefs}
+          rowHeight={64}
+        />
       </div>
     </>
   );

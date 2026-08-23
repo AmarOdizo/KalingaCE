@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
-import { getSubjects, getMCQsBySubject, getExamById, getMCQsByExam, checkExamAttempt, submitExamAttempt } from "./data";
+import { getSubjects, getMCQsBySubject, getExamById, getMCQsByExam, checkExamAttempt, submitExamAttempt, getSQAByExam, submitSQAAnswer } from "./data";
 import Loading from "./Loading";
 import {
   BookOpen,
@@ -122,15 +122,18 @@ export default function MCQClient() {
         questions.forEach((q) => {
           const alreadyAnswered = updatedAnswers.some(ans => ans.questionText === q.question);
           if (!alreadyAnswered) {
+            const isMcq = q.type === "mcq" || !q.type;
             updatedAnswers.push({
-              questionId: q.id,
+              questionId: q.id || q._id,
               questionText: q.question,
-              options: q.options,
+              options: q.options || [],
               chosen: "Unanswered",
-              correct: q.correctAnswer,
-              isCorrect: false,
-              explanation: q.explanation,
+              correct: isMcq ? q.correctAnswer : "",
+              isCorrect: isMcq ? false : null,
+              explanation: q.explanation || "",
               marks: q.marks || 1,
+              type: q.type || "mcq",
+              sqaId: q.sqaId || null
             });
           }
         });
@@ -143,14 +146,16 @@ export default function MCQClient() {
 
     if (isScheduledExam) {
       try {
-        const totalScore = quizQuestions.reduce((acc, q) => acc + (q.marks || 1), 0);
+        const mcqAnswers = finalAnswers.filter(ans => ans.type === "mcq" || !ans.type);
+        const totalMcqPossible = quizQuestions.filter(q => q.type === "mcq" || !q.type).reduce((acc, q) => acc + (q.marks || 1), 0);
+        const totalSqaPossible = quizQuestions.filter(q => q.type === "sqa").reduce((acc, q) => acc + (q.marks || q.maxMarks || 5), 0);
         const attemptData = {
           studentName,
           mobileNumber,
           examId,
           score,
-          totalPossibleScore: totalScore,
-          answers: finalAnswers.map(ans => ({
+          totalPossibleScore: totalMcqPossible + totalSqaPossible,
+          answers: mcqAnswers.map(ans => ({
             questionId: ans.questionId,
             questionText: ans.questionText,
             chosenAnswer: ans.chosen,
@@ -160,6 +165,18 @@ export default function MCQClient() {
           })),
         };
         await submitExamAttempt(attemptData);
+
+        // Submit SQA Answers
+        const sqaAnswers = finalAnswers.filter(ans => ans.type === "sqa");
+        if (sqaAnswers.length > 0) {
+          await Promise.all(sqaAnswers.map(async (ans) => {
+            if (ans.sqaId && ans.chosen && ans.chosen !== "Unanswered") {
+              await submitSQAAnswer(ans.sqaId, ans.questionId, ans.chosen, studentName, mobileNumber).catch(e => {
+                console.error("Failed to submit SQA answer", e);
+              });
+            }
+          }));
+        }
       } catch (err) {
         console.error("Failed to save auto-submitted attempt:", err);
       }
@@ -224,17 +241,33 @@ export default function MCQClient() {
           return;
         }
 
-        // 3. Load MCQs for this exam
-        const questions = await getMCQsByExam(examId);
-        if (!questions || questions.length === 0) {
+        // 3. Load MCQs & SQAs for this exam
+        const [mcqs, sqaDoc] = await Promise.all([
+          getMCQsByExam(examId).catch(() => []),
+          getSQAByExam(examId).catch(() => null)
+        ]);
+
+        const mcqQuestions = mcqs.map(q => ({ ...q, type: "mcq" }));
+        const sqaQuestions = (sqaDoc && sqaDoc.questions) ? sqaDoc.questions.map(q => ({
+          ...q,
+          type: "sqa",
+          options: [],
+          correctAnswer: "",
+          marks: q.maxMarks || 5,
+          sqaId: sqaDoc._id
+        })) : [];
+
+        const combinedQuestions = [...mcqQuestions, ...sqaQuestions];
+
+        if (combinedQuestions.length === 0) {
           setError("No questions found for this exam. Please contact the administrator.");
           setLoading(false);
           return;
         }
 
         // 4. Initialize exam state
-        setAllQuestions(questions);
-        setQuizQuestions(questions); // Show all questions for the actual exam
+        setAllQuestions(combinedQuestions);
+        setQuizQuestions(combinedQuestions); // Show all questions for the actual exam
         setIsScheduledExam(true);
         setCurrentIndex(0);
         setScore(0);
@@ -444,16 +477,19 @@ export default function MCQClient() {
 
     if (isScheduledExam) {
       const currentQuestion = quizQuestions[currentIndex];
-      const isCorrect = selectedAnswer.trim() === currentQuestion.correctAnswer.trim();
+      const isMcq = currentQuestion.type === "mcq" || !currentQuestion.type;
+      const isCorrect = isMcq ? (selectedAnswer.trim() === currentQuestion.correctAnswer.trim()) : null;
       const currentAnswerObj = {
-        questionId: currentQuestion.id,
+        questionId: currentQuestion.id || currentQuestion._id,
         questionText: currentQuestion.question,
-        options: currentQuestion.options,
+        options: currentQuestion.options || [],
         chosen: selectedAnswer || "Unanswered",
-        correct: currentQuestion.correctAnswer,
+        correct: isMcq ? currentQuestion.correctAnswer : "",
         isCorrect,
-        explanation: currentQuestion.explanation,
+        explanation: currentQuestion.explanation || "",
         marks: currentQuestion.marks || 1,
+        type: currentQuestion.type || "mcq",
+        sqaId: currentQuestion.sqaId || null
       };
       updatedAnswers.push(currentAnswerObj);
       setUserAnswers(updatedAnswers);
@@ -462,9 +498,12 @@ export default function MCQClient() {
     if (currentIndex < quizQuestions.length - 1) {
       if (isScheduledExam) {
         const currentQuestion = quizQuestions[currentIndex];
-        const isCorrect = selectedAnswer.trim() === currentQuestion.correctAnswer.trim();
-        if (isCorrect) {
-          setScore((prev) => prev + (currentQuestion.marks || 1));
+        const isMcq = currentQuestion.type === "mcq" || !currentQuestion.type;
+        if (isMcq) {
+          const isCorrect = selectedAnswer.trim() === currentQuestion.correctAnswer.trim();
+          if (isCorrect) {
+            setScore((prev) => prev + (currentQuestion.marks || 1));
+          }
         }
       }
       setCurrentIndex((prev) => prev + 1);
@@ -474,10 +513,13 @@ export default function MCQClient() {
       if (isScheduledExam) {
         try {
           setLoading(true);
-          const totalScore = quizQuestions.reduce((acc, q) => acc + (q.marks || 1), 0);
+          const mcqAnswers = updatedAnswers.filter(ans => ans.type === "mcq" || !ans.type);
+          const totalMcqPossible = quizQuestions.filter(q => q.type === "mcq" || !q.type).reduce((acc, q) => acc + (q.marks || 1), 0);
+          const totalSqaPossible = quizQuestions.filter(q => q.type === "sqa").reduce((acc, q) => acc + (q.marks || q.maxMarks || 5), 0);
           
           const lastQuestion = quizQuestions[currentIndex];
-          const lastCorrect = selectedAnswer.trim() === lastQuestion.correctAnswer.trim();
+          const isLastMcq = lastQuestion.type === "mcq" || !lastQuestion.type;
+          const lastCorrect = isLastMcq ? (selectedAnswer.trim() === lastQuestion.correctAnswer.trim()) : false;
           const finalScore = lastCorrect ? (score + (lastQuestion.marks || 1)) : score;
 
           const attemptData = {
@@ -485,8 +527,8 @@ export default function MCQClient() {
             mobileNumber,
             examId,
             score: finalScore,
-            totalPossibleScore: totalScore,
-            answers: updatedAnswers.map(ans => ({
+            totalPossibleScore: totalMcqPossible + totalSqaPossible,
+            answers: mcqAnswers.map(ans => ({
               questionId: ans.questionId,
               questionText: ans.questionText,
               chosenAnswer: ans.chosen,
@@ -496,6 +538,18 @@ export default function MCQClient() {
             })),
           };
           await submitExamAttempt(attemptData);
+
+          // Submit SQA Answers
+          const sqaAnswers = updatedAnswers.filter(ans => ans.type === "sqa");
+          if (sqaAnswers.length > 0) {
+            await Promise.all(sqaAnswers.map(async (ans) => {
+              if (ans.sqaId && ans.chosen && ans.chosen !== "Unanswered") {
+                await submitSQAAnswer(ans.sqaId, ans.questionId, ans.chosen, studentName, mobileNumber).catch(e => {
+                  console.error("Failed to submit SQA answer", e);
+                });
+              }
+            }));
+          }
         } catch (err) {
           console.error("Failed to save attempt:", err);
         } finally {
@@ -738,61 +792,81 @@ export default function MCQClient() {
 
                   {/* Question Text */}
                   <div className="p-8">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white leading-relaxed">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white leading-relaxed flex items-center gap-2">
                       {quizQuestions[currentIndex].question}
+                      {quizQuestions[currentIndex].type === "sqa" && (
+                        <span className="inline-flex items-center rounded-md bg-indigo-50 dark:bg-indigo-950/40 px-2 py-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                          Short Answer
+                        </span>
+                      )}
                     </h3>
 
-                    {/* Grid of Options */}
-                    <div className="mt-8 grid gap-4">
-                      {quizQuestions[currentIndex].options.map((option, idx) => {
-                        const isOptionSelected = selectedAnswer.trim() === option.trim();
-                        const isOptionCorrect = option.trim() === quizQuestions[currentIndex].correctAnswer.trim();
+                    {/* CONDITION: MCQ options or SQA textarea */}
+                    {(quizQuestions[currentIndex].type === "mcq" || !quizQuestions[currentIndex].type) ? (
+                      <div className="mt-8 grid gap-4">
+                        {quizQuestions[currentIndex].options.map((option, idx) => {
+                          const isOptionSelected = selectedAnswer.trim() === option.trim();
+                          const isOptionCorrect = option.trim() === quizQuestions[currentIndex].correctAnswer.trim();
 
-                        let buttonStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/55 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80";
-                        if (isAnswered) {
-                          if (isOptionCorrect) {
-                            buttonStyle = "border-emerald-500 bg-emerald-50/20 text-emerald-800 dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 font-bold";
+                          let buttonStyle = "border-slate-200 bg-white text-slate-700 hover:border-slate-350 hover:bg-slate-50/55 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800/80";
+                          if (isAnswered) {
+                            if (isOptionCorrect) {
+                              buttonStyle = "border-emerald-500 bg-emerald-50/20 text-emerald-800 dark:border-emerald-500/50 dark:bg-emerald-950/20 dark:text-emerald-400 font-bold";
+                            } else if (isOptionSelected) {
+                              buttonStyle = "border-red-500 bg-red-50/20 text-red-800 dark:border-red-500/50 dark:bg-red-950/20 dark:text-red-400 font-bold";
+                            } else {
+                              buttonStyle = "border-slate-100 bg-white/40 text-slate-400 dark:border-slate-800 dark:bg-slate-900/20 dark:text-slate-600 opacity-60";
+                            }
                           } else if (isOptionSelected) {
-                            buttonStyle = "border-red-500 bg-red-50/20 text-red-800 dark:border-red-500/50 dark:bg-red-950/20 dark:text-red-400 font-bold";
-                          } else {
-                            buttonStyle = "border-slate-100 bg-white/40 text-slate-400 dark:border-slate-800 dark:bg-slate-900/20 dark:text-slate-600 opacity-60";
+                            buttonStyle = "border-primary-500 bg-primary-50/30 text-primary-900 dark:border-primary-500/80 dark:bg-primary-950/20 dark:text-primary-350 font-bold ring-2 ring-primary-500/20 shadow-sm";
                           }
-                        } else if (isOptionSelected) {
-                          buttonStyle = "border-primary-500 bg-primary-50/30 text-primary-900 dark:border-primary-500/80 dark:bg-primary-950/20 dark:text-primary-350 font-bold ring-2 ring-primary-500/20 shadow-sm";
-                        }
 
-                        return (
-                          <button
-                            key={idx}
-                            disabled={isAnswered}
-                            onClick={() => handleSelectOption(option)}
-                            className={`flex items-start gap-4 rounded-2xl border p-4.5 text-left text-sm transition-all duration-200 active:scale-[0.99] select-none ${
-                              !isAnswered ? "cursor-pointer" : "cursor-default"
-                            } ${buttonStyle}`}
-                          >
-                            {/* Option label indicator (A, B, C, D) */}
-                            <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-                              isAnswered && isOptionCorrect
-                                ? "bg-emerald-500 text-white"
-                                : isAnswered && isOptionSelected
-                                ? "bg-red-500 text-white"
-                                : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
-                            }`}>
-                              {String.fromCharCode(65 + idx)}
-                            </span>
-                            <span className="pt-0.5 leading-relaxed">{option}</span>
+                          return (
+                            <button
+                              key={idx}
+                              disabled={isAnswered}
+                              onClick={() => handleSelectOption(option)}
+                              className={`flex items-start gap-4 rounded-2xl border p-4.5 text-left text-sm transition-all duration-200 active:scale-[0.99] select-none ${
+                                !isAnswered ? "cursor-pointer" : "cursor-default"
+                              } ${buttonStyle}`}
+                            >
+                              {/* Option label indicator (A, B, C, D) */}
+                              <span className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+                                isAnswered && isOptionCorrect
+                                  ? "bg-emerald-500 text-white"
+                                  : isAnswered && isOptionSelected
+                                  ? "bg-red-500 text-white"
+                                  : "bg-slate-200 text-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                              }`}>
+                                {String.fromCharCode(65 + idx)}
+                              </span>
+                              <span className="pt-0.5 leading-relaxed">{option}</span>
 
-                            {/* Status Checkmark or X icons */}
-                            {isAnswered && isOptionCorrect && (
-                              <CheckCircle2 size={18} className="ml-auto shrink-0 text-emerald-500 dark:text-emerald-400 mt-0.5" />
-                            )}
-                            {isAnswered && isOptionSelected && !isOptionCorrect && (
-                              <AlertCircle size={18} className="ml-auto shrink-0 text-red-500 dark:text-red-400 mt-0.5" />
-                            )}
-                          </button>
-                        );
-                      })}
-                    </div>
+                              {/* Status Checkmark or X icons */}
+                              {isAnswered && isOptionCorrect && (
+                                <CheckCircle2 size={18} className="ml-auto shrink-0 text-emerald-500 dark:text-emerald-400 mt-0.5" />
+                              )}
+                              {isAnswered && isOptionSelected && !isOptionCorrect && (
+                                <AlertCircle size={18} className="ml-auto shrink-0 text-red-500 dark:text-red-400 mt-0.5" />
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : (
+                      <div className="mt-8 space-y-2">
+                        <label className="text-xs font-bold text-slate-450 uppercase tracking-wider block">
+                          Your Short Answer Response
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={selectedAnswer}
+                          onChange={(e) => setSelectedAnswer(e.target.value)}
+                          placeholder="Type your descriptive answer response here..."
+                          className="w-full rounded-2xl border border-slate-200 bg-slate-50/50 p-4.5 outline-none text-sm text-slate-800 focus:border-primary-500 focus:bg-white dark:border-slate-800 dark:bg-slate-900 dark:text-white dark:focus:bg-slate-950 transition-all shadow-inner"
+                        />
+                      </div>
+                    )}
 
                     {/* Feedback & Explanation Panel */}
                     {isAnswered && (
@@ -811,7 +885,7 @@ export default function MCQClient() {
 
                   {/* Action Buttons */}
                   <div className="flex justify-end p-6 border-t border-slate-100 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-900/30">
-                    {(isAnswered || (isScheduledExam && selectedAnswer)) ? (
+                    {(isAnswered || isScheduledExam) ? (
                       <button
                         onClick={handleNext}
                         className="btn-primary px-7 py-3 cursor-pointer flex items-center gap-1.5"

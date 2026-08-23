@@ -38,11 +38,6 @@ export default function AdminSidebar() {
       href: "/admin/exam-information",
     },
     {
-      name: "Exam Attempts",
-      icon: Trophy,
-      href: "/admin/exam-attempts",
-    },
-    {
       name: "Available Notes",
       icon: BookOpen,
       href: "/admin/available-notes",

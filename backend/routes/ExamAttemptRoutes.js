@@ -143,4 +143,22 @@ router.post("/check", async (req, res) => {
   }
 });
 
+// Update attempt score (for SQA descriptive grading updates)
+router.put("/:id", async (req, res) => {
+  try {
+    const { score } = req.body;
+    const attempt = await ExamAttempt.findByIdAndUpdate(
+      req.params.id,
+      { score },
+      { new: true }
+    );
+    if (!attempt) {
+      return res.status(404).json({ success: false, message: "Attempt not found" });
+    }
+    res.status(200).json({ success: true, data: attempt });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Failed to update score", error: error.message });
+  }
+});
+
 module.exports = router;

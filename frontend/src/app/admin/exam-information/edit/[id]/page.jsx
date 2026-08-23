@@ -55,7 +55,7 @@ export default function EditExamInformation() {
       if (res.success) {
         alert("Exam Information Updated Successfully");
         if (submitAction === "mcq") {
-          router.push(`/admin/mcq?examId=${res.data?._id || res.data?.id || id}&launchCreate=true`);
+          router.push(`/admin/question-form?examId=${res.data?._id || res.data?.id || id}&launchCreate=true`);
         } else {
           router.push("/admin/exam-information");
         }

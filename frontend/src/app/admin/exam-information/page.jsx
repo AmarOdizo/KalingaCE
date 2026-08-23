@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 
-import { getExamInformation, getMCQs } from "./data";
+import { getExamInformation, getMCQs, getSQAs } from "./data";
 import { filterExamInformation } from "./utils";
 
 import SearchFilter from "./components/SearchFilter";
@@ -24,6 +24,7 @@ export default function ExamInformationPage() {
 function ExamInformationContent() {
   const [examData, setExamData] = useState([]);
   const [mcqData, setMcqData] = useState([]);
+  const [sqaData, setSqaData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
@@ -35,15 +36,20 @@ function ExamInformationContent() {
   const loadExamInformation = useCallback(async () => {
     try {
       setLoading(true);
-      const [exams, mcqs] = await Promise.all([
+      const [exams, mcqs, sqas] = await Promise.all([
         getExamInformation(),
         getMCQs().catch((err) => {
           console.error("Failed to load MCQs", err);
           return [];
         }),
+        getSQAs().catch((err) => {
+          console.error("Failed to load SQAs", err);
+          return [];
+        }),
       ]);
       setExamData(exams || []);
       setMcqData(mcqs || []);
+      setSqaData(sqas || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -65,7 +71,7 @@ function ExamInformationContent() {
         (ex) => ex._id === courseId || ex.id === Number(courseId)
       );
       if (match) {
-        router.push(`/admin/mcq?examId=${match._id || match.id}&launchCreate=true`);
+        router.push(`/admin/question-form?examId=${match._id || match.id}&launchCreate=true`);
       }
     }
   }, [launchMCQ, courseId, examData, router]);
@@ -115,6 +121,7 @@ function ExamInformationContent() {
         <ExamTable
           exams={filteredData}
           mcqs={mcqData}
+          sqas={sqaData}
           refreshData={loadExamInformation}
         />
       </div>

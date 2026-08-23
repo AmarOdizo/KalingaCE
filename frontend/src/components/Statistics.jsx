@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { CalendarDays, GraduationCap, Users, Building2 } from "lucide-react";
+import { AgCharts } from "ag-charts-react";
 
 export default function Statistics() {
   const [data, setData] = useState({
@@ -10,7 +11,22 @@ export default function Statistics() {
     totalAvailable: 0,
     totalFaculty: 0,
   });
+  const [campusData, setCampusData] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isDark, setIsDark] = useState(false);
+
+  // Dark Mode detection observer
+  useEffect(() => {
+    const html = document.documentElement;
+    setIsDark(html.classList.contains("dark"));
+
+    const observer = new MutationObserver(() => {
+      setIsDark(html.classList.contains("dark"));
+    });
+
+    observer.observe(html, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -26,7 +42,7 @@ export default function Statistics() {
           let totalAvailable = 0;
           let totalFaculty = 0;
 
-          campuses.forEach((c) => {
+          const chartData = campuses.map((c) => {
             // Opening Date
             if (c.OpeningDate) {
               const d = new Date(c.OpeningDate);
@@ -41,19 +57,29 @@ export default function Statistics() {
             const passed = Array.isArray(c.TotalPassedOutStudent)
               ? c.TotalPassedOutStudent[0]
               : c.TotalPassedOutStudent;
-            totalPassedOut += Number(passed) || 0;
+            const numPassed = Number(passed) || 0;
+            totalPassedOut += numPassed;
 
             // Available Students
             const avail = Array.isArray(c.TotalAvailableStudent)
               ? c.TotalAvailableStudent[0]
               : c.TotalAvailableStudent;
-            totalAvailable += Number(avail) || 0;
+            const numAvail = Number(avail) || 0;
+            totalAvailable += numAvail;
 
             // Faculty
             const fac = Array.isArray(c.Totalfaculty)
               ? c.Totalfaculty[0]
               : c.Totalfaculty;
-            totalFaculty += Number(fac) || 0;
+            const numFac = Number(fac) || 0;
+            totalFaculty += numFac;
+
+            return {
+              campusName: c.campusName || "Unknown",
+              activeStudents: numAvail,
+              passedOutStudents: numPassed,
+              faculty: numFac,
+            };
           });
 
           const formattedDate = earliestDate
@@ -70,6 +96,7 @@ export default function Statistics() {
             totalAvailable,
             totalFaculty,
           });
+          setCampusData(chartData);
         }
       } catch (err) {
         console.error("Error fetching statistics:", err);
@@ -119,6 +146,73 @@ export default function Statistics() {
       gradient: "from-amber-500 to-orange-500",
     },
   ];
+
+  // AG Charts layout options
+  const chartOptions = useMemo(() => {
+    return {
+      data: campusData,
+      theme: isDark ? "ag-default-dark" : "ag-default",
+      background: {
+        fill: "transparent",
+      },
+      series: [
+        {
+          type: "bar",
+          xKey: "campusName",
+          yKey: "activeStudents",
+          yName: "Active Students",
+          fill: "#6366f1", // Indigo 500
+          stroke: "#6366f1",
+        },
+        {
+          type: "bar",
+          xKey: "campusName",
+          yKey: "passedOutStudents",
+          yName: "Passed Out Students",
+          fill: "#10b981", // Emerald 500
+          stroke: "#10b981",
+        },
+        {
+          type: "line",
+          xKey: "campusName",
+          yKey: "faculty",
+          yName: "Faculty",
+          stroke: "#f59e0b", // Amber 500
+          marker: {
+            fill: "#f59e0b",
+          },
+        },
+      ],
+      axes: [
+        {
+          type: "category",
+          position: "bottom",
+          label: {
+            fontFamily: "var(--font-sans), sans-serif",
+          },
+        },
+        {
+          type: "number",
+          position: "left",
+          label: {
+            fontFamily: "var(--font-sans), sans-serif",
+          },
+          title: {
+            text: "Number of People",
+            fontFamily: "var(--font-sans), sans-serif",
+          },
+        },
+      ],
+      legend: {
+        position: "bottom",
+        item: {
+          label: {
+            fontFamily: "var(--font-sans), sans-serif",
+          },
+        },
+      },
+    };
+  }, [campusData, isDark]);
 
   return (
     <section className="relative py-12 overflow-hidden bg-slate-50/60 dark:bg-slate-950/40 border-y border-slate-200/50 dark:border-slate-800/80 transition-colors duration-300">
@@ -187,6 +281,29 @@ export default function Statistics() {
             );
           })}
         </div>
+
+        {/* AG Charts Container */}
+        {campusData.length > 0 && (
+          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-premium dark:border-slate-800/85 dark:bg-slate-900/40 backdrop-blur-md transition-all duration-300">
+            <div className="mb-6">
+              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                Campus Comparison
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Visual breakdown of active students, passout alumni, and faculty sizes across campus locations.
+              </p>
+            </div>
+            {loading ? (
+              <div className="h-96 w-full flex items-center justify-center text-slate-400">
+                <span className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
+              </div>
+            ) : (
+              <div style={{ height: "400px", width: "100%" }}>
+                <AgCharts options={chartOptions} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </section>
   );

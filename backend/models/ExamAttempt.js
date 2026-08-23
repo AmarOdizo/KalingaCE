@@ -27,7 +27,7 @@ const ExamAttemptSchema = new mongoose.Schema(
     },
     answers: [
       {
-        questionId: Number,
+        questionId: mongoose.Schema.Types.Mixed,
         questionText: String,
         chosenAnswer: String,
         correctAnswer: String,

@@ -31,7 +31,7 @@ export default function AddExamInformation() {
       if (res.success) {
         alert("Exam Information Added Successfully");
         if (submitAction === "mcq") {
-          router.push(`/admin/mcq?examId=${res.data._id || res.data.id}&launchCreate=true`);
+          router.push(`/admin/question-form?examId=${res.data._id || res.data.id}&launchCreate=true`);
         } else {
           router.push("/admin/exam-information");
         }

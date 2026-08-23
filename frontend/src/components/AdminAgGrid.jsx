@@ -1,11 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AgGridReact } from "ag-grid-react";
 import { themeQuartz, colorSchemeDark, ModuleRegistry, AllCommunityModule } from "ag-grid-community";
+import dynamic from "next/dynamic";
 
 // Register all community features globally
 ModuleRegistry.registerModules([AllCommunityModule]);
+
+const AgGridReact = dynamic(
+  () => import("ag-grid-react").then((mod) => mod.AgGridReact),
+  { ssr: false }
+);
 
 // Custom premium theme parameter configuration
 const lightTheme = themeQuartz.withParams({

@@ -2,7 +2,12 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { CalendarDays, GraduationCap, Users, Building2 } from "lucide-react";
-import { AgCharts } from "ag-charts-react";
+import dynamic from "next/dynamic";
+
+const AgCharts = dynamic(
+  () => import("ag-charts-react").then((mod) => mod.AgCharts),
+  { ssr: false }
+);
 
 export default function Statistics() {
   const [data, setData] = useState({

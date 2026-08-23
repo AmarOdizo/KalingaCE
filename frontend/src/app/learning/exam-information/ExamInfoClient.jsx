@@ -35,7 +35,7 @@ export default function ExamInfoClient() {
     return (
       <section className="mx-auto max-w-7xl px-6 py-16">
         <h2 className="mb-8 text-center text-3xl font-bold">
-          Exam Information
+          Exam
         </h2>
 
         <div className="text-center">Loading...</div>
@@ -46,7 +46,7 @@ export default function ExamInfoClient() {
   return (
     <main className="mx-auto max-w-7xl px-6 py-16">
       <div className="mb-10 text-center">
-        <h2 className="text-4xl font-bold">Exam Information</h2>
+        <h2 className="text-4xl font-bold">Exam</h2>
 
         <p className="mt-3 text-gray-500">Latest upcoming examinations.</p>
       </div>

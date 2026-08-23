@@ -80,7 +80,6 @@ export default function Navbar() {
 
           <div className="relative group">
             <button className="flex items-center gap-1.5 font-semibold text-slate-600 hover:text-primary-600 dark:text-slate-300 dark:hover:text-primary-400 transition-colors duration-200 cursor-pointer">
-              <BookOpen size={16} />
               Learning Hub
               <ChevronDown
                 size={14}
@@ -93,14 +92,14 @@ export default function Navbar() {
                 href="/learning/exam-information"
                 className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
               >
-                📘 Exam Information
+                Exam
               </Link>
 
               <Link
                 href="/learning/notes"
                 className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
               >
-                📝 Notes
+                Notes
               </Link>
             </div>
           </div>
@@ -160,7 +159,6 @@ export default function Navbar() {
                 className="flex w-full items-center justify-between font-semibold text-slate-700 dark:text-slate-300"
               >
                 <div className="flex items-center gap-2">
-                  <BookOpen size={16} />
                   Learning Hub
                 </div>
 
@@ -182,7 +180,7 @@ export default function Navbar() {
                       setLearningOpen(false);
                     }}
                   >
-                    📘 Exam Information
+                    Exam
                   </Link>
 
                   <Link
@@ -193,7 +191,7 @@ export default function Navbar() {
                       setLearningOpen(false);
                     }}
                   >
-                    📝 Notes
+                    Notes
                   </Link>
                 </div>
               )}

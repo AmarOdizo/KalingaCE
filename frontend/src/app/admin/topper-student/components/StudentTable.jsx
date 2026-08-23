@@ -32,18 +32,21 @@ export default function StudentTable({ students, onDelete }) {
       headerName: "Name",
       field: "name",
       flex: 1,
+      minWidth: 150,
       cellClass: "font-bold text-slate-800 dark:text-slate-100 flex items-center",
     },
     {
       headerName: "Subject",
       field: "subject",
       flex: 1,
+      minWidth: 130,
       cellClass: "text-slate-600 dark:text-slate-350 text-sm font-semibold flex items-center",
     },
     {
       headerName: "Batch",
       field: "batch",
       flex: 1,
+      minWidth: 130,
       cellClass: "text-slate-600 dark:text-slate-350 text-sm font-semibold flex items-center",
     },
     {

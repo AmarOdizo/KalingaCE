@@ -33,19 +33,22 @@ export default function CampusTable({
       headerName: "Campus Name",
       field: "campusName",
       flex: 1.5,
+      minWidth: 160,
       cellClass: "font-bold text-slate-900 dark:text-white flex items-center",
     },
     {
       headerName: "City",
       field: "city",
       flex: 1,
+      minWidth: 120,
       cellClass: "text-slate-600 dark:text-slate-300 flex items-center",
     },
     {
       headerName: "Phone",
       field: "phone",
       flex: 1,
-      cellClass: "text-slate-600 dark:text-slate-350 font-mono text-xs flex items-center",
+      minWidth: 120,
+      cellClass: "text-slate-600 dark:text-slate-355 font-mono text-xs flex items-center",
     },
     {
       headerName: "Faculty",

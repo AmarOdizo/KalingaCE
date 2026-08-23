@@ -40,18 +40,21 @@ export default function NoteTable({ notes, onDelete }) {
       headerName: "Subject",
       field: "subjectName",
       flex: 1,
+      minWidth: 120,
       cellClass: "text-slate-700 dark:text-slate-305 flex items-center font-medium",
     },
     {
       headerName: "Note Title",
       field: "noteTitle",
       flex: 1.5,
+      minWidth: 150,
       cellClass: "font-bold text-slate-900 dark:text-white flex items-center",
     },
     {
       headerName: "Uploaded By",
       field: "uploadedBy",
       flex: 1,
+      minWidth: 120,
       cellClass: "text-slate-700 dark:text-slate-305 flex items-center font-medium",
     },
     {

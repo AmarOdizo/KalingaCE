@@ -61,6 +61,7 @@ export default function AdminAgGrid({ rowData, columnDefs, quickFilterText, ...p
           sortable: true,
           filter: true,
           resizable: true,
+          minWidth: 80,
           cellClass: "flex items-center", // Vertical centering for custom renderers
         }}
         {...props}

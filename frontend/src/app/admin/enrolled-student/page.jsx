@@ -37,6 +37,7 @@ export default function EnrolledStudentsAdminPage() {
       headerName: "Student Name",
       field: "name",
       flex: 1,
+      minWidth: 150,
       cellRenderer: (params) => {
         const name = params.value || "";
         return (
@@ -55,6 +56,7 @@ export default function EnrolledStudentsAdminPage() {
       headerName: "Email",
       field: "email",
       flex: 1,
+      minWidth: 150,
       cellRenderer: (params) => (
         <div className="flex items-center gap-2 text-slate-650 dark:text-slate-350 text-sm">
           <Mail size={15} className="text-slate-400 shrink-0" />
@@ -66,6 +68,7 @@ export default function EnrolledStudentsAdminPage() {
       headerName: "Phone",
       field: "phone",
       flex: 1,
+      minWidth: 120,
       cellRenderer: (params) => (
         <div className="flex items-center gap-2 text-slate-650 dark:text-slate-355 text-sm">
           <Phone size={15} className="text-slate-400 shrink-0" />
@@ -77,6 +80,7 @@ export default function EnrolledStudentsAdminPage() {
       headerName: "Course Enquired",
       valueGetter: (params) => params.data.courseName?.courseName || "Unknown Course",
       flex: 1.5,
+      minWidth: 160,
       cellRenderer: (params) => (
         <div className="flex items-center h-full">
           <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-200/30 dark:border-indigo-500/10 max-w-xs truncate">

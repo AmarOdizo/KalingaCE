@@ -28,6 +28,7 @@ function ExamAttemptsContent() {
       headerName: "Student Details",
       field: "studentName",
       flex: 1,
+      minWidth: 150,
       cellRenderer: (params) => {
         const att = params.data;
         return (
@@ -44,6 +45,7 @@ function ExamAttemptsContent() {
       headerName: "Exam Name",
       field: "examId.examName",
       flex: 1.5,
+      minWidth: 180,
       valueGetter: (params) => params.data.examId?.examName || "Unknown Exam",
       cellClass: "text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center",
     },
@@ -51,6 +53,7 @@ function ExamAttemptsContent() {
       headerName: "Score",
       field: "score",
       width: 120,
+      minWidth: 100,
       cellRenderer: (params) => {
         const att = params.data;
         return (
@@ -66,6 +69,7 @@ function ExamAttemptsContent() {
       headerName: "Submitted Time",
       field: "submittedAt",
       flex: 1.2,
+      minWidth: 130,
       cellRenderer: (params) => {
         const dateVal = params.value || params.data.createdAt;
         if (!dateVal) return <span className="flex items-center h-full">-</span>;
@@ -95,6 +99,7 @@ function ExamAttemptsContent() {
         </div>
       ),
       width: 150,
+      minWidth: 130,
       sortable: false,
       filter: false,
     },

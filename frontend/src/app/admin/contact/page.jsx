@@ -39,6 +39,7 @@ export default function Contact1Page() {
       headerName: "Sender",
       field: "name",
       flex: 1,
+      minWidth: 150,
       cellRenderer: (params) => {
         const name = params.value || "";
         return (
@@ -71,11 +72,13 @@ export default function Contact1Page() {
         );
       },
       flex: 1.5,
+      minWidth: 180,
     },
     {
       headerName: "Subject",
       field: "subject",
       flex: 1.2,
+      minWidth: 150,
       cellRenderer: (params) => (
         <div className="flex items-center gap-1.5 h-full">
           <MessageSquare size={14} className="text-primary-500 shrink-0" />
@@ -87,6 +90,7 @@ export default function Contact1Page() {
       headerName: "Message Preview",
       field: "description",
       flex: 2,
+      minWidth: 200,
       cellClass: "text-xs text-slate-500 dark:text-slate-400 font-medium flex items-center",
       valueFormatter: (params) => params.value || "N/A",
     },

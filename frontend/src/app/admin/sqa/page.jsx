@@ -89,6 +89,7 @@ export default function SQAAdminPage() {
       headerName: "Assessment Title",
       field: "title",
       flex: 1.5,
+      minWidth: 160,
       cellRenderer: (params) => (
         <div className="flex flex-col justify-center h-full">
           <span className="text-slate-900 dark:text-white font-bold">{params.value}</span>
@@ -102,6 +103,7 @@ export default function SQAAdminPage() {
       headerName: "Total Questions",
       field: "questions",
       flex: 1,
+      minWidth: 120,
       valueFormatter: (params) => `${params.value?.length || 0} Questions`,
       cellClass: "text-slate-700 dark:text-slate-300 font-semibold flex items-center",
     },
@@ -109,6 +111,7 @@ export default function SQAAdminPage() {
       headerName: "Student Submissions",
       field: "answers",
       flex: 1,
+      minWidth: 120,
       cellRenderer: (params) => {
         const totalAnswers = params.value?.length || 0;
         return (
@@ -124,6 +127,7 @@ export default function SQAAdminPage() {
       headerName: "Pending Review",
       field: "answers",
       flex: 1,
+      minWidth: 120,
       cellRenderer: (params) => {
         const pendingCount = params.value?.filter((a) => !a.checked).length || 0;
         return (

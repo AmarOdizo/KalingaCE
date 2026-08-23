@@ -71,6 +71,7 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
       headerName: "Exam & Venue",
       field: "examName",
       flex: 1,
+      minWidth: 150,
       cellRenderer: (params) => (
         <div className="flex flex-col justify-center h-full">
           <p className="font-bold text-slate-800 dark:text-slate-100 leading-tight">
@@ -108,6 +109,7 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
       headerName: "Batch",
       field: "batch",
       flex: 1,
+      minWidth: 130,
       valueFormatter: (params) => formatBatch(params.value),
       cellClass: "text-slate-650 dark:text-slate-300 text-sm font-semibold flex items-center",
     },
@@ -115,6 +117,7 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
       headerName: "Date",
       field: "examDate",
       flex: 1,
+      minWidth: 130,
       valueFormatter: (params) => formatDate(params.value),
       cellClass: "text-slate-650 dark:text-slate-305 text-sm font-bold flex items-center",
     },

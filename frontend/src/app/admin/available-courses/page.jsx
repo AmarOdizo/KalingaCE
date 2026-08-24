@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, ArrowLeft } from "lucide-react";
 
 import { getCourses, deleteCourse } from "./data";
 
@@ -16,11 +17,17 @@ import CourseModal from "./components/CourseModal";
 import Pagination from "./components/Pagination";
 
 export default function AvailableCourses() {
+  const router = useRouter();
   // ==========================
   // States
   // ==========================
 
   const [courses, setCourses] = useState([]);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [loading, setLoading] = useState(true);
 
@@ -143,14 +150,23 @@ export default function AvailableCourses() {
       <title>Manage Courses | Admin Panel</title>
       {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
-            <span className="gradient-text">Available Courses</span>
-          </h1>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:bg-slate-850 dark:hover:text-blue-400 text-slate-600 dark:text-slate-350 cursor-pointer transition-all duration-200 shrink-0"
+            title="Go Back"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
+              <span className="gradient-text">Available Courses</span>
+            </h1>
 
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Create, manage, and view student course offerings.
-          </p>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              Create, manage, and view student course offerings.
+            </p>
+          </div>
         </div>
 
         <Link
@@ -184,7 +200,7 @@ export default function AvailableCourses() {
       </div>
       {/* Content */}
 
-      {loading ? (
+      {!mounted || loading ? (
         <Loading />
       ) : filteredCourses.length === 0 ? (
         <EmptyState />

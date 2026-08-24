@@ -2,7 +2,8 @@
 
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, ArrowLeft } from "lucide-react";
 
 import { getNotes, deleteNote } from "./data";
 
@@ -12,9 +13,15 @@ import LoadingSpinner from "./notecomponents/LoadingSpinner";
 import EmptyState from "./notecomponents/EmptyState";
 
 export default function AvailableNotesPage() {
+  const router = useRouter();
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const loadNotes = async () => {
     try {
@@ -63,22 +70,30 @@ export default function AvailableNotesPage() {
     }
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return <LoadingSpinner />;
   }
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 md:p-8 dark:bg-slate-950 transition-colors duration-300">
       <title>Manage Notes | Admin Panel</title>
-      {/* Header */}
       <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
-        <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-            Available Notes
-          </h1>
-          <p className="mt-2 text-slate-500 dark:text-slate-400 font-semibold text-sm">
-            Upload, remove, and manage student learning notes and study documents.
-          </p>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:bg-slate-850 dark:hover:text-blue-400 text-slate-600 dark:text-slate-350 cursor-pointer transition-all duration-200 shrink-0"
+            title="Go Back"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div>
+            <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              Available Notes
+            </h1>
+            <p className="mt-2 text-slate-500 dark:text-slate-400 font-semibold text-sm">
+              Upload, remove, and manage student learning notes and study documents.
+            </p>
+          </div>
         </div>
 
         <Link

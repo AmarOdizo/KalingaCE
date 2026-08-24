@@ -244,7 +244,7 @@ export default function CoursesClient() {
             Kalinga Computer Education
           </span>
           <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl mt-4">
-            📚 Explore Our{" "}
+            Explore Our{" "}
             <span className="gradient-text">Available Courses</span>
           </h1>
           <p className="mt-4 text-base text-slate-500 dark:text-slate-400 leading-relaxed">

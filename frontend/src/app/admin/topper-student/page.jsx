@@ -89,9 +89,9 @@ export default function TopperStudent() {
             </p>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-          <ExportCSV students={filteredStudents} />
+
           <Link
             href="/admin/topper-student/add"
             className="btn-primary"

@@ -94,7 +94,7 @@ function ExamInformationContent() {
   return (
     <div className="w-full p-6 md:p-8 transition-colors duration-300">
       <title>Exam Schedules | Admin Panel</title>
-      
+
       <div className="mb-8 flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
         <div className="flex items-center gap-4">
           <button
@@ -115,7 +115,7 @@ function ExamInformationContent() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-          <ExportCSV exams={filteredData} />
+
           <Link
             href="/admin/exam-information/add"
             className="btn-primary py-2.5 px-5 text-sm"

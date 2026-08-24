@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
-import { Eye, Pencil, Trash2, BookOpenCheck, Award } from "lucide-react";
-import { deleteExamInformation } from "../data";
+import { Eye, Pencil, Trash2, BookOpenCheck, Award, Send } from "lucide-react";
+import { deleteExamInformation, togglePublishResults } from "../data";
 import { formatBatch, formatDate } from "../utils";
 import EmptyState from "./EmptyState";
 import AdminAgGrid from "@/components/AdminAgGrid";
@@ -33,6 +33,17 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
       console.log(error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePublishToggle = async (exam) => {
+    try {
+      const targetId = exam._id || exam.id;
+      await togglePublishResults(targetId);
+      refreshData();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to toggle publish status: " + error.message);
     }
   };
 
@@ -154,6 +165,37 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
       },
     },
     {
+      headerName: "Result Status",
+      field: "resultsPublished",
+      width: 140,
+      cellRenderer: (params) => {
+        const exam = params.data;
+        const isOnline = exam.mode?.toLowerCase() === "online";
+        if (!isOnline) {
+          return (
+            <div className="flex items-center justify-center h-full w-full text-slate-400 font-bold text-xs">
+              -
+            </div>
+          );
+        }
+
+        const isPublished = params.value || false;
+        return (
+          <div className="flex items-center justify-center h-full w-full">
+            <span
+              className={`inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-black ${
+                isPublished
+                  ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400"
+                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-450"
+              }`}
+            >
+              {isPublished ? "Published" : "Draft / Hidden"}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       headerName: "Actions",
       cellRenderer: (params) => {
         const exam = params.data;
@@ -176,6 +218,17 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
                 >
                   <Award size={16} />
                 </Link>
+                <button
+                  onClick={() => handlePublishToggle(exam)}
+                  className={`rounded-xl p-2 transition-all duration-200 active:scale-95 cursor-pointer ${
+                    exam.resultsPublished
+                      ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white"
+                      : "bg-slate-105 text-slate-500 dark:bg-slate-800 dark:text-slate-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white"
+                  }`}
+                  title={exam.resultsPublished ? "Unpublish Results" : "Publish Results"}
+                >
+                  <Send size={16} />
+                </button>
               </>
             )}
 
@@ -205,7 +258,7 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
           </div>
         );
       },
-      width: 220,
+      width: 260,
       sortable: false,
       filter: false,
     },

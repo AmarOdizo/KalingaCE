@@ -54,6 +54,11 @@ const StudentSchema = new mongoose.Schema(
       ref: "ExamAttempt",
       default: null,
     },
+
+    published: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: "Student",

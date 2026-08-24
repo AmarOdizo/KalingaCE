@@ -19,6 +19,11 @@ export default function Statistics() {
   const [campusData, setCampusData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Dark Mode detection observer
   useEffect(() => {
@@ -298,7 +303,7 @@ export default function Statistics() {
                 Visual breakdown of active students, passout alumni, and faculty sizes across campus locations.
               </p>
             </div>
-            {loading ? (
+            {!mounted || loading ? (
               <div className="h-96 w-full flex items-center justify-center text-slate-400">
                 <span className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
               </div>

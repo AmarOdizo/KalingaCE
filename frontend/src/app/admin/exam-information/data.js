@@ -102,6 +102,23 @@ export const uploadExamImage = async (file) => {
 };
 
 // ==============================
+// Publish Results Toggle
+// ==============================
+export const togglePublishResults = async (id) => {
+  const response = await customFetch(`/${id}/publish`, {
+    method: "PATCH",
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message || "Failed to toggle results publication");
+  }
+
+  return result.data;
+};
+
+// ==============================
 // MCQ API INTEGRATION
 // ==============================
 const MCQ_LOCAL_URL = "http://localhost:5000/api/MCQ";

@@ -73,6 +73,12 @@ export default function MCQClient() {
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
 
   // Quiz State
   const [view, setView] = useState("select"); // "select", "quiz", "result"
@@ -99,17 +105,11 @@ export default function MCQClient() {
   // Search filter
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Check if 5 minutes have passed since submission (for scheduled exams)
+  // Check if results have been published by the admin (for scheduled exams)
   const is5MinutesPassed = useMemo(() => {
     if (!isScheduledExam) return true; // practice hub always displays results
-    if (alreadyAttemptedData) {
-      const submissionTime = new Date(alreadyAttemptedData.submittedAt || alreadyAttemptedData.createdAt);
-      const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-      return submissionTime < fiveMinutesAgo;
-    }
-    // If just submitted, it's not 5 minutes yet
-    return false;
-  }, [isScheduledExam, alreadyAttemptedData]);
+    return examDetails?.resultsPublished || false;
+  }, [isScheduledExam, examDetails]);
 
   // Auto-submit quiz when duration completes
   const handleAutoSubmit = async () => {
@@ -292,6 +292,7 @@ export default function MCQClient() {
     loadScheduledExam();
   }, [examId]);
 
+
   const handleRegisterExam = async (e) => {
     e.preventDefault();
     if (!studentName.trim() || !mobileNumber.trim()) {
@@ -396,6 +397,15 @@ export default function MCQClient() {
 
     fetchSubjects();
   }, [examId]);
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-slate-50 py-16 text-center text-slate-500 dark:bg-slate-950 flex flex-col items-center justify-center">
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-indigo-600 border-t-transparent mb-4" />
+        <p className="font-semibold text-sm">Loading MCQ Assessment Hub...</p>
+      </div>
+    );
+  }
 
   // Shuffle questions helper
   const prepareQuiz = (questions) => {
@@ -920,7 +930,7 @@ export default function MCQClient() {
                     Thank you, <strong>{studentName}</strong>. Your responses for the exam <strong>{examDetails?.examName}</strong> have been securely recorded.
                   </p>
                   <div className="my-6 rounded-2xl bg-indigo-50/50 p-4 border border-indigo-100/50 text-indigo-700 text-xs font-semibold dark:bg-indigo-950/20 dark:border-indigo-900/30 dark:text-indigo-400">
-                    🔒 Results and detailed question reviews will be released 5 minutes after completion.
+                    🔒 Results and detailed scorecards will be released once published by the Administrator.
                   </div>
                   <button
                     onClick={() => router.push("/learning/exam-information")}

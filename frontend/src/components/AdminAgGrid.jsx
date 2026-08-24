@@ -33,6 +33,11 @@ const darkTheme = themeQuartz.withPart(colorSchemeDark).withParams({
 
 export default function AdminAgGrid({ rowData, columnDefs, quickFilterText, ...props }) {
   const [isDark, setIsDark] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -45,6 +50,14 @@ export default function AdminAgGrid({ rowData, columnDefs, quickFilterText, ...p
     observer.observe(html, { attributes: true, attributeFilter: ["class"] });
     return () => observer.disconnect();
   }, []);
+
+  if (!mounted) {
+    return (
+      <div style={{ height: "550px", width: "100%" }} className="w-full bg-slate-50/50 dark:bg-slate-900/20 animate-pulse rounded-2xl flex items-center justify-center text-xs font-bold text-slate-400/80 border border-slate-200/50 dark:border-slate-800/40">
+        Loading Grid System...
+      </div>
+    );
+  }
 
   return (
     <div style={{ height: "550px", width: "100%" }} className="w-full">

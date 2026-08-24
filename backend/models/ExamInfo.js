@@ -52,6 +52,11 @@ const ExamInformationSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
+    resultsPublished: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     collection: "ExamInformation",

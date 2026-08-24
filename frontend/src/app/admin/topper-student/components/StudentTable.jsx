@@ -1,11 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2, Send } from "lucide-react";
 import { calculatePercentage, calculateGrade } from "../utils";
 import AdminAgGrid from "@/components/AdminAgGrid";
+import { togglePublishTopper } from "../data";
 
-export default function StudentTable({ students, onDelete }) {
+export default function StudentTable({ students, onDelete, refreshData }) {
+  const handlePublishToggle = async (student) => {
+    try {
+      const targetId = student._id || student.id;
+      await togglePublishTopper(targetId);
+      if (refreshData) refreshData();
+    } catch (error) {
+      console.error(error);
+      alert("Failed to toggle topper status: " + error.message);
+    }
+  };
+
   const columnDefs = [
     {
       headerName: "Image",
@@ -96,6 +108,27 @@ export default function StudentTable({ students, onDelete }) {
       width: 100,
     },
     {
+      headerName: "Status",
+      field: "published",
+      width: 130,
+      cellRenderer: (params) => {
+        const isPublished = params.value !== false;
+        return (
+          <div className="flex items-center h-full">
+            <span
+              className={`rounded-full px-3 py-1 text-xs font-black ${
+                isPublished
+                  ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400"
+                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-450"
+              }`}
+            >
+              {isPublished ? "Published" : "Draft / Hidden"}
+            </span>
+          </div>
+        );
+      },
+    },
+    {
       headerName: "Actions",
       cellRenderer: (params) => (
         <div className="flex items-center justify-center h-full gap-2">
@@ -116,6 +149,18 @@ export default function StudentTable({ students, onDelete }) {
           </Link>
 
           <button
+            onClick={() => handlePublishToggle(params.data)}
+            className={`rounded-xl p-2 transition-all duration-200 active:scale-95 cursor-pointer ${
+              params.data.published !== false
+                ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 hover:bg-emerald-600 hover:text-white dark:hover:bg-emerald-500 dark:hover:text-white"
+                : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500 dark:hover:text-white"
+            }`}
+            title={params.data.published !== false ? "Unpublish Topper" : "Publish Topper"}
+          >
+            <Send size={16} />
+          </button>
+
+          <button
             onClick={() => onDelete(params.data)}
             className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
             title="Delete Student"
@@ -124,7 +169,7 @@ export default function StudentTable({ students, onDelete }) {
           </button>
         </div>
       ),
-      width: 150,
+      width: 190,
       sortable: false,
       filter: false,
     },

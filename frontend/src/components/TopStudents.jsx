@@ -48,7 +48,10 @@ export default function TopStudents() {
         const topperStudents = res.data.data
           .filter((student) => {
             const batchStr = (student.batch || "").toString();
-            return batchStr.includes(presentYear);
+            const matchesYear = batchStr.includes(presentYear);
+            const isTopperPublished = student.published !== false;
+            const isExamPublished = !student.examId || student.examId.resultsPublished === true;
+            return matchesYear && isTopperPublished && isExamPublished;
           })
           .map((student) => ({
             ...student,

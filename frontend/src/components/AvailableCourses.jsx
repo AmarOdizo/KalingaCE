@@ -36,6 +36,11 @@ export default function AvailableCourses() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [enrollLoading, setEnrollLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [enrollData, setEnrollData] = useState({
     name: "",
     email: "",
@@ -240,7 +245,7 @@ export default function AvailableCourses() {
   };
 
   // Render Skeleton cards during loading state
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <section className="bg-slate-50 py-20 dark:bg-slate-950 transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-5">

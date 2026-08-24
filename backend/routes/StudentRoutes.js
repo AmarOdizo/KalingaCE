@@ -15,7 +15,7 @@ const imagekit = require("../config/imagekit");
 // ==============================
 router.get("/", async (req, res) => {
   try {
-    const students = await Student.find().sort({ id: 1 });
+    const students = await Student.find().sort({ id: 1 }).populate("examId");
 
     res.status(200).json({
       success: true,
@@ -188,6 +188,43 @@ router.delete("/:id", async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Student Deleted Successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ==============================
+// TOGGLE Student Topper Publication Status
+// ==============================
+router.patch("/:id/publish", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    let student;
+
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      student = await Student.findById(idParam);
+    } else {
+      student = await Student.findOne({ id: Number(idParam) });
+    }
+
+    if (!student) {
+      return res.status(404).json({
+        success: false,
+        message: "Topper student not found",
+      });
+    }
+
+    student.published = !student.published;
+    await student.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Topper results ${student.published ? "published" : "unpublished"} successfully`,
+      data: student,
     });
   } catch (error) {
     res.status(500).json({

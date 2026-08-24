@@ -20,6 +20,11 @@ export default function TopperStudent() {
   const [search, setSearch] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const loadStudents = useCallback(async () => {
     try {
@@ -34,9 +39,9 @@ export default function TopperStudent() {
   }, []);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!mounted) return;
     loadStudents();
-  }, [loadStudents]);
+  }, [loadStudents, mounted]);
 
   const filteredStudents = useMemo(() => {
     return searchStudents(students, search);
@@ -57,7 +62,7 @@ export default function TopperStudent() {
     }
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return <Loading />;
   }
 
@@ -99,6 +104,7 @@ export default function TopperStudent() {
         <StudentTable
           students={filteredStudents}
           onDelete={handleDeleteClick}
+          refreshData={loadStudents}
         />
       )}
 

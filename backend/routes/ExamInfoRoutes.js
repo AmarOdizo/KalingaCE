@@ -248,6 +248,44 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
+
+// ==============================
+// TOGGLE Results Publication Status
+// ==============================
+router.patch("/:id/publish", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    let exam;
+
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({ id: Number(idParam) });
+    }
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam Information not found",
+      });
+    }
+
+    exam.resultsPublished = !exam.resultsPublished;
+    await exam.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Exam results ${exam.resultsPublished ? "published" : "unpublished"} successfully`,
+      data: exam,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 router.post("/upload", upload.single("image"), uploadExamInfoImage);
 
 module.exports = router;

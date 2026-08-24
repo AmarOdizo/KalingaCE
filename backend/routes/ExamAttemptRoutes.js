@@ -2,6 +2,60 @@ const express = require("express");
 const router = express.Router();
 const ExamAttempt = require("../models/ExamAttempt");
 
+const updateToppersForExam = async (examId) => {
+  try {
+    const Student = require("../models/Student");
+    const StudentCounter = require("../models/StudentCounter");
+    const ExamInfo = require("../models/ExamInfo");
+
+    const exam = await ExamInfo.findById(examId);
+    if (!exam) return;
+
+    // 1. Fetch all attempts for this exam
+    const attempts = await ExamAttempt.find({ examId });
+    if (attempts.length === 0) {
+      // If no attempts, delete all toppers for this exam
+      await Student.deleteMany({ examId });
+      return;
+    }
+
+    // 2. Find the maximum score
+    const maxScore = Math.max(...attempts.map((a) => a.score));
+
+    // 3. Find all students/attempts with this maximum score
+    const winningAttempts = attempts.filter((a) => a.score === maxScore);
+
+    // 4. Delete existing toppers for this exam
+    await Student.deleteMany({ examId });
+
+    // 5. Create new toppers for each winning attempt
+    const subjectName = exam.examName || "Online MCQ Exam";
+    const currentYear = new Date().getFullYear().toString();
+
+    for (const win of winningAttempts) {
+      const counter = await StudentCounter.findByIdAndUpdate(
+        "studentId",
+        { $inc: { seq: 1 } },
+        { new: true, upsert: true }
+      );
+
+      await Student.create({
+        id: counter.seq,
+        name: win.studentName,
+        subject: subjectName,
+        batch: currentYear,
+        totalMark: win.totalPossibleScore,
+        gainMark: win.score,
+        image: "",
+        examId: examId,
+        attemptId: win._id,
+      });
+    }
+  } catch (err) {
+    console.error("Error updating toppers:", err);
+  }
+};
+
 // Get all exam attempts (for admin)
 router.get("/", async (req, res) => {
   try {
@@ -44,50 +98,7 @@ router.post("/", async (req, res) => {
       answers,
     });
 
-    // Check for 90% or above marks to auto-save in Topper Student collection
-    if (totalPossibleScore > 0) {
-      const percentage = (score / totalPossibleScore) * 105; // Wait, percentage calculation is (score / totalPossibleScore) * 100
-      const actualPercentage = (score / totalPossibleScore) * 100;
-      if (actualPercentage >= 90) {
-        try {
-          const Student = require("../models/Student");
-          const StudentCounter = require("../models/StudentCounter");
-          const ExamInfo = require("../models/ExamInfo");
-
-          const exam = await ExamInfo.findById(examId);
-          const subjectName = exam ? exam.examName : "Online MCQ Exam";
-          const currentYear = new Date().getFullYear().toString();
-
-          const existingTopper = await Student.findOne({
-            name: studentName,
-            subject: subjectName,
-            batch: currentYear,
-          });
-
-          if (!existingTopper) {
-            const counter = await StudentCounter.findByIdAndUpdate(
-              "studentId",
-              { $inc: { seq: 1 } },
-              { new: true, upsert: true }
-            );
-
-            await Student.create({
-              id: counter.seq,
-              name: studentName,
-              subject: subjectName,
-              batch: currentYear,
-              totalMark: totalPossibleScore,
-              gainMark: score,
-              image: "",
-              examId: examId,
-              attemptId: attempt._id,
-            });
-          }
-        } catch (topperErr) {
-          console.error("Failed to auto-save topper student:", topperErr);
-        }
-      }
-    }
+    await updateToppersForExam(examId);
 
     res.status(201).json({
       success: true,
@@ -155,6 +166,10 @@ router.put("/:id", async (req, res) => {
     if (!attempt) {
       return res.status(404).json({ success: false, message: "Attempt not found" });
     }
+    
+    // Recalculate toppers for this exam
+    await updateToppersForExam(attempt.examId);
+
     res.status(200).json({ success: true, data: attempt });
   } catch (error) {
     res.status(500).json({ success: false, message: "Failed to update score", error: error.message });

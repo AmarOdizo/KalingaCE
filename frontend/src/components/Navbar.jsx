@@ -96,6 +96,13 @@ export default function Navbar() {
               </Link>
 
               <Link
+                href="/learning/result"
+                className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
+              >
+                Result
+              </Link>
+
+              <Link
                 href="/learning/notes"
                 className="block rounded-xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 hover:text-primary-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-primary-400 transition-colors"
               >
@@ -181,6 +188,17 @@ export default function Navbar() {
                     }}
                   >
                     Exam
+                  </Link>
+
+                  <Link
+                    href="/learning/result"
+                    className="rounded-lg py-2 text-sm font-medium text-slate-600 hover:text-primary-600 dark:text-slate-400 dark:hover:text-primary-400"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setLearningOpen(false);
+                    }}
+                  >
+                    Result
                   </Link>
 
                   <Link

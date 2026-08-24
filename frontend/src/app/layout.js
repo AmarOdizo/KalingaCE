@@ -115,8 +115,8 @@ export default function RootLayout({ children }) {
   };
 
   return (
-    <html lang="en" className={plusJakartaSans.variable}>
-      <body>
+    <html lang="en" className={plusJakartaSans.variable} suppressHydrationWarning>
+      <body suppressHydrationWarning>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

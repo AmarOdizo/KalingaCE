@@ -9,6 +9,11 @@ export default function ExamInfoClient() {
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const loadExams = async () => {
     try {
@@ -30,6 +35,17 @@ export default function ExamInfoClient() {
     }, 0);
     return () => clearTimeout(timer);
   }, []);
+
+  if (!mounted) {
+    return (
+      <section className="mx-auto max-w-7xl px-6 py-16">
+        <h2 className="mb-8 text-center text-3xl font-bold">
+          Exam
+        </h2>
+        <div className="text-center">Loading Exam Portal...</div>
+      </section>
+    );
+  }
 
   if (loading) {
     return (

@@ -27,6 +27,11 @@ function ExamInformationContent() {
   const [sqaData, setSqaData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -58,14 +63,16 @@ function ExamInformationContent() {
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     const timer = setTimeout(() => {
       loadExamInformation();
     }, 0);
     return () => clearTimeout(timer);
-  }, [loadExamInformation]);
+  }, [loadExamInformation, mounted]);
 
   // Auto-launch MCQ page if query param is set
   useEffect(() => {
+    if (!mounted) return;
     if (launchMCQ === "true" && courseId && examData.length > 0) {
       const match = examData.find(
         (ex) => ex._id === courseId || ex.id === Number(courseId)
@@ -74,13 +81,13 @@ function ExamInformationContent() {
         router.push(`/admin/question-form?examId=${match._id || match.id}&launchCreate=true`);
       }
     }
-  }, [launchMCQ, courseId, examData, router]);
+  }, [launchMCQ, courseId, examData, router, mounted]);
 
   const filteredData = useMemo(() => {
     return filterExamInformation(examData, search);
   }, [examData, search]);
 
-  if (loading) {
+  if (!mounted || loading) {
     return <Loading />;
   }
 

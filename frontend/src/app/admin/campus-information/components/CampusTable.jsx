@@ -7,15 +7,16 @@ import AdminAgGrid from "@/components/AdminAgGrid";
 export default function CampusTable({
   campuses = [],
   onDelete,
+  onSetMain,
   deleting = false,
 }) {
   if (!campuses.length) {
     return (
       <div className="rounded-2xl bg-white dark:bg-slate-900/50 p-10 text-center border border-slate-200/80 dark:border-slate-800/80 shadow-premium">
         <h2 className="text-lg font-semibold text-slate-700 dark:text-slate-350">
-          No Campus Information Found
+          No Branch Information Found
         </h2>
-        <p className="mt-1 text-sm text-slate-400">Add a new campus to get started.</p>
+        <p className="mt-1 text-sm text-slate-400">Add a new branch to get started.</p>
       </div>
     );
   }
@@ -30,7 +31,7 @@ export default function CampusTable({
       filter: false,
     },
     {
-      headerName: "Campus Name",
+      headerName: "Branch Name",
       field: "campusName",
       flex: 1.5,
       minWidth: 160,
@@ -93,6 +94,32 @@ export default function CampusTable({
           </div>
         );
       },
+    },
+    {
+      headerName: "Main Branch",
+      field: "isMain",
+      width: 140,
+      cellRenderer: (params) => {
+        const campus = params.data;
+        return (
+          <div className="flex items-center justify-center h-full">
+            {campus.isMain ? (
+              <span className="inline-flex items-center rounded-full bg-indigo-500/10 text-indigo-750 dark:text-indigo-400 px-2.5 py-1 text-xs font-bold border border-indigo-500/20 shadow-sm">
+                Main Branch
+              </span>
+            ) : (
+              <button
+                onClick={() => onSetMain && onSetMain(campus)}
+                className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-300 bg-slate-105 hover:bg-indigo-600 hover:text-white dark:bg-slate-800 dark:hover:bg-indigo-600 transition rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer"
+              >
+                Set Main
+              </button>
+            )}
+          </div>
+        );
+      },
+      sortable: false,
+      filter: false,
     },
     {
       headerName: "Actions",
@@ -187,6 +214,18 @@ export default function CampusTable({
               </div>
 
               <div className="flex justify-end gap-2 pt-1">
+                {campus.isMain ? (
+                  <span className="inline-flex items-center rounded-full bg-indigo-500/10 text-indigo-750 dark:text-indigo-400 px-2.5 py-1 text-xs font-bold border border-indigo-500/20 shadow-sm mr-auto">
+                    Main Branch
+                  </span>
+                ) : (
+                  <button
+                    onClick={() => onSetMain && onSetMain(campus)}
+                    className="inline-flex items-center justify-center px-3 py-1 text-xs font-bold text-slate-700 dark:text-slate-350 bg-slate-105 dark:bg-slate-800 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 transition rounded-lg border border-slate-200 dark:border-slate-700 cursor-pointer mr-auto"
+                  >
+                    Set Main
+                  </button>
+                )}
                 <Link
                   href={`/admin/campus-information/view/${campus._id}`}
                   className="inline-flex items-center justify-center p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-305 hover:bg-slate-200 dark:hover:bg-slate-700 transition"

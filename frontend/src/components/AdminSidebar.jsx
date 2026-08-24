@@ -43,7 +43,7 @@ export default function AdminSidebar() {
       href: "/admin/available-notes",
     },
     {
-      name: "Campus Information",
+      name: "Branch Information",
       icon: GraduationCap,
       href: "/admin/campus-information",
     },

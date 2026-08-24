@@ -3,6 +3,7 @@ import Image from "next/image";
 import HeroSlider from "@/components/HeroSlider";
 import TopStudents from "@/components/TopStudents";
 import Statistics from "@/components/Statistics";
+import OurBranches from "@/components/OurBranches";
 import AvailableCourses from "@/components/AvailableCourses";
 import FAQ from "@/components/FAQ";
 import Footer from "@/components/Footer";
@@ -21,6 +22,7 @@ export default function Home() {
       <HeroSlider />
       <TopStudents />
       <Statistics />
+      <OurBranches />
       <AvailableCourses />
       {/* Other Sections */}
       <FAQ />

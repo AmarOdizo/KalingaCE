@@ -58,7 +58,7 @@ export default function ExamCard({ exam, onView }) {
             {/* Exam Mode */}
             <div className="flex items-center gap-2.5">
               <MapPin size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
-              <span className="truncate">{examMode} ({exam.venue || "Campus"})</span>
+              <span className="truncate">{examMode} ({exam.venue || "Branch"})</span>
             </div>
 
             {/* Exam Date */}

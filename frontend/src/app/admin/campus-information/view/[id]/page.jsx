@@ -59,9 +59,9 @@ export default function ViewCampusPage() {
   if (!campus) {
     return (
       <div className="mx-auto max-w-md mt-12 p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-premium">
-        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Campus Not Found</h2>
+        <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">Branch Not Found</h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-          The campus information you are trying to view does not exist.
+          The branch information you are trying to view does not exist.
         </p>
         <Link
           href="/admin/campus-information"
@@ -102,7 +102,7 @@ export default function ViewCampusPage() {
           className="btn-primary py-2 px-4 text-xs font-semibold"
         >
           <Pencil size={14} />
-          Edit Campus
+          Edit Branch
         </Link>
       </div>
 
@@ -251,7 +251,7 @@ export default function ViewCampusPage() {
           <div className="space-y-4">
             <DetailItem
               icon={<MapPin size={18} />}
-              label="Campus Address"
+              label="Branch Address"
               value={`${campus.address}, ${campus.city}, ${campus.state} - ${campus.pincode}`}
             />
             <DetailItem

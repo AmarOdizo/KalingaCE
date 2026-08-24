@@ -129,4 +129,39 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+/* ==========================================
+   SET MAIN CAMPUS/BRANCH
+========================================== */
+router.put("/:id/set-main", async (req, res) => {
+  try {
+    // Set all to false first
+    await CampusInformation.updateMany({}, { isMain: false });
+    
+    // Set the target one to true
+    const campus = await CampusInformation.findByIdAndUpdate(
+      req.params.id,
+      { isMain: true },
+      { new: true }
+    );
+
+    if (!campus) {
+      return res.status(404).json({
+        success: false,
+        message: "Branch not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Branch set as main successfully",
+      data: campus,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 module.exports = router;

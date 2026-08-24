@@ -15,7 +15,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-const API_URL = "https://kalingace-4.onrender.com/api/Student";
+const API_URL =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000/api/Student"
+    : "https://kalingace-4.onrender.com/api/Student";
 
 export default function TopStudents() {
   const router = useRouter();
@@ -44,14 +49,11 @@ export default function TopStudents() {
       const res = await axios.get(API_URL);
 
       if (res.data && res.data.data && res.data.data.length > 0) {
-        const presentYear = new Date().getFullYear().toString();
-        const topperStudents = res.data.data
+        let topperStudents = res.data.data
           .filter((student) => {
-            const batchStr = (student.batch || "").toString();
-            const matchesYear = batchStr.includes(presentYear);
             const isTopperPublished = student.published !== false;
             const isExamPublished = !student.examId || student.examId.resultsPublished === true;
-            return matchesYear && isTopperPublished && isExamPublished;
+            return isTopperPublished && isExamPublished;
           })
           .map((student) => ({
             ...student,
@@ -59,9 +61,19 @@ export default function TopStudents() {
               student.totalMark > 0
                 ? ((student.gainMark / student.totalMark) * 100).toFixed(2)
                 : 0,
-          }))
-          .sort((a, b) => b.percentage - a.percentage);
+          }));
 
+        // Try filtering by current year first
+        const presentYear = new Date().getFullYear().toString();
+        const currentYearToppers = topperStudents.filter((student) =>
+          (student.batch || "").toString().includes(presentYear)
+        );
+
+        if (currentYearToppers.length > 0) {
+          topperStudents = currentYearToppers;
+        }
+
+        topperStudents.sort((a, b) => b.percentage - a.percentage);
         setStudents(topperStudents);
       } else {
         setStudents([]);
@@ -132,7 +144,7 @@ export default function TopStudents() {
         <div className="mb-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
           <div className="text-left">
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-              🏆 <span className="gradient-text">Top Students</span>
+              <span className="gradient-text">Top Students</span>
             </h2>
             <p className="mt-3 text-slate-500 dark:text-slate-400 max-w-xl">
               Meet our outstanding learners who achieved excellence and set

@@ -46,12 +46,12 @@ export default function EditCampusPage() {
       setSaving(true);
       await updateCampusInformation(id, formData);
 
-      alert("Campus information updated successfully.");
+      alert("Branch information updated successfully.");
       router.push("/admin/campus-information");
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert(error.message || "Failed to update campus information.");
+      alert(error.message || "Failed to update branch information.");
     } finally {
       setSaving(false);
     }
@@ -69,10 +69,10 @@ export default function EditCampusPage() {
     return (
       <div className="mx-auto max-w-md mt-12 p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center shadow-premium">
         <h2 className="text-2xl font-bold text-red-600 dark:text-red-400">
-          Campus Information Not Found
+          Branch Information Not Found
         </h2>
         <p className="mt-2 text-sm text-slate-500 dark:text-slate-405">
-          We couldn&apos;t retrieve details for this campus ID.
+          We couldn&apos;t retrieve details for this branch ID.
         </p>
         <Link
           href="/admin/campus-information"
@@ -99,7 +99,7 @@ export default function EditCampusPage() {
 
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
-            <span className="gradient-text">Edit Campus</span>
+            <span className="gradient-text">Edit Branch</span>
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             Modify details for <span className="font-semibold text-slate-700 dark:text-slate-200">{campus.campusName}</span>.

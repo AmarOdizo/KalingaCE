@@ -21,7 +21,7 @@ export default function DeleteModal({
 
         {/* Title */}
         <h2 className="mt-5 text-center text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-          Delete Campus
+          Delete Branch
         </h2>
 
         {/* Message */}
@@ -29,7 +29,7 @@ export default function DeleteModal({
           Are you sure you want to delete
           <span className="font-semibold text-slate-900 dark:text-white">
             {" "}
-            {campusName || "this campus"}{" "}
+            {campusName || "this branch"}{" "}
           </span>
           ?
         </p>

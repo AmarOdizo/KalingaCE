@@ -18,12 +18,12 @@ export default function AddCampusPage() {
       setLoading(true);
       await createCampusInformation(formData);
 
-      alert("Campus Information added successfully.");
+      alert("Branch Information added successfully.");
       router.push("/admin/campus-information");
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert(error.message || "Failed to create campus information.");
+      alert(error.message || "Failed to create branch information.");
     } finally {
       setLoading(false);
     }
@@ -43,10 +43,10 @@ export default function AddCampusPage() {
 
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
-            <span className="gradient-text">Add Campus</span>
+            <span className="gradient-text">Add Branch</span>
           </h1>
           <p className="mt-1 text-sm text-slate-505 dark:text-slate-400">
-            Fill in the details below to register a new campus.
+            Fill in the details below to register a new branch.
           </p>
         </div>
       </div>

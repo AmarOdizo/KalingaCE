@@ -19,7 +19,11 @@ export default function Footer() {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const res = await fetch("https://kalingace-4.onrender.com/api/CampusInformation");
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const url = isLocal
+          ? "http://localhost:5000/api/CampusInformation"
+          : "https://kalingace-4.onrender.com/api/CampusInformation";
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch contact details");
         const json = await res.json();
         const campuses = json.data || [];

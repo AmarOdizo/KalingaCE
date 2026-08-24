@@ -22,7 +22,11 @@ export default function HeroSlider() {
 
     async function fetchPosters() {
       try {
-        const res = await fetch("https://kalingace-4.onrender.com/api/Poster", {
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const url = isLocal
+          ? "http://localhost:5000/api/Poster"
+          : "https://kalingace-4.onrender.com/api/Poster";
+        const res = await fetch(url, {
           cache: "no-store",
         });
         if (res.ok) {

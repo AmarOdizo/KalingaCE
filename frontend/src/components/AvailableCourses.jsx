@@ -293,68 +293,24 @@ export default function AvailableCourses() {
               Explore Programs
             </span>
             <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white sm:text-4xl mt-3">
-              📚 <span className="gradient-text">Available Courses</span>
+              <span className="gradient-text">Available Courses</span>
             </h2>
             <p className="mt-3 text-base text-slate-600 dark:text-slate-400 leading-relaxed">
               Kickstart your career with our premium, highly practical education
               programs designed to build real-world competency.
             </p>
           </div>
-
-          {/* Navigation Controls & Status */}
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex gap-2.5">
-              <button
-                onClick={handlePrev}
-                className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 hover:scale-105 active:scale-95 text-slate-700 dark:text-slate-350 transition-all cursor-pointer"
-                aria-label="Previous slide"
-              >
-                <ArrowLeft size={18} />
-              </button>
-              <button
-                onClick={handleNext}
-                className="flex h-12 w-12 items-center justify-center rounded-xl border border-slate-200 bg-white shadow-sm hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800/80 hover:scale-105 active:scale-95 text-slate-700 dark:text-slate-350 transition-all cursor-pointer"
-                aria-label="Next slide"
-              >
-                <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
         </div>
 
-        {/* Swiper Slider or Empty State */}
+        {/* Grid of Course Cards */}
         {courses.length === 0 ? (
           <div className="text-center py-12 text-slate-500 dark:text-slate-400 font-semibold bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800/80">
             No courses available at the moment.
           </div>
         ) : (
-          <Swiper
-            modules={[Navigation, Autoplay]}
-            loop={courses.length > 2}
-            autoplay={{
-              delay: 4500,
-              disableOnInteraction: false,
-              pauseOnMouseEnter: true,
-            }}
-            spaceBetween={28}
-            breakpoints={{
-              0: {
-                slidesPerView: 1,
-              },
-              640: {
-                slidesPerView: 2,
-              },
-              1024: {
-                slidesPerView: 3,
-              },
-            }}
-            onBeforeInit={(swiper) => {
-              swiperRef.current = swiper;
-            }}
-            className="pb-6"
-          >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-6">
             {courses.map((course) => (
-              <SwiperSlide key={course.id || course._id} className="h-full">
+              <div key={course.id || course._id} className="h-full">
                 <div className="premium-card group flex flex-col justify-between h-[540px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/60">
                   {/* Image & Floating Tags */}
                   <div className="relative h-52 w-full overflow-hidden bg-slate-100 dark:bg-slate-950">
@@ -485,9 +441,9 @@ export default function AvailableCourses() {
                     </div>
                   </div>
                 </div>
-              </SwiperSlide>
+              </div>
             ))}
-          </Swiper>
+          </div>
         )}
       </div>
 

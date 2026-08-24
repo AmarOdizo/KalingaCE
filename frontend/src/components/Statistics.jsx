@@ -4,19 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import { CalendarDays, GraduationCap, Users, Building2 } from "lucide-react";
 import dynamic from "next/dynamic";
 
-const AgCharts = dynamic(
-  () => import("ag-charts-react").then((mod) => mod.AgCharts),
-  { ssr: false }
-);
+
 
 export default function Statistics() {
-  const [data, setData] = useState({
-    openingDate: "15 Jan 2024",
-    totalPassedOut: 0,
-    totalAvailable: 0,
-    totalFaculty: 0,
-  });
-  const [campusData, setCampusData] = useState([]);
+  const [campuses, setCampuses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDark, setIsDark] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -41,73 +32,15 @@ export default function Statistics() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch("https://kalingace-4.onrender.com/api/CampusInformation");
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const url = isLocal
+          ? "http://localhost:5000/api/CampusInformation"
+          : "https://kalingace-4.onrender.com/api/CampusInformation";
+        const res = await fetch(url);
         if (!res.ok) throw new Error("Failed to fetch statistics");
         const json = await res.json();
-        const campuses = json.data || [];
-
-        if (campuses.length > 0) {
-          let earliestDate = null;
-          let totalPassedOut = 0;
-          let totalAvailable = 0;
-          let totalFaculty = 0;
-
-          const chartData = campuses.map((c) => {
-            // Opening Date
-            if (c.OpeningDate) {
-              const d = new Date(c.OpeningDate);
-              if (!isNaN(d.getTime())) {
-                if (!earliestDate || d < earliestDate) {
-                  earliestDate = d;
-                }
-              }
-            }
-
-            // Passed Out Students
-            const passed = Array.isArray(c.TotalPassedOutStudent)
-              ? c.TotalPassedOutStudent[0]
-              : c.TotalPassedOutStudent;
-            const numPassed = Number(passed) || 0;
-            totalPassedOut += numPassed;
-
-            // Available Students
-            const avail = Array.isArray(c.TotalAvailableStudent)
-              ? c.TotalAvailableStudent[0]
-              : c.TotalAvailableStudent;
-            const numAvail = Number(avail) || 0;
-            totalAvailable += numAvail;
-
-            // Faculty
-            const fac = Array.isArray(c.Totalfaculty)
-              ? c.Totalfaculty[0]
-              : c.Totalfaculty;
-            const numFac = Number(fac) || 0;
-            totalFaculty += numFac;
-
-            return {
-              campusName: c.campusName || "Unknown",
-              activeStudents: numAvail,
-              passedOutStudents: numPassed,
-              faculty: numFac,
-            };
-          });
-
-          const formattedDate = earliestDate
-            ? earliestDate.toLocaleDateString("en-US", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-              })
-            : "15 Jan 2024";
-
-          setData({
-            openingDate: formattedDate,
-            totalPassedOut,
-            totalAvailable,
-            totalFaculty,
-          });
-          setCampusData(chartData);
-        }
+        const dataList = json.data || [];
+        setCampuses(dataList);
       } catch (err) {
         console.error("Error fetching statistics:", err);
       } finally {
@@ -118,10 +51,62 @@ export default function Statistics() {
     fetchStats();
   }, []);
 
+  const activeCampuses = useMemo(() => {
+    return campuses.filter((c) => c.status === "Active");
+  }, [campuses]);
+
+  const statsData = useMemo(() => {
+    let earliestDate = null;
+    let totalPassedOut = 0;
+    let totalAvailable = 0;
+    let totalFaculty = 0;
+
+    activeCampuses.forEach((c) => {
+      if (c.OpeningDate) {
+        const d = new Date(c.OpeningDate);
+        if (!isNaN(d.getTime())) {
+          if (!earliestDate || d < earliestDate) {
+            earliestDate = d;
+          }
+        }
+      }
+
+      const passed = Array.isArray(c.TotalPassedOutStudent)
+        ? c.TotalPassedOutStudent[0]
+        : c.TotalPassedOutStudent;
+      totalPassedOut += Number(passed) || 0;
+
+      const avail = Array.isArray(c.TotalAvailableStudent)
+        ? c.TotalAvailableStudent[0]
+        : c.TotalAvailableStudent;
+      totalAvailable += Number(avail) || 0;
+
+      const fac = Array.isArray(c.Totalfaculty)
+        ? c.Totalfaculty[0]
+        : c.Totalfaculty;
+      totalFaculty += Number(fac) || 0;
+    });
+
+    const formattedDate = earliestDate
+      ? earliestDate.toLocaleDateString("en-US", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        })
+      : "15 Jan 2024";
+
+    return {
+      openingDate: formattedDate,
+      totalPassedOut,
+      totalAvailable,
+      totalFaculty,
+    };
+  }, [activeCampuses]);
+
   const stats = [
     {
       title: "Opening Date",
-      value: data.openingDate,
+      value: statsData.openingDate,
       desc: "Delivering educational excellence",
       icon: CalendarDays,
       color: "text-blue-600 dark:text-blue-400",
@@ -130,7 +115,7 @@ export default function Statistics() {
     },
     {
       title: "Total Passout Students",
-      value: loading ? null : `${data.totalPassedOut.toLocaleString()}+`,
+      value: loading ? null : `${statsData.totalPassedOut.toLocaleString()}+`,
       desc: "Graduated alumni community",
       icon: GraduationCap,
       color: "text-emerald-600 dark:text-emerald-400",
@@ -139,7 +124,7 @@ export default function Statistics() {
     },
     {
       title: "Available Students",
-      value: loading ? null : `${data.totalAvailable.toLocaleString()}+`,
+      value: loading ? null : `${statsData.totalAvailable.toLocaleString()}+`,
       desc: "Active students enrolled",
       icon: Users,
       color: "text-indigo-600 dark:text-indigo-400",
@@ -148,7 +133,7 @@ export default function Statistics() {
     },
     {
       title: "Total Faculty",
-      value: loading ? null : `${data.totalFaculty.toLocaleString()}+`,
+      value: loading ? null : `${statsData.totalFaculty.toLocaleString()}+`,
       desc: "Dedicated mentors & staff",
       icon: Building2,
       color: "text-amber-600 dark:text-amber-400",
@@ -156,73 +141,6 @@ export default function Statistics() {
       gradient: "from-amber-500 to-orange-500",
     },
   ];
-
-  // AG Charts layout options
-  const chartOptions = useMemo(() => {
-    return {
-      data: campusData,
-      theme: isDark ? "ag-default-dark" : "ag-default",
-      background: {
-        fill: "transparent",
-      },
-      series: [
-        {
-          type: "bar",
-          xKey: "campusName",
-          yKey: "activeStudents",
-          yName: "Active Students",
-          fill: "#6366f1", // Indigo 500
-          stroke: "#6366f1",
-        },
-        {
-          type: "bar",
-          xKey: "campusName",
-          yKey: "passedOutStudents",
-          yName: "Passed Out Students",
-          fill: "#10b981", // Emerald 500
-          stroke: "#10b981",
-        },
-        {
-          type: "line",
-          xKey: "campusName",
-          yKey: "faculty",
-          yName: "Faculty",
-          stroke: "#f59e0b", // Amber 500
-          marker: {
-            fill: "#f59e0b",
-          },
-        },
-      ],
-      axes: [
-        {
-          type: "category",
-          position: "bottom",
-          label: {
-            fontFamily: "var(--font-sans), sans-serif",
-          },
-        },
-        {
-          type: "number",
-          position: "left",
-          label: {
-            fontFamily: "var(--font-sans), sans-serif",
-          },
-          title: {
-            text: "Number of People",
-            fontFamily: "var(--font-sans), sans-serif",
-          },
-        },
-      ],
-      legend: {
-        position: "bottom",
-        item: {
-          label: {
-            fontFamily: "var(--font-sans), sans-serif",
-          },
-        },
-      },
-    };
-  }, [campusData, isDark]);
 
   return (
     <section className="relative py-12 overflow-hidden bg-slate-50/60 dark:bg-slate-950/40 border-y border-slate-200/50 dark:border-slate-800/80 transition-colors duration-300">
@@ -232,7 +150,7 @@ export default function Statistics() {
 
       <div className="mx-auto max-w-7xl px-6 relative z-10">
         {/* Compact Header Title */}
-        <div className="mx-auto max-w-2xl text-center mb-10 space-y-2">
+        <div className="mx-auto max-w-2xl text-center mb-10 space-y-3">
           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-primary-50 dark:bg-primary-950/40 text-primary-600 dark:text-primary-400 border border-primary-200/30 dark:border-primary-800/30 uppercase tracking-widest">
             Kalinga at a glance
           </span>
@@ -240,7 +158,7 @@ export default function Statistics() {
             Kalinga Computer Education
             <span className="gradient-text"> By The Numbers</span>
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-505 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
             Dynamic metrics showcasing our academic environment, alumni
             achievements, and faculty structure.
           </p>
@@ -292,28 +210,7 @@ export default function Statistics() {
           })}
         </div>
 
-        {/* AG Charts Container */}
-        {campusData.length > 0 && (
-          <div className="mt-10 overflow-hidden rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-premium dark:border-slate-800/85 dark:bg-slate-900/40 backdrop-blur-md transition-all duration-300">
-            <div className="mb-6">
-              <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                Campus Comparison
-              </h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Visual breakdown of active students, passout alumni, and faculty sizes across campus locations.
-              </p>
-            </div>
-            {!mounted || loading ? (
-              <div className="h-96 w-full flex items-center justify-center text-slate-400">
-                <span className="h-8 w-8 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-              </div>
-            ) : (
-              <div style={{ height: "400px", width: "100%" }}>
-                <AgCharts options={chartOptions} />
-              </div>
-            )}
-          </div>
-        )}
+
       </div>
     </section>
   );

@@ -83,6 +83,10 @@ const CampusInformationSchema = new mongoose.Schema(
       default: "",
     },
 
+    isMain: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       enum: ["Active", "Inactive"],

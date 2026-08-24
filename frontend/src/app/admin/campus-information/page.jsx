@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Plus, Search, Filter, School, Users, GraduationCap, Building2 } from "lucide-react";
 
-import { getCampusInformations, deleteCampusInformation } from "./data";
+import { getCampusInformations, deleteCampusInformation, setMainCampus } from "./data";
 
 import CampusTable from "./components/CampusTable";
 import DeleteModal from "./components/DeleteModal";
@@ -68,12 +68,33 @@ export default function CampusInformationPage() {
       setOpenDeleteModal(false);
       setSelectedCampus(null);
 
-      alert("Campus deleted successfully.");
+      alert("Branch deleted successfully.");
     } catch (error) {
       console.error(error);
       alert(error.message);
     } finally {
       setDeleteLoading(false);
+    }
+  };
+
+  const handleSetMain = async (campus) => {
+    try {
+      setLoading(true);
+      await setMainCampus(campus._id);
+      
+      setCampuses((prev) =>
+        prev.map((item) => ({
+          ...item,
+          isMain: item._id === campus._id,
+        }))
+      );
+      
+      alert("Main branch updated successfully.");
+    } catch (error) {
+      console.error(error);
+      alert(error.message || "Failed to set main branch");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,15 +137,15 @@ export default function CampusInformationPage() {
 
   return (
     <div className="w-full p-4 sm:p-6 md:p-8 space-y-8 transition-colors duration-300">
-      <title>Campus Information | Admin Panel</title>
+      <title>Branch Information | Admin Panel</title>
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white md:text-4xl">
-            <span className="gradient-text">Campus Information</span>
+            <span className="gradient-text">Branch Information</span>
           </h1>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
-            Manage your educational campuses, check faculty counts, student distribution, and contact details.
+            Manage your educational branches, check faculty counts, student distribution, and contact details.
           </p>
         </div>
 
@@ -133,17 +154,17 @@ export default function CampusInformationPage() {
           className="btn-primary py-2.5 px-5 text-sm shrink-0 self-start sm:self-auto"
         >
           <Plus size={18} />
-          Add Campus
+          Add Branch
         </Link>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1: Total Campuses */}
+        {/* Card 1: Total Branches */}
         <div className="premium-card flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Total Campuses
+              Total Branches
             </p>
             <h3 className="mt-1 text-3xl font-bold text-slate-900 dark:text-white">
               {totalCampuses}
@@ -154,11 +175,11 @@ export default function CampusInformationPage() {
           </div>
         </div>
 
-        {/* Card 2: Active Campuses */}
+        {/* Card 2: Active Branches */}
         <div className="premium-card flex items-center justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-              Active Campuses
+              Active Branches
             </p>
             <h3 className="mt-1 text-3xl font-bold text-green-600 dark:text-green-400">
               {activeCampuses}
@@ -206,7 +227,7 @@ export default function CampusInformationPage() {
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 dark:text-slate-500" />
           <input
             type="text"
-            placeholder="Search campuses by name, city, or phone..."
+            placeholder="Search branches by name, city, or phone..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl outline-none focus:ring-2 focus:ring-primary-500/20 dark:focus:ring-primary-500/40"
@@ -231,6 +252,7 @@ export default function CampusInformationPage() {
       <CampusTable
         campuses={filteredCampuses}
         onDelete={handleDeleteClick}
+        onSetMain={handleSetMain}
         deleting={deleteLoading}
       />
 

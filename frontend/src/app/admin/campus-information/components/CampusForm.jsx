@@ -135,12 +135,12 @@ export default function CampusForm({
 
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
           <Input
-            label="Campus Name"
+            label="Branch Name"
             name="campusName"
             value={formData.campusName}
             onChange={handleChange}
             required
-            placeholder="e.g. Kalinga University Main Campus"
+            placeholder="e.g. Kalinga University Main Branch"
           />
 
           <Input
@@ -381,7 +381,7 @@ export default function CampusForm({
           disabled={loading}
           className="btn-primary py-2.5 px-6 text-sm"
         >
-          {loading ? "Saving..." : "Save Campus Information"}
+          {loading ? "Saving..." : "Save Branch Information"}
         </button>
       </div>
     </form>

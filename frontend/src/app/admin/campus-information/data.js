@@ -1,4 +1,9 @@
-const API_URL = "https://kalingace-4.onrender.com/api/CampusInformation";
+const API_URL =
+  typeof window !== "undefined" &&
+  (window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1")
+    ? "http://localhost:5000/api/CampusInformation"
+    : "https://kalingace-4.onrender.com/api/CampusInformation";
 
 /* ===========================
    GET ALL CAMPUS
@@ -86,6 +91,26 @@ export async function deleteCampusInformation(id) {
 
   if (!res.ok) {
     throw new Error(result.message || "Failed to delete campus information");
+  }
+
+  return result;
+}
+
+/* ===========================
+   SET MAIN CAMPUS
+=========================== */
+export async function setMainCampus(id) {
+  const res = await fetch(`${API_URL}/${id}/set-main`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const result = await res.json();
+
+  if (!res.ok) {
+    throw new Error(result.message || "Failed to set main branch");
   }
 
   return result;

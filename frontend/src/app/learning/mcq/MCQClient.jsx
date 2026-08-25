@@ -385,49 +385,36 @@ export default function MCQClient() {
       setCheckingAttempt(true);
       const checkRes = await checkExamAttempt(examId, mobileNumber.trim());
       if (checkRes.hasAttempted) {
-        const submissionTime = new Date(checkRes.attempt.submittedAt || checkRes.attempt.createdAt);
-        const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        const is5Passed = submissionTime < fiveMinutesAgo;
-
-        if (!is5Passed) {
-          Swal.fire({
-            title: "Exam Already Attempted",
-            text: "You have already completed this exam. Results and detailed review will be visible 5 minutes after submission.",
-            icon: "info",
-            confirmButtonColor: "#3b82f6",
-          });
-        } else {
-          Swal.fire({
-            title: "Exam Already Attempted",
-            text: "This mobile number has already attempted this exam. Since you can only attempt the exam once every 5 minutes, you cannot retake it. However, you can view your previous result directly.",
-            icon: "info",
-            showCancelButton: true,
-            confirmButtonText: "View My Result",
-            cancelButtonText: "Close",
-            confirmButtonColor: "#3b82f6",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const prevAttempt = checkRes.attempt;
-              setAlreadyAttemptedData(prevAttempt);
-              setStudentName(prevAttempt.studentName);
-              setMobileNumber(prevAttempt.mobileNumber);
-              setScore(prevAttempt.score);
-              const reconstructed = prevAttempt.answers.map(ans => ({
-                questionId: ans.questionId,
-                questionText: ans.questionText,
-                options: [],
-                chosen: ans.chosenAnswer,
-                correct: ans.correctAnswer,
-                isCorrect: ans.isCorrect,
-                explanation: "",
-                marks: ans.marks,
-              }));
-              setUserAnswers(reconstructed);
-              setShowRegistration(false);
-              setView("result");
-            }
-          });
-        }
+        Swal.fire({
+          title: "Exam Already Attempted",
+          text: "This mobile number has already attempted this exam. You cannot retake it. However, you can view your previous result directly.",
+          icon: "info",
+          showCancelButton: true,
+          confirmButtonText: "View My Result",
+          cancelButtonText: "Close",
+          confirmButtonColor: "#3b82f6",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const prevAttempt = checkRes.attempt;
+            setAlreadyAttemptedData(prevAttempt);
+            setStudentName(prevAttempt.studentName);
+            setMobileNumber(prevAttempt.mobileNumber);
+            setScore(prevAttempt.score);
+            const reconstructed = prevAttempt.answers.map(ans => ({
+              questionId: ans.questionId,
+              questionText: ans.questionText,
+              options: [],
+              chosen: ans.chosenAnswer,
+              correct: ans.correctAnswer,
+              isCorrect: ans.isCorrect,
+              explanation: "",
+              marks: ans.marks,
+            }));
+            setUserAnswers(reconstructed);
+            setShowRegistration(false);
+            setView("result");
+          }
+        });
       } else {
         // Save registration details
         localStorage.setItem(`exam_student_name_${examId}`, studentName);

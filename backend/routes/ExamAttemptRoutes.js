@@ -126,11 +126,9 @@ router.post("/check", async (req, res) => {
       });
     }
 
-    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
     const attempt = await ExamAttempt.findOne({
       examId,
       mobileNumber,
-      submittedAt: { $gte: fiveMinutesAgo },
     });
 
     if (attempt) {

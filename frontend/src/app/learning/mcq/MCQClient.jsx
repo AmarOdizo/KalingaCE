@@ -120,8 +120,8 @@ export default function MCQClient() {
     return examDetails?.resultsPublished || false;
   }, [isScheduledExam, examDetails]);
 
-  // Auto-submit quiz when duration completes
-  const handleAutoSubmit = async () => {
+  // Auto-submit quiz when duration completes or anti-cheating trigger
+  const handleAutoSubmit = async (reason = "time") => {
     // Fill in remaining questions as unanswered
     let finalAnswers = [];
     setUserAnswers((prevAnswers) => {
@@ -201,12 +201,17 @@ export default function MCQClient() {
     
     setView("result");
     Swal.fire({
-      title: "Time is Up!",
-      text: "The exam duration has ended. Your responses have been submitted automatically.",
+      title: reason === "cheat" ? "Exam Terminated!" : "Time is Up!",
+      text: reason === "cheat"
+        ? "Your exam has been automatically submitted because you switched tabs, minimized the window, or opened another application."
+        : "The exam duration has ended. Your responses have been submitted automatically.",
       icon: "warning",
       confirmButtonColor: "#3b82f6",
     });
   };
+
+  const [blurCount, setBlurCount] = useState(0);
+  const lastViolationRef = useRef(0);
 
   // Copy prevention & assessment page lock effect
   useEffect(() => {
@@ -243,6 +248,54 @@ export default function MCQClient() {
       document.body.classList.remove("select-none");
     };
   }, [view]);
+
+  // Anti-cheating tab switch/blur detection effect
+  useEffect(() => {
+    if (!isScheduledExam || view !== "quiz") {
+      setBlurCount(0);
+      return;
+    }
+
+    const handleViolation = () => {
+      const now = Date.now();
+      // Ignore multiple triggers within 2 seconds to avoid dual events (blur + visibility change)
+      if (now - lastViolationRef.current < 2000) return;
+      lastViolationRef.current = now;
+
+      setBlurCount((prev) => {
+        const next = prev + 1;
+        if (next === 1) {
+          Swal.fire({
+            title: "Warning: Focus Lost!",
+            text: "You are not allowed to switch tabs, minimize the window, or open other applications during the exam. Next violation will automatically submit your exam.",
+            icon: "warning",
+            confirmButtonColor: "#ef4444",
+          });
+        } else if (next >= 2) {
+          handleAutoSubmit("cheat");
+        }
+        return next;
+      });
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        handleViolation();
+      }
+    };
+
+    const handleWindowBlur = () => {
+      handleViolation();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+    };
+  }, [isScheduledExam, view, quizQuestions, score, userAnswers, studentName, mobileNumber]);
 
   // Countdown Timer Effect
   useEffect(() => {

@@ -89,6 +89,15 @@ router.post("/", async (req, res) => {
       });
     }
 
+    const ExamInfo = require("../models/ExamInfo");
+    const exam = await ExamInfo.findById(examId);
+    if (!exam || exam.status !== "Started") {
+      return res.status(400).json({
+        success: false,
+        message: "Submissions are closed for this exam. It has either been closed by the admin or hasn't started.",
+      });
+    }
+
     const attempt = await ExamAttempt.create({
       studentName,
       mobileNumber,

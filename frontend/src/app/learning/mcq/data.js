@@ -241,3 +241,28 @@ export const updateExamAttemptScore = async (attemptId, score) => {
     throw error;
   }
 };
+
+// ==============================
+// VERIFY Exam Password
+// ==============================
+export const verifyExamPassword = async (examId, examPassword) => {
+  try {
+    const baseUrl = API_URL.replace("/api/MCQ", "/api/ExamInfo");
+    const response = await fetch(`${baseUrl}/${examId}/verify-password`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ examPassword }),
+    });
+
+    const result = await response.json();
+    return {
+      success: result.success,
+      message: result.message,
+    };
+  } catch (error) {
+    console.error("Verify Exam Password Error:", error);
+    return { success: false, message: error.message };
+  }
+};

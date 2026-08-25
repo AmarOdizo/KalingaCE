@@ -4,6 +4,25 @@ import { useEffect, useState } from "react";
 import { uploadExamImage } from "../data";
 import ImageUpload from "./ImageUpload";
 
+const validateDateTime = (dateStr, timeStr) => {
+  if (!dateStr || !timeStr) return true;
+  try {
+    const selectedDate = new Date(dateStr);
+    const [hours, minutes] = timeStr.split(":").map(Number);
+    const selectedDateTime = new Date(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate(),
+      hours,
+      minutes,
+      0
+    );
+    return selectedDateTime.getTime() >= (Date.now() - 60000);
+  } catch (e) {
+    return false;
+  }
+};
+
 export default function ExamForm({
   initialData = {},
   onSubmit,
@@ -22,6 +41,7 @@ export default function ExamForm({
   });
 
   const [uploading, setUploading] = useState(false);
+  const [dateTimeError, setDateTimeError] = useState("");
 
   useEffect(() => {
     if (initialData && Object.keys(initialData).length > 0) {
@@ -62,10 +82,17 @@ export default function ExamForm({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
+      if (updated.examDate && updated.examTime) {
+        if (!validateDateTime(updated.examDate, updated.examTime)) {
+          setDateTimeError("The selected date and time is in the past!");
+        } else {
+          setDateTimeError("");
+        }
+      }
+      return updated;
+    });
   };
 
   const handleBatchChange = (batch) => {
@@ -110,6 +137,10 @@ export default function ExamForm({
     e.preventDefault();
     if (!formData.batch || !formData.batch.trim()) {
       return alert("Please enter target batch.");
+    }
+    if (formData.examDate && formData.examTime && !validateDateTime(formData.examDate, formData.examTime)) {
+      alert("Error: Cannot save. The selected exam date and time is in the past. Please select a valid current or future date and time.");
+      return;
     }
     onSubmit(formData, submitAction);
   };
@@ -177,6 +208,11 @@ export default function ExamForm({
             className="premium-input cursor-pointer"
             required
           />
+          {dateTimeError && (
+            <p className="mt-1.5 text-xs font-bold text-rose-600 dark:text-rose-400 animate-pulse">
+              ⚠️ {dateTimeError}
+            </p>
+          )}
         </div>
 
         {/* Duration */}

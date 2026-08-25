@@ -140,6 +140,59 @@ export const updateExamStatus = async (id, status) => {
 };
 
 // ==============================
+// START Exam (Manual Control)
+// ==============================
+export const startExam = async (id, examPassword) => {
+  const response = await customFetch(`/${id}/start`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ examPassword }),
+  });
+
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(result.message || "Failed to start exam");
+  }
+  return result.data;
+};
+
+// ==============================
+// VERIFY Exam Password
+// ==============================
+export const verifyExamPassword = async (id, examPassword) => {
+  const response = await customFetch(`/${id}/verify-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ examPassword }),
+  });
+
+  const result = await response.json();
+  return {
+    success: result.success,
+    message: result.message,
+  };
+};
+
+// ==============================
+// CLOSE Exam (Manual Control)
+// ==============================
+export const closeExam = async (id) => {
+  const response = await customFetch(`/${id}/close`, {
+    method: "PATCH",
+  });
+
+  const result = await response.json();
+  if (!result.success) {
+    throw new Error(result.message || "Failed to close exam");
+  }
+  return result.data;
+};
+
+// ==============================
 // MCQ API INTEGRATION
 // ==============================
 const MCQ_LOCAL_URL = "http://localhost:5000/api/MCQ";

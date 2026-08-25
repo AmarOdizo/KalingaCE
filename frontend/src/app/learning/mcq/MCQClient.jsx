@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Swal from "sweetalert2";
-import { getSubjects, getMCQsBySubject, getExamById, getMCQsByExam, checkExamAttempt, submitExamAttempt, getSQAByExam, submitSQAAnswer } from "./data";
+import { getSubjects, getMCQsBySubject, getExamById, getMCQsByExam, checkExamAttempt, submitExamAttempt, getSQAByExam, submitSQAAnswer, verifyExamPassword } from "./data";
 import Loading from "./Loading";
 import {
   BookOpen,
@@ -107,6 +107,7 @@ export default function MCQClient() {
   // Student registration states
   const [studentName, setStudentName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
+  const [studentExamPassword, setStudentExamPassword] = useState("");
   const [showRegistration, setShowRegistration] = useState(false);
   const [checkingAttempt, setCheckingAttempt] = useState(false);
   const [alreadyAttemptedData, setAlreadyAttemptedData] = useState(null);
@@ -155,6 +156,25 @@ export default function MCQClient() {
 
     if (isScheduledExam) {
       try {
+        const latestExam = await getExamById(examId);
+        if (latestExam.status !== "Started") {
+          Swal.fire({
+            title: "Exam Closed!",
+            text: "The exam has been closed by the administrator. Submissions are no longer accepted.",
+            icon: "error",
+            confirmButtonColor: "#3b82f6",
+          });
+          localStorage.removeItem(`exam_questions_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_start_time_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_student_name_${examId}`);
+          localStorage.removeItem(`exam_student_mobile_${examId}`);
+          setView("result");
+          return;
+        }
+
         const mcqAnswers = finalAnswers.filter(ans => ans.type === "mcq" || !ans.type);
         const totalMcqPossible = quizQuestions.filter(q => q.type === "mcq" || !q.type).reduce((acc, q) => acc + (q.marks || 1), 0);
         const totalSqaPossible = quizQuestions.filter(q => q.type === "sqa").reduce((acc, q) => acc + (q.marks || q.maxMarks || 5), 0);
@@ -192,6 +212,7 @@ export default function MCQClient() {
         localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
         localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
         localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+        localStorage.removeItem(`exam_start_time_${mobileNumber.trim()}_${examId}`);
         localStorage.removeItem(`exam_student_name_${examId}`);
         localStorage.removeItem(`exam_student_mobile_${examId}`);
       } catch (err) {
@@ -335,27 +356,8 @@ export default function MCQClient() {
           setMobileNumber(savedMobile);
         }
 
-        if (exam.status === "Inactive") {
-          setError("This exam is currently inactive.");
-          setLoading(false);
-          return;
-        }
-
-        // 2. Validate date and time
-        const startDateTime = parseExamStart(exam.examDate, exam.examTime);
-        const durationMinutes = parseDurationMinutes(exam.duration);
-        const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60 * 1000);
-
-        const now = new Date();
-
-        if (now < startDateTime) {
-          setError("This exam has not started yet.");
-          setLoading(false);
-          return;
-        }
-
-        if (now > endDateTime) {
-          setError("This exam has already expired/completed.");
+        if (exam.status !== "Started") {
+          setError("This exam is not currently active or has been closed by the administrator.");
           setLoading(false);
           return;
         }
@@ -394,10 +396,6 @@ export default function MCQClient() {
         setSelectedAnswer("");
         setIsAnswered(false);
 
-        // Calculate remaining seconds
-        const remainingSecs = Math.floor((endDateTime - now) / 1000);
-        setTimeRemaining(remainingSecs);
-
         // Show registration instead of jumping directly to quiz
         setShowRegistration(true);
       } catch (err) {
@@ -434,41 +432,42 @@ export default function MCQClient() {
       return;
     }
 
+    if (examDetails?.examPassword && !studentExamPassword.trim()) {
+      Swal.fire({
+        title: "Password Required",
+        text: "Please enter the exam password to proceed.",
+        icon: "error",
+        confirmButtonColor: "#3b82f6",
+      });
+      return;
+    }
+
     try {
       setCheckingAttempt(true);
+      if (examDetails?.examPassword) {
+        const verifyRes = await verifyExamPassword(examId, studentExamPassword.trim());
+        if (!verifyRes.success) {
+          Swal.fire({
+            title: "Incorrect Password",
+            text: "The exam password you entered is incorrect.",
+            icon: "error",
+            confirmButtonColor: "#3b82f6",
+          });
+          setCheckingAttempt(false);
+          return;
+        }
+      }
       const checkRes = await checkExamAttempt(examId, mobileNumber.trim());
       if (checkRes.hasAttempted) {
         Swal.fire({
           title: "Exam Already Attempted",
-          text: "This mobile number has already attempted this exam. You cannot retake it. However, you can view your previous result directly.",
-          icon: "info",
-          showCancelButton: true,
-          confirmButtonText: "View My Result",
-          cancelButtonText: "Close",
-          confirmButtonColor: "#3b82f6",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            const prevAttempt = checkRes.attempt;
-            setAlreadyAttemptedData(prevAttempt);
-            setStudentName(prevAttempt.studentName);
-            setMobileNumber(prevAttempt.mobileNumber);
-            setScore(prevAttempt.score);
-            const reconstructed = prevAttempt.answers.map(ans => ({
-              questionId: ans.questionId,
-              questionText: ans.questionText,
-              options: [],
-              chosen: ans.chosenAnswer,
-              correct: ans.correctAnswer,
-              isCorrect: ans.isCorrect,
-              explanation: "",
-              marks: ans.marks,
-            }));
-            setUserAnswers(reconstructed);
-            setShowRegistration(false);
-            setView("result");
-          }
+          text: "This mobile number has already attempted this exam. You cannot retake it.",
+          icon: "warning",
+          confirmButtonColor: "#ef4444",
         });
-      } else {
+        setCheckingAttempt(false);
+        return;
+      }
         // Save registration details
         localStorage.setItem(`exam_student_name_${examId}`, studentName);
         localStorage.setItem(`exam_student_mobile_${examId}`, mobileNumber.trim());
@@ -526,12 +525,25 @@ export default function MCQClient() {
           setScore(0);
         }
 
+        // Calculate remaining seconds based on personal start time stamp
+        const durationMinutes = parseDurationMinutes(examDetails?.duration || "60");
+        const startTimestampKey = `exam_start_time_${mobileNumber.trim()}_${examId}`;
+        let startTimestamp = localStorage.getItem(startTimestampKey);
+        if (!startTimestamp) {
+          startTimestamp = Date.now().toString();
+          localStorage.setItem(startTimestampKey, startTimestamp);
+        }
+
+        const elapsedSecs = Math.floor((Date.now() - Number(startTimestamp)) / 1000);
+        const totalAllowedSecs = durationMinutes * 60;
+        const remainingSecs = Math.max(0, totalAllowedSecs - elapsedSecs);
+        setTimeRemaining(remainingSecs);
+
         setQuizQuestions(randomized);
         setSelectedAnswer("");
         setIsAnswered(false);
         setShowRegistration(false);
         setView("quiz");
-      }
     } catch (err) {
       console.error(err);
       Swal.fire({
@@ -711,6 +723,25 @@ export default function MCQClient() {
       if (isScheduledExam) {
         try {
           setLoading(true);
+          const latestExam = await getExamById(examId);
+          if (latestExam.status !== "Started") {
+            Swal.fire({
+              title: "Exam Closed!",
+              text: "The exam has been closed by the administrator. Submissions are no longer accepted.",
+              icon: "error",
+              confirmButtonColor: "#3b82f6",
+            });
+            localStorage.removeItem(`exam_questions_${mobileNumber.trim()}_${examId}`);
+            localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
+            localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
+            localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+            localStorage.removeItem(`exam_start_time_${mobileNumber.trim()}_${examId}`);
+            localStorage.removeItem(`exam_student_name_${examId}`);
+            localStorage.removeItem(`exam_student_mobile_${examId}`);
+            setView("result");
+            return;
+          }
+
           const mcqAnswers = updatedAnswers.filter(ans => ans.type === "mcq" || !ans.type);
           const totalMcqPossible = quizQuestions.filter(q => q.type === "mcq" || !q.type).reduce((acc, q) => acc + (q.marks || 1), 0);
           const totalSqaPossible = quizQuestions.filter(q => q.type === "sqa").reduce((acc, q) => acc + (q.marks || q.maxMarks || 5), 0);
@@ -754,6 +785,7 @@ export default function MCQClient() {
           localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
           localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
           localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_start_time_${mobileNumber.trim()}_${examId}`);
           localStorage.removeItem(`exam_student_name_${examId}`);
           localStorage.removeItem(`exam_student_mobile_${examId}`);
         } catch (err) {
@@ -840,6 +872,22 @@ export default function MCQClient() {
                   className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 outline-none text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 placeholder:text-slate-400 transition hover:border-slate-300 focus:border-primary-500 focus:shadow-glow-blue"
                 />
               </div>
+
+              {examDetails?.examPassword && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">
+                    Exam Password
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    placeholder="Enter exam password"
+                    value={studentExamPassword}
+                    onChange={(e) => setStudentExamPassword(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white py-3 px-4 outline-none text-sm text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 placeholder:text-slate-400 transition hover:border-slate-300 focus:border-primary-500 focus:shadow-glow-blue"
+                  />
+                </div>
+              )}
 
               <button
                 type="submit"

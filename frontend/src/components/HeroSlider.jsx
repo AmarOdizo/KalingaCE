@@ -53,7 +53,7 @@ export default function HeroSlider() {
     return (
       <section className="py-6 md:py-10 bg-gradient-to-b from-slate-50 to-slate-100/50 dark:from-slate-950 dark:to-slate-900/50">
         <div className="mx-auto w-full max-w-7xl px-6">
-          <div className="w-full aspect-[16/9] md:aspect-[2.5/1] xl:aspect-[2.8/1] rounded-3xl bg-slate-200 dark:bg-slate-900 animate-pulse flex items-center justify-center border border-slate-100 dark:border-slate-800/60 shadow-premium">
+          <div className="w-full aspect-[2.5/1] max-h-[380px] rounded-3xl bg-slate-200 dark:bg-slate-900 animate-pulse flex items-center justify-center border border-slate-100 dark:border-slate-800/60 shadow-premium">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-primary-500 border-t-transparent dark:border-primary-400 dark:border-t-transparent" />
           </div>
         </div>
@@ -87,19 +87,13 @@ export default function HeroSlider() {
         >
           {posters.map((poster, index) => (
             <SwiperSlide key={index}>
-              <div className="relative w-full aspect-[16/9] md:aspect-[2.5/1] xl:aspect-[2.8/1] overflow-hidden bg-slate-100 dark:bg-slate-950/20 select-none group">
+              <div className="relative w-full overflow-hidden select-none group flex items-center justify-center">
                 {/* Main Foreground Poster Image */}
                 <img
                   src={poster}
                   alt={`Poster Slide ${index + 1}`}
-                  className="w-full h-full object-cover transition-transform duration-[1200ms] ease-out scale-100 group-hover:scale-105"
+                  className="w-full h-auto object-contain transition-transform duration-[1200ms] ease-out scale-100"
                 />
-
-                {/* Subtle dark gradient overlay to give it a premium cinema feel */}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/30 via-slate-950/5 to-transparent pointer-events-none z-10" />
-
-                {/* Glowing decorative border overlay */}
-                <div className="absolute inset-0 border border-white/5 rounded-3xl pointer-events-none z-20" />
               </div>
             </SwiperSlide>
           ))}

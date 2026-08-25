@@ -75,54 +75,29 @@ export default function ExamModal({ exam, onClose }) {
         setTimeStatus("OFFLINE");
         return;
       }
-      try {
-        const startDateTime = parseExamStart(exam.examDate, exam.examTime);
-        const durationMinutes = parseDurationMinutes(exam.duration);
-        const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60 * 1000);
-        
-        const now = new Date();
-        
-        if (now < startDateTime) {
-          setTimeStatus("NOT_STARTED");
-          const diffMs = startDateTime - now;
-          const diffHours = Math.floor(diffMs / (3600 * 1000));
-          const diffMins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
-          const diffSecs = Math.floor((diffMs % (60 * 1000)) / 1000);
-          
-          if (diffHours > 24) {
-            const examDateFormatted = new Date(exam.examDate).toLocaleDateString("en-IN", {
-              day: "2-digit",
-              month: "short",
-              year: "numeric",
-            });
-            setTimeRemainingText(`on ${examDateFormatted} at ${exam.examTime}`);
-          } else {
-            const hStr = diffHours > 0 ? `${diffHours}h ` : "";
-            const mStr = diffMins > 0 ? `${diffMins}m ` : "";
-            setTimeRemainingText(`starts in ${hStr}${mStr}${diffSecs}s`);
-          }
-        } else if (now > endDateTime) {
-          setTimeStatus("EXPIRED");
-          setTimeRemainingText("");
-        } else {
-          setTimeStatus("ACTIVE");
-          const diffMs = endDateTime - now;
-          const diffHours = Math.floor(diffMs / (3600 * 1000));
-          const diffMins = Math.floor((diffMs % (3600 * 1000)) / (60 * 1000));
-          const diffSecs = Math.floor((diffMs % (60 * 1000)) / 1000);
-          
-          const hStr = diffHours > 0 ? `${diffHours}h ` : "";
-          const mStr = diffMins > 0 ? `${diffMins}m ` : "";
-          setTimeRemainingText(`closes in ${hStr}${mStr}${diffSecs}s`);
-        }
-      } catch (err) {
-        console.error(err);
+
+      const status = exam.status || "Scheduled";
+
+      if (status === "Started") {
         setTimeStatus("ACTIVE");
+        setTimeRemainingText("");
+      } else if (status === "Closed") {
+        setTimeStatus("EXPIRED");
+        setTimeRemainingText("");
+      } else {
+        // Scheduled / Active (not started yet)
+        setTimeStatus("NOT_STARTED");
+        const dateFormatted = new Date(exam.examDate).toLocaleDateString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        });
+        setTimeRemainingText(`${dateFormatted} at ${exam.examTime}`);
       }
     };
 
     calculateTimeStatus();
-    const interval = setInterval(calculateTimeStatus, 1000);
+    const interval = setInterval(calculateTimeStatus, 5000);
     return () => clearInterval(interval);
   }, [exam]);
 
@@ -256,7 +231,7 @@ export default function ExamModal({ exam, onClose }) {
                 >
                   <span className="text-sm">Start Exam</span>
                   <span className="text-xs font-semibold text-indigo-200/90">
-                    Active ({timeRemainingText})
+                    Active (Duration: {exam.duration})
                   </span>
                 </button>
               )}

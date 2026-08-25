@@ -93,6 +93,23 @@ router.post("/", upload.single("image"), async (req, res) => {
       });
     }
 
+    const selectedDateObj = new Date(examDate);
+    const [hours, minutes] = examTime.split(":").map(Number);
+    const selectedDateTime = new Date(
+      selectedDateObj.getFullYear(),
+      selectedDateObj.getMonth(),
+      selectedDateObj.getDate(),
+      hours,
+      minutes,
+      0
+    );
+    if (selectedDateTime.getTime() < (Date.now() - 60000)) {
+      return res.status(400).json({
+        success: false,
+        message: "Cannot save. The selected exam date and time is in the past.",
+      });
+    }
+
     let imageUrl = "";
 
     if (req.file) {
@@ -173,6 +190,25 @@ router.put("/:id", upload.single("image"), async (req, res) => {
         success: false,
         message: "Exam Information not found",
       });
+    }
+
+    if (examDate && examTime) {
+      const selectedDateObj = new Date(examDate);
+      const [hours, minutes] = examTime.split(":").map(Number);
+      const selectedDateTime = new Date(
+        selectedDateObj.getFullYear(),
+        selectedDateObj.getMonth(),
+        selectedDateObj.getDate(),
+        hours,
+        minutes,
+        0
+      );
+      if (selectedDateTime.getTime() < (Date.now() - 60000)) {
+        return res.status(400).json({
+          success: false,
+          message: "Cannot save. The selected exam date and time is in the past.",
+        });
+      }
     }
 
     let imageUrl = exam.image;
@@ -321,6 +357,141 @@ router.patch("/:id/status", async (req, res) => {
     res.status(200).json({
       success: true,
       message: `Exam status updated to ${status} successfully`,
+      data: exam,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ==============================
+// START Exam (Manual Control)
+// ==============================
+router.patch("/:id/start", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    const { examPassword } = req.body;
+
+    let exam;
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({ id: Number(idParam) });
+    }
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam Information not found",
+      });
+    }
+
+    exam.status = "Started";
+    exam.startTime = new Date();
+    exam.closeTime = null; // Clear close time if restarting
+
+    if (examPassword) {
+      const bcrypt = require("bcryptjs");
+      exam.examPassword = await bcrypt.hash(examPassword, 10);
+    } else {
+      exam.examPassword = null;
+    }
+
+    await exam.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Exam started successfully",
+      data: exam,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ==============================
+// VERIFY Exam Password
+// ==============================
+router.post("/:id/verify-password", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    const { examPassword } = req.body;
+
+    let exam;
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({ id: Number(idParam) });
+    }
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam Information not found",
+      });
+    }
+
+    if (!exam.examPassword) {
+      return res.status(200).json({
+        success: true,
+        message: "No password required for this exam",
+      });
+    }
+
+    const bcrypt = require("bcryptjs");
+    const isMatch = await bcrypt.compare(examPassword || "", exam.examPassword);
+    if (!isMatch) {
+      return res.status(400).json({
+        success: false,
+        message: "Incorrect exam password",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Exam password verified successfully",
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
+// ==============================
+// CLOSE Exam (Manual Control)
+// ==============================
+router.patch("/:id/close", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    let exam;
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({ id: Number(idParam) });
+    }
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam Information not found",
+      });
+    }
+
+    exam.status = "Closed";
+    exam.closeTime = new Date();
+    await exam.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Exam closed successfully",
       data: exam,
     });
   } catch (error) {

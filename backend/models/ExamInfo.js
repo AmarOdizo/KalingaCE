@@ -59,8 +59,20 @@ const ExamInformationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Active", "Inactive"],
-      default: "Active",
+      enum: ["Active", "Inactive", "Scheduled", "Started", "Closed"],
+      default: "Scheduled",
+    },
+    startTime: {
+      type: Date,
+      default: null,
+    },
+    closeTime: {
+      type: Date,
+      default: null,
+    },
+    examPassword: {
+      type: String,
+      default: null,
     },
   },
   {

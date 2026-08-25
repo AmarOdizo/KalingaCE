@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
 import { Eye, Pencil, Trash2, BookOpenCheck, Award, Send } from "lucide-react";
-import { deleteExamInformation, togglePublishResults, updateExamStatus } from "../data";
+import { deleteExamInformation, togglePublishResults, updateExamStatus, startExam, closeExam } from "../data";
+import Swal from "sweetalert2";
 import { formatBatch, formatDate } from "../utils";
 import EmptyState from "./EmptyState";
 import AdminAgGrid from "@/components/AdminAgGrid";
@@ -253,41 +254,91 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
     {
       headerName: "Status",
       field: "status",
-      width: 140,
+      width: 160,
       cellRenderer: (params) => {
         const exam = params.data;
-        const expired = isExamExpired(exam);
-        
-        // If expired, it's always shown as Inactive
-        const currentStatus = expired ? "Inactive" : (exam.status || "Active");
+        const currentStatus = exam.status || "Scheduled";
 
-        const handleChangeStatus = async (newStatus) => {
+        const handleStart = async () => {
+          const { value: password } = await Swal.fire({
+            title: "Set Exam Password",
+            input: "password",
+            inputLabel: "Please set a password for this exam. Students must enter this password to start.",
+            inputPlaceholder: "Enter password",
+            inputAttributes: {
+              autocapitalize: "off",
+              autocorrect: "off"
+            },
+            showCancelButton: true,
+            confirmButtonColor: "#4f46e5",
+            inputValidator: (value) => {
+              if (!value) {
+                return "You must enter a password!";
+              }
+            }
+          });
+
+          if (!password) return;
+
           try {
             const targetId = exam._id || exam.id;
-            await updateExamStatus(targetId, newStatus);
+            await startExam(targetId, password);
             refreshData();
           } catch (error) {
             console.error(error);
-            alert("Failed to update status: " + error.message);
+            alert("Failed to start exam: " + error.message);
           }
         };
 
+        const handleClose = async () => {
+          try {
+            const targetId = exam._id || exam.id;
+            await closeExam(targetId);
+            refreshData();
+          } catch (error) {
+            console.error(error);
+            alert("Failed to close exam: " + error.message);
+          }
+        };
+
+        const formatDateTime = (dateVal) => {
+          if (!dateVal) return "";
+          const d = new Date(dateVal);
+          return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        };
+
         return (
-          <div className="flex items-center justify-center h-full w-full">
-            {expired ? (
-              <span className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-black bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
-                Expired (Inactive)
-              </span>
+          <div className="flex flex-col items-center justify-center h-full w-full py-1">
+            {currentStatus === "Started" ? (
+              <div className="flex flex-col items-center gap-1 justify-center h-full">
+                <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-black bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                  Started {formatDateTime(exam.startTime)}
+                </span>
+                <button
+                  onClick={handleClose}
+                  className="px-2 py-0.5 text-[10px] font-bold text-white bg-rose-600 hover:bg-rose-700 active:scale-95 rounded transition-all cursor-pointer"
+                >
+                  Close Exam
+                </button>
+              </div>
+            ) : currentStatus === "Closed" || currentStatus === "Inactive" ? (
+              <div className="flex flex-col items-center gap-1 justify-center h-full">
+                <span className="inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-black bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                  Closed {formatDateTime(exam.closeTime)}
+                </span>
+                <button
+                  onClick={handleStart}
+                  className="px-2 py-0.5 text-[10px] font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded transition-all cursor-pointer"
+                >
+                  Restart Exam
+                </button>
+              </div>
             ) : (
               <button
-                onClick={() => handleChangeStatus(currentStatus === "Active" ? "Inactive" : "Active")}
-                className={`px-3 py-1 text-xs font-bold rounded-full border cursor-pointer transition-all duration-200 active:scale-95 ${
-                  currentStatus === "Active"
-                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800/40 dark:hover:bg-emerald-500/20"
-                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750"
-                }`}
+                onClick={handleStart}
+                className="px-3 py-1 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 rounded-full transition-all cursor-pointer"
               >
-                {currentStatus}
+                Start Exam
               </button>
             )}
           </div>

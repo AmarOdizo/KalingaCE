@@ -20,8 +20,8 @@ export default function ExamInfoClient() {
       setLoading(true);
 
       const data = await getExamInformation();
-
-      setExams(data || []);
+      const activeExams = (data || []).filter((ex) => ex.status !== "Inactive");
+      setExams(activeExams);
     } catch (error) {
       console.log(error);
     } finally {

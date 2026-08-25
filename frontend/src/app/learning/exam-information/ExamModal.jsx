@@ -67,6 +67,10 @@ export default function ExamModal({ exam, onClose }) {
     if (!exam) return;
 
     const calculateTimeStatus = () => {
+      if (exam.status === "Inactive") {
+        setTimeStatus("INACTIVE");
+        return;
+      }
       if (exam.mode !== "Online") {
         setTimeStatus("OFFLINE");
         return;
@@ -220,6 +224,15 @@ export default function ExamModal({ exam, onClose }) {
                 <div className="w-full text-center text-sm font-semibold text-slate-500 py-3 border border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-950/20 px-4">
                   Offline Exam: Online testing is not available. Only institute students can take this exam at the institute.
                 </div>
+              )}
+
+              {timeStatus === "INACTIVE" && (
+                <button
+                  disabled
+                  className="w-full rounded-xl bg-slate-50 dark:bg-slate-950/10 border border-slate-205 dark:border-slate-800/30 py-3.5 px-4 font-bold text-slate-500 cursor-not-allowed text-center text-sm"
+                >
+                  Exam Inactive
+                </button>
               )}
 
               {timeStatus === "NOT_STARTED" && (

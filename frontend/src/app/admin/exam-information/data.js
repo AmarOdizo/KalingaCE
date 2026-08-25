@@ -119,6 +119,27 @@ export const togglePublishResults = async (id) => {
 };
 
 // ==============================
+// Update Status (Active/Inactive)
+// ==============================
+export const updateExamStatus = async (id, status) => {
+  const response = await customFetch(`/${id}/status`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status }),
+  });
+
+  const result = await response.json();
+
+  if (!result.success) {
+    throw new Error(result.message || "Failed to update exam status");
+  }
+
+  return result.data;
+};
+
+// ==============================
 // MCQ API INTEGRATION
 // ==============================
 const MCQ_LOCAL_URL = "http://localhost:5000/api/MCQ";

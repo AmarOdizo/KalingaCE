@@ -57,6 +57,11 @@ const ExamInformationSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    status: {
+      type: String,
+      enum: ["Active", "Inactive"],
+      default: "Active",
+    },
   },
   {
     collection: "ExamInformation",

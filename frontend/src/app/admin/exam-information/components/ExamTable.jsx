@@ -4,10 +4,65 @@ import Link from "next/link";
 import { useState } from "react";
 import DeleteModal from "./DeleteModal";
 import { Eye, Pencil, Trash2, BookOpenCheck, Award, Send } from "lucide-react";
-import { deleteExamInformation, togglePublishResults } from "../data";
+import { deleteExamInformation, togglePublishResults, updateExamStatus } from "../data";
 import { formatBatch, formatDate } from "../utils";
 import EmptyState from "./EmptyState";
 import AdminAgGrid from "@/components/AdminAgGrid";
+
+const parseExamStart = (examDate, examTime) => {
+  try {
+    const d = new Date(examDate);
+    const timeStr = examTime || "00:00";
+    let hours = 0;
+    let minutes = 0;
+    
+    if (timeStr.toLowerCase().includes("am") || timeStr.toLowerCase().includes("pm")) {
+      const match = timeStr.match(/(\d+):(\d+)\s*(am|pm)/i);
+      if (match) {
+        hours = Number(match[1]);
+        minutes = Number(match[2]);
+        const ampm = match[3].toLowerCase();
+        if (ampm === "pm" && hours < 12) hours += 12;
+        if (ampm === "am" && hours === 12) hours = 0;
+      }
+    } else {
+      const parts = timeStr.split(":");
+      hours = Number(parts[0]) || 0;
+      minutes = Number(parts[1]) || 0;
+    }
+    
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), hours, minutes, 0);
+  } catch (err) {
+    return new Date();
+  }
+};
+
+const parseDurationMinutes = (durationStr) => {
+  try {
+    const str = (durationStr || "").toLowerCase();
+    const num = parseFloat(str) || 0;
+    if (str.includes("minute")) {
+      return num;
+    }
+    if (str.includes("hour")) {
+      return num * 60;
+    }
+    return 60;
+  } catch (err) {
+    return 60;
+  }
+};
+
+const isExamExpired = (exam) => {
+  try {
+    const startDateTime = parseExamStart(exam.examDate, exam.examTime);
+    const durationMinutes = parseDurationMinutes(exam.duration);
+    const endDateTime = new Date(startDateTime.getTime() + durationMinutes * 60 * 1000);
+    return new Date() > endDateTime;
+  } catch (e) {
+    return false;
+  }
+};
 
 export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
@@ -194,6 +249,50 @@ export default function ExamTable({ exams, mcqs = [], sqas = [], refreshData }) 
           </div>
         );
       },
+    },
+    {
+      headerName: "Status",
+      field: "status",
+      width: 140,
+      cellRenderer: (params) => {
+        const exam = params.data;
+        const expired = isExamExpired(exam);
+        
+        // If expired, it's always shown as Inactive
+        const currentStatus = expired ? "Inactive" : (exam.status || "Active");
+
+        const handleChangeStatus = async (newStatus) => {
+          try {
+            const targetId = exam._id || exam.id;
+            await updateExamStatus(targetId, newStatus);
+            refreshData();
+          } catch (error) {
+            console.error(error);
+            alert("Failed to update status: " + error.message);
+          }
+        };
+
+        return (
+          <div className="flex items-center justify-center h-full w-full">
+            {expired ? (
+              <span className="inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-black bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
+                Expired (Inactive)
+              </span>
+            ) : (
+              <button
+                onClick={() => handleChangeStatus(currentStatus === "Active" ? "Inactive" : "Active")}
+                className={`px-3 py-1 text-xs font-bold rounded-full border cursor-pointer transition-all duration-200 active:scale-95 ${
+                  currentStatus === "Active"
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800/40 dark:hover:bg-emerald-500/20"
+                    : "bg-slate-100 text-slate-500 border-slate-200 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700 dark:hover:bg-slate-750"
+                }`}
+              >
+                {currentStatus}
+              </button>
+            )}
+          </div>
+        );
+      }
     },
     {
       headerName: "Actions",

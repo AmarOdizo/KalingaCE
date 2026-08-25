@@ -65,6 +65,15 @@ const parseDurationMinutes = (durationStr) => {
   }
 };
 
+const shuffleArray = (array) => {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+};
+
 export default function MCQClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -177,6 +186,14 @@ export default function MCQClient() {
             }
           }));
         }
+
+        // Clear exam storage upon auto-submit
+        localStorage.removeItem(`exam_questions_${mobileNumber.trim()}_${examId}`);
+        localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
+        localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
+        localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+        localStorage.removeItem(`exam_student_name_${examId}`);
+        localStorage.removeItem(`exam_student_mobile_${examId}`);
       } catch (err) {
         console.error("Failed to save auto-submitted attempt:", err);
       }
@@ -257,6 +274,19 @@ export default function MCQClient() {
         // 1. Fetch exam info
         const exam = await getExamById(examId);
         setExamDetails(exam);
+
+        const savedName = localStorage.getItem(`exam_student_name_${examId}`);
+        const savedMobile = localStorage.getItem(`exam_student_mobile_${examId}`);
+        if (savedName && savedMobile) {
+          setStudentName(savedName);
+          setMobileNumber(savedMobile);
+        }
+
+        if (exam.status === "Inactive") {
+          setError("This exam is currently inactive.");
+          setLoading(false);
+          return;
+        }
 
         // 2. Validate date and time
         const startDateTime = parseExamStart(exam.examDate, exam.examTime);
@@ -399,6 +429,66 @@ export default function MCQClient() {
           });
         }
       } else {
+        // Save registration details
+        localStorage.setItem(`exam_student_name_${examId}`, studentName);
+        localStorage.setItem(`exam_student_mobile_${examId}`, mobileNumber.trim());
+
+        const storageKey = `exam_questions_${mobileNumber.trim()}_${examId}`;
+        const cachedQuestions = localStorage.getItem(storageKey);
+        
+        let randomized;
+        if (cachedQuestions) {
+          try {
+            randomized = JSON.parse(cachedQuestions);
+          } catch (e) {
+            console.error("Failed to parse cached questions", e);
+          }
+        }
+
+        if (!randomized || !Array.isArray(randomized) || randomized.length === 0) {
+          // Shuffle question order
+          const shuffledQuestions = shuffleArray(allQuestions);
+          // Shuffle options for each question
+          randomized = shuffledQuestions.map(q => {
+            if ((q.type === "mcq" || !q.type) && q.options && q.options.length > 0) {
+              return {
+                ...q,
+                options: shuffleArray(q.options)
+              };
+            }
+            return q;
+          });
+          localStorage.setItem(storageKey, JSON.stringify(randomized));
+        }
+
+        // Restore progress if any exists
+        const progressAnswers = localStorage.getItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
+        const progressIndex = localStorage.getItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
+        const progressScore = localStorage.getItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+        
+        if (progressAnswers) {
+          try {
+            setUserAnswers(JSON.parse(progressAnswers));
+          } catch(e) {}
+        } else {
+          setUserAnswers([]);
+        }
+        
+        if (progressIndex) {
+          setCurrentIndex(Number(progressIndex) || 0);
+        } else {
+          setCurrentIndex(0);
+        }
+
+        if (progressScore) {
+          setScore(Number(progressScore) || 0);
+        } else {
+          setScore(0);
+        }
+
+        setQuizQuestions(randomized);
+        setSelectedAnswer("");
+        setIsAnswered(false);
         setShowRegistration(false);
         setView("quiz");
       }
@@ -449,7 +539,16 @@ export default function MCQClient() {
     const shuffled = [...questions].sort(() => Math.random() - 0.5);
     // Take minimum to maximum 10 questions
     const selected = shuffled.slice(0, 10);
-    setQuizQuestions(selected);
+    const selectedWithShuffledOptions = selected.map(q => {
+      if ((q.type === "mcq" || !q.type) && q.options && q.options.length > 0) {
+        return {
+          ...q,
+          options: shuffleArray(q.options)
+        };
+      }
+      return q;
+    });
+    setQuizQuestions(selectedWithShuffledOptions);
     setCurrentIndex(0);
     setScore(0);
     setUserAnswers([]);
@@ -517,6 +616,13 @@ export default function MCQClient() {
     }
   };
 
+  const saveProgress = (index, answers, currentScore) => {
+    if (!isScheduledExam || !mobileNumber) return;
+    localStorage.setItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`, index.toString());
+    localStorage.setItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`, JSON.stringify(answers));
+    localStorage.setItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`, currentScore.toString());
+  };
+
   // Go to next question or show results
   const handleNext = async () => {
     let updatedAnswers = [...userAnswers];
@@ -542,19 +648,25 @@ export default function MCQClient() {
     }
 
     if (currentIndex < quizQuestions.length - 1) {
+      let finalScore = score;
       if (isScheduledExam) {
         const currentQuestion = quizQuestions[currentIndex];
         const isMcq = currentQuestion.type === "mcq" || !currentQuestion.type;
         if (isMcq) {
           const isCorrect = selectedAnswer.trim() === currentQuestion.correctAnswer.trim();
           if (isCorrect) {
-            setScore((prev) => prev + (currentQuestion.marks || 1));
+            finalScore = score + (currentQuestion.marks || 1);
+            setScore(finalScore);
           }
         }
       }
-      setCurrentIndex((prev) => prev + 1);
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
       setSelectedAnswer("");
       setIsAnswered(false);
+      
+      // Save progress to local storage
+      saveProgress(nextIndex, updatedAnswers, finalScore);
     } else {
       if (isScheduledExam) {
         try {
@@ -596,6 +708,14 @@ export default function MCQClient() {
               }
             }));
           }
+
+          // Clear exam storage upon successful submission
+          localStorage.removeItem(`exam_questions_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_answers_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_index_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_progress_score_${mobileNumber.trim()}_${examId}`);
+          localStorage.removeItem(`exam_student_name_${examId}`);
+          localStorage.removeItem(`exam_student_mobile_${examId}`);
         } catch (err) {
           console.error("Failed to save attempt:", err);
         } finally {

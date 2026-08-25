@@ -286,6 +286,51 @@ router.patch("/:id/publish", async (req, res) => {
   }
 });
 
+// ==============================
+// UPDATE Exam Status (Active/Inactive)
+// ==============================
+router.patch("/:id/status", async (req, res) => {
+  try {
+    const idParam = req.params.id;
+    const { status } = req.body;
+
+    if (!status || !["Active", "Inactive"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Status must be Active or Inactive",
+      });
+    }
+
+    let exam;
+    if (/^[0-9a-fA-F]{24}$/.test(idParam)) {
+      exam = await ExamInformation.findById(idParam);
+    } else {
+      exam = await ExamInformation.findOne({ id: Number(idParam) });
+    }
+
+    if (!exam) {
+      return res.status(404).json({
+        success: false,
+        message: "Exam Information not found",
+      });
+    }
+
+    exam.status = status;
+    await exam.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Exam status updated to ${status} successfully`,
+      data: exam,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+});
+
 router.post("/upload", upload.single("image"), uploadExamInfoImage);
 
 module.exports = router;

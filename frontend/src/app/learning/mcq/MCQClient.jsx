@@ -191,6 +191,42 @@ export default function MCQClient() {
     });
   };
 
+  // Copy prevention & assessment page lock effect
+  useEffect(() => {
+    if (view !== "quiz") return;
+
+    const preventDefault = (e) => e.preventDefault();
+
+    const handleKeyDown = (e) => {
+      // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, Ctrl+U, Ctrl+C, Ctrl+V
+      if (
+        e.keyCode === 123 ||
+        (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) ||
+        (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 67 || e.keyCode === 86)) ||
+        (e.metaKey && (e.keyCode === 85 || e.keyCode === 67 || e.keyCode === 86))
+      ) {
+        e.preventDefault();
+        return false;
+      }
+    };
+
+    document.addEventListener("copy", preventDefault);
+    document.addEventListener("cut", preventDefault);
+    document.addEventListener("contextmenu", preventDefault);
+    document.addEventListener("keydown", handleKeyDown);
+
+    // Apply select-none to body during exam
+    document.body.classList.add("select-none");
+
+    return () => {
+      document.removeEventListener("copy", preventDefault);
+      document.removeEventListener("cut", preventDefault);
+      document.removeEventListener("contextmenu", preventDefault);
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.classList.remove("select-none");
+    };
+  }, [view]);
+
   // Countdown Timer Effect
   useEffect(() => {
     if (!isScheduledExam || timeRemaining <= 0 || view !== "quiz") return;
@@ -735,7 +771,7 @@ export default function MCQClient() {
 
             {/* 2. ACTIVE QUIZ PLAYBACK */}
             {view === "quiz" && quizQuestions.length > 0 && (
-              <div className="animate-in fade-in zoom-in-95 duration-200">
+              <div className="animate-in fade-in zoom-in-95 duration-200 select-none">
                 {/* Quiz Navigation Header */}
                 <div className="mb-8 flex items-center justify-between gap-4">
                   <button

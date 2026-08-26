@@ -28,7 +28,6 @@ export default function Footer() {
         const json = await res.json();
         const campuses = json.data || [];
 
-        // Find primary head office campus or first active
         let primary = campuses.find((c) =>
           c?.campusName?.toLowerCase()?.includes("head office"),
         );
@@ -82,7 +81,7 @@ export default function Footer() {
       default:
         return {
           icon: Globe,
-          hoverBg: "hover:bg-primary-600",
+          hoverBg: "hover:bg-indigo-600",
         };
     }
   };
@@ -91,31 +90,31 @@ export default function Footer() {
     <footer className="bg-slate-900 text-slate-400 dark:bg-slate-950 dark:text-slate-400 border-t border-slate-800">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-4">
-          {/* Company */}
-          <div>
+          
+          {/* Brand/Company */}
+          <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="p-1 bg-white rounded-xl shadow-md">
+              <div className="p-1 bg-white rounded-xl shadow-md shrink-0">
                 <Image
                   src="/klogo.png"
                   alt="Logo"
-                  width={48}
-                  height={48}
+                  width={44}
+                  height={44}
                   className="rounded-lg object-contain"
                 />
               </div>
 
               <div>
-                <h2 className="text-lg font-extrabold text-white tracking-tight">
+                <h2 className="text-base font-extrabold text-white tracking-tight leading-tight">
                   Kalinga Computer Education
                 </h2>
-
-                <p className="text-[10px] font-bold uppercase tracking-wider text-primary-400">
+                <p className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 mt-1">
                   Learn • Build • Grow
                 </p>
               </div>
             </div>
 
-            <p className="mt-5 text-sm leading-6 text-slate-400 font-medium">
+            <p className="text-xs leading-relaxed text-slate-400 font-medium">
               We provide professional computer education with practical training
               in Web Development, Python, Java, AI, Tally, Graphic Design, DCA,
               PGDCA and many more.
@@ -124,15 +123,15 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
+            <h3 className="mb-5 text-xs font-bold text-white uppercase tracking-wider">
               Quick Links
             </h3>
 
-            <div className="space-y-3 font-semibold">
+            <div className="space-y-3 font-semibold text-xs flex flex-col items-start">
               <Link
                 id="footer-nav-courses"
                 href="/courses"
-                className="block hover:text-primary-400 transition-colors"
+                className="hover:text-indigo-455 hover:translate-x-1 transition-all duration-200"
               >
                 Courses
               </Link>
@@ -140,7 +139,7 @@ export default function Footer() {
               <Link
                 id="footer-nav-contact"
                 href="/contact"
-                className="block hover:text-primary-400 transition-colors"
+                className="hover:text-indigo-455 hover:translate-x-1 transition-all duration-200"
               >
                 Contact-Us
               </Link>
@@ -148,7 +147,7 @@ export default function Footer() {
               <Link
                 id="footer-nav-login"
                 href="/login"
-                className="block hover:text-primary-400 transition-colors"
+                className="hover:text-indigo-455 hover:translate-x-1 transition-all duration-200"
               >
                 Login
               </Link>
@@ -157,46 +156,46 @@ export default function Footer() {
 
           {/* Courses */}
           <div>
-            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
+            <h3 className="mb-5 text-xs font-bold text-white uppercase tracking-wider">
               Popular Courses
             </h3>
 
-            <div className="space-y-3 font-semibold text-slate-400">
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+            <div className="space-y-3 font-semibold text-slate-400 text-xs flex flex-col items-start">
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 Full Stack Development
-              </p>
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+              </span>
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 React.js & Next.js
-              </p>
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+              </span>
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 Python Programming
-              </p>
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+              </span>
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 Java Programming
-              </p>
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+              </span>
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 Artificial Intelligence
-              </p>
-              <p className="hover:text-primary-400 cursor-default transition-colors">
+              </span>
+              <span className="hover:text-indigo-455 cursor-default hover:translate-x-1 transition-all duration-200">
                 Tally Prime
-              </p>
+              </span>
             </div>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="mb-5 text-md font-bold text-white uppercase tracking-wider">
+            <h3 className="mb-5 text-xs font-bold text-white uppercase tracking-wider">
               Contact Us
             </h3>
 
-            <div className="space-y-4 font-semibold text-slate-400 text-sm">
+            <div className="space-y-4 font-semibold text-slate-400 text-xs">
               <div className="flex items-start gap-3">
-                <MapPin className="mt-0.5 text-primary-500" size={18} />
-                <p className="whitespace-pre-line">{contactInfo.address}</p>
+                <MapPin className="mt-0.5 text-indigo-500 shrink-0" size={16} />
+                <p className="whitespace-pre-line leading-relaxed">{contactInfo.address}</p>
               </div>
 
               <div className="flex items-center gap-3">
-                <Phone className="text-emerald-500" size={18} />
+                <Phone className="text-emerald-500 shrink-0" size={16} />
                 <p>
                   <a
                     href={`tel:${contactInfo.phone}`}
@@ -208,7 +207,7 @@ export default function Footer() {
               </div>
 
               <div className="flex items-center gap-3">
-                <Mail className="text-rose-500" size={18} />
+                <Mail className="text-rose-500 shrink-0" size={16} />
                 <p>
                   <a
                     href={`mailto:${contactInfo.email}`}
@@ -221,7 +220,7 @@ export default function Footer() {
             </div>
 
             {/* Social Icons */}
-            <div className="mt-6 flex flex-wrap gap-3.5">
+            <div className="mt-6 flex flex-wrap gap-2.5">
               {contactInfo.socialLinks.length > 0 ? (
                 contactInfo.socialLinks.map((item, idx) => {
                   const helper = getSocialHelper(item?.type);
@@ -242,7 +241,7 @@ export default function Footer() {
                       className={`rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all ${helper.hoverBg} hover:text-white active:scale-95 cursor-pointer`}
                       title={item?.type}
                     >
-                      <Icon size={16} />
+                      <Icon size={14} />
                     </a>
                   );
                 })
@@ -253,9 +252,9 @@ export default function Footer() {
                     href="https://facebook.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-primary-600 hover:text-white active:scale-95 cursor-pointer"
+                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-indigo-600 hover:text-white active:scale-95 cursor-pointer"
                   >
-                    <FaFacebookF size={16} />
+                    <FaFacebookF size={14} />
                   </a>
 
                   <a
@@ -265,7 +264,7 @@ export default function Footer() {
                     rel="noopener noreferrer"
                     className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-pink-600 hover:text-white active:scale-95 cursor-pointer"
                   >
-                    <FaInstagram size={16} />
+                    <FaInstagram size={14} />
                   </a>
 
                   <a
@@ -273,9 +272,9 @@ export default function Footer() {
                     href="https://youtube.com"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-red-600 hover:text-white active:scale-95 cursor-pointer"
+                    className="rounded-xl bg-slate-800 p-2.5 text-slate-300 transition-all hover:bg-rose-600 hover:text-white active:scale-95 cursor-pointer"
                   >
-                    <FaYoutube size={16} />
+                    <FaYoutube size={14} />
                   </a>
                 </>
               )}
@@ -283,15 +282,15 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom */}
-        <div className="mt-12 border-t border-slate-800 pt-6 text-center text-xs font-semibold text-slate-500">
+        {/* Bottom copyright row */}
+        <div className="mt-12 border-t border-slate-800 pt-6 text-center text-[11px] font-semibold text-slate-500">
           <p>
             © {new Date().getFullYear()}{" "}
             <span className="text-slate-400">Kalinga Computer Education</span>.
             All Rights Reserved.
           </p>
 
-          <p className="mt-2 text-[10px] text-slate-600">
+          <p className="mt-1.5 text-[9px] text-slate-600">
             Designed & Developed with ❤️ using Next.js & Tailwind CSS
           </p>
         </div>

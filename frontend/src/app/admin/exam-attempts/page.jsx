@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useMemo, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { Search, Eye, X, BookOpen, AlertCircle, Phone, Award, CheckCircle2, XCircle, Check, Trophy } from "lucide-react";
+import { Search, Eye, X, BookOpen, AlertCircle, Phone, Award, CheckCircle2, XCircle, Check, Trophy, Send } from "lucide-react";
 import { getAllExamAttempts, updateExamAttemptScore } from "../../learning/mcq/data";
 import { getSQAByExamId, checkAnswer } from "../sqa/data";
 import Loading from "../exam-information/components/Loading";
 import AdminAgGrid from "@/components/AdminAgGrid";
+import { togglePublishResults } from "../exam-information/data";
 
 export default function ExamAttemptsPage() {
   return (
@@ -46,8 +47,24 @@ function ExamAttemptsContent() {
       field: "examId.examName",
       flex: 1.5,
       minWidth: 180,
-      valueGetter: (params) => params.data.examId?.examName || "Unknown Exam",
-      cellClass: "text-sm font-medium text-slate-700 dark:text-slate-300 flex items-center",
+      cellRenderer: (params) => {
+        const att = params.data;
+        const examName = att.examId?.examName || "Unknown Exam";
+        const isPublished = att.examId?.resultsPublished || false;
+        return (
+          <div className="flex flex-col justify-center h-full">
+            <span className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">{examName}</span>
+            {att.examId && (
+              <span className={`inline-flex items-center gap-1 text-[10px] font-bold mt-0.5 ${
+                isPublished ? "text-emerald-650 dark:text-emerald-400" : "text-slate-400 dark:text-slate-500"
+              }`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${isPublished ? "bg-emerald-500" : "bg-slate-350 dark:bg-slate-600"}`}></span>
+                {isPublished ? "Published" : "Draft / Unreleased"}
+              </span>
+            )}
+          </div>
+        );
+      },
     },
     {
       headerName: "Score",
@@ -170,6 +187,41 @@ function ExamAttemptsContent() {
       alert("Failed to grade SQA response: " + err.message);
     } finally {
       setLoadingSqa(false);
+    }
+  };
+
+  const handlePublishToggle = async (examId) => {
+    try {
+      await togglePublishResults(examId);
+      setAttempts(prevAttempts => 
+        prevAttempts.map(att => {
+          if (att.examId && (att.examId._id === examId || att.examId === examId)) {
+            return {
+              ...att,
+              examId: {
+                ...att.examId,
+                resultsPublished: !att.examId.resultsPublished
+              }
+            };
+          }
+          return att;
+        })
+      );
+      setSelectedAttempt(prev => {
+        if (prev && prev.examId && (prev.examId._id === examId || prev.examId === examId)) {
+          return {
+            ...prev,
+            examId: {
+              ...prev.examId,
+              resultsPublished: !prev.examId.resultsPublished
+            }
+          };
+        }
+        return prev;
+      });
+    } catch (error) {
+      console.error("Failed to toggle publish status:", error);
+      alert("Failed to toggle publish status: " + error.message);
     }
   };
 
@@ -311,7 +363,7 @@ function ExamAttemptsContent() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-xs p-4 overflow-y-auto animate-in fade-in duration-200">
           <div className="relative w-full max-w-4xl rounded-3xl border border-slate-200/80 bg-white shadow-premium dark:border-slate-800 dark:bg-slate-900 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95 duration-350 ease-out">
             {/* Modal Header */}
-            <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800 shrink-0">
+            <div className="flex items-center justify-between border-b border-slate-100 p-6 dark:border-slate-800 shrink-0 flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <div className="rounded-2xl bg-indigo-50 p-2.5 text-indigo-650 dark:bg-indigo-950/50 dark:text-indigo-400">
                   <Award size={24} />
@@ -325,12 +377,28 @@ function ExamAttemptsContent() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setSelectedAttempt(null)}
-                className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-50 cursor-pointer dark:border-slate-800 dark:hover:bg-slate-850 transition-colors"
-              >
-                <X size={16} />
-              </button>
+              <div className="flex items-center gap-2">
+                {selectedAttempt.examId && (
+                  <button
+                    type="button"
+                    onClick={() => handlePublishToggle(selectedAttempt.examId._id || selectedAttempt.examId)}
+                    className={`inline-flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-bold transition shadow-sm cursor-pointer border ${
+                      selectedAttempt.examId.resultsPublished
+                        ? "bg-emerald-50 border-emerald-250 text-emerald-700 dark:bg-emerald-950/40 dark:border-emerald-900/30 dark:text-emerald-400 hover:bg-emerald-100/50"
+                        : "bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700"
+                    }`}
+                  >
+                    <Send size={12} />
+                    {selectedAttempt.examId.resultsPublished ? "Unpublish Results" : "Publish Results"}
+                  </button>
+                )}
+                <button
+                  onClick={() => setSelectedAttempt(null)}
+                  className="rounded-xl border border-slate-200 p-2 text-slate-400 hover:bg-slate-50 cursor-pointer dark:border-slate-800 dark:hover:bg-slate-850 transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
             </div>
 
             {/* Modal Content Scrollable Area */}

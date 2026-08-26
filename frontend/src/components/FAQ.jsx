@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, HelpCircle } from "lucide-react";
 
 const faqs = [
   {
@@ -44,55 +44,67 @@ export default function FAQ() {
   };
 
   return (
-    <section className="bg-gradient-to-b from-white to-slate-100 py-20 dark:from-slate-900 dark:to-slate-950">
+    <section className="bg-gradient-to-b from-white to-slate-50 py-24 dark:from-slate-900 dark:to-slate-950 border-t border-slate-100 dark:border-slate-800/40">
       <div className="mx-auto max-w-4xl px-6">
-        <div className="mb-14 text-center">
+        
+        {/* Header Section */}
+        <div className="mb-16 text-center space-y-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/20 uppercase tracking-widest">
+            FAQ Helpdesk
+          </span>
           <h2 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-            <span className="gradient-text">Frequently Asked Questions</span>
+            Frequently Asked <span className="gradient-text">Questions</span>
           </h2>
-
-          <p className="mt-3 text-slate-500 dark:text-slate-400">
-            Find answers to the most common questions about our computer education courses.
+          <p className="mt-3 text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+            Find answers to the most common questions about our computer education courses and certifications.
           </p>
         </div>
 
-        <div className="space-y-4">
+        {/* FAQs List */}
+        <div className="space-y-4 max-w-3xl mx-auto">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index;
             return (
               <div
                 key={index}
-                className={`overflow-hidden rounded-2xl border transition-all duration-300 bg-white dark:bg-slate-900/60
+                className={`overflow-hidden rounded-2xl border transition-all duration-350 bg-white/80 dark:bg-slate-900/40 backdrop-blur-md
                   ${
                     isOpen
-                      ? "border-primary-500/80 shadow-md ring-4 ring-primary-500/5 dark:border-primary-500/50"
-                      : "border-slate-200/80 shadow-premium dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700"
+                      ? "border-indigo-200 shadow-md dark:border-indigo-950/60 ring-2 ring-indigo-500/5"
+                      : "border-slate-200/60 shadow-premium dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 hover:scale-[1.005] duration-200"
                   }`}
               >
                 <button
                   onClick={() => toggleFAQ(index)}
-                  className="flex w-full items-center justify-between px-6 py-5 text-left cursor-pointer"
+                  className="flex w-full items-center justify-between px-6 py-5 text-left cursor-pointer group"
                 >
-                  <h3 className="text-md font-extrabold text-slate-800 dark:text-white md:text-lg">
-                    {faq.question}
-                  </h3>
+                  <div className="flex items-center gap-3.5 pr-4">
+                    <HelpCircle size={18} className={`shrink-0 transition-colors duration-250 ${
+                      isOpen ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 group-hover:text-indigo-500"
+                    }`} />
+                    <h3 className={`text-sm font-extrabold leading-tight transition-colors duration-250 ${
+                      isOpen ? "text-indigo-600 dark:text-indigo-400" : "text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white"
+                    }`}>
+                      {faq.question}
+                    </h3>
+                  </div>
 
-                  <div className={`rounded-xl p-1.5 transition-colors ${isOpen ? "bg-primary-50 dark:bg-primary-500/10 text-primary-600 dark:text-primary-400" : "text-slate-400"}`}>
-                    {isOpen ? (
-                      <ChevronUp size={18} />
-                    ) : (
-                      <ChevronDown size={18} />
-                    )}
+                  <div className={`rounded-xl p-1.5 transition-all duration-300 shrink-0 ${
+                    isOpen 
+                      ? "bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 rotate-180" 
+                      : "text-slate-400 bg-slate-50 dark:bg-slate-800 group-hover:text-slate-600 dark:group-hover:text-slate-300"
+                  }`}>
+                    <ChevronDown size={15} />
                   </div>
                 </button>
 
                 <div
-                  className={`grid transition-all duration-300 ease-in-out ${
+                  className={`grid transition-all duration-350 ease-in-out ${
                     isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
                   }`}
                 >
                   <div className="overflow-hidden">
-                    <p className="px-6 pb-5 text-slate-600 dark:text-slate-300 leading-relaxed text-sm md:text-base border-t border-slate-50/50 pt-2.5 dark:border-slate-800/30">
+                    <p className="px-6 pb-6 text-xs text-slate-500 dark:text-slate-300 leading-relaxed pl-12 border-t border-slate-100/50 dark:border-slate-800/40 pt-3">
                       {faq.answer}
                     </p>
                   </div>

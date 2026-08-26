@@ -12,7 +12,7 @@ import {
   ChevronRight,
   Star,
 } from "lucide-react";
-import { getCourses } from "@/components/courseData";
+import { getCourses, getCourseById } from "@/components/courseData";
 import Image from "next/image";
 import Link from "next/link";
 import Swal from "sweetalert2";
@@ -25,6 +25,7 @@ export default function CoursesClient() {
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [modalOpen, setOpenModal] = useState(false);
+  const [detailsModalOpen, setDetailsModalOpen] = useState(false);
   const [enrollLoading, setEnrollLoading] = useState(false);
   const [enrollData, setEnrollData] = useState({
     name: "",
@@ -111,6 +112,30 @@ export default function CoursesClient() {
     } finally {
       setEnrollLoading(false);
     }
+  };
+
+  const openCourseDetails = async (course) => {
+    if (!course) return;
+
+    try {
+      const id = course.id || course._id;
+      const courseData = await getCourseById(id);
+      if (courseData) {
+        setSelectedCourse(courseData);
+      } else {
+        setSelectedCourse(course);
+      }
+    } catch (error) {
+      console.log("Failed to fetch course details, using client state:", error);
+      setSelectedCourse(course);
+    } finally {
+      setDetailsModalOpen(true);
+    }
+  };
+
+  const closeCourseDetails = () => {
+    setSelectedCourse(null);
+    setDetailsModalOpen(false);
   };
 
   useEffect(() => {
@@ -324,18 +349,25 @@ export default function CoursesClient() {
             {[1, 2, 3].map((item) => (
               <div
                 key={item}
-                className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-900 animate-pulse"
+                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 animate-pulse h-[425px] flex flex-col justify-between"
               >
-                <div className="relative h-52 w-full rounded-2xl bg-slate-200 dark:bg-slate-800 mb-6"></div>
-                <div className="h-4 w-1/4 bg-slate-200 dark:bg-slate-800 rounded mb-3"></div>
-                <div className="h-7 w-3/4 bg-slate-300 dark:bg-slate-700 rounded mb-4"></div>
-                <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
-                <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-800 rounded mb-6"></div>
-                <div className="flex justify-between items-center mb-6">
-                  <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                  <div className="h-5 w-20 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                <div>
+                  <div className="relative h-40 w-full rounded-xl bg-slate-200 dark:bg-slate-800 mb-4"></div>
+                  <div className="h-4 w-1/4 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
+                  <div className="h-6 w-3/4 bg-slate-300 dark:bg-slate-700 rounded mb-3"></div>
+                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded mb-1.5"></div>
+                  <div className="h-3 w-5/6 bg-slate-200 dark:bg-slate-800 rounded mb-4"></div>
                 </div>
-                <div className="h-12 w-full bg-slate-300 dark:bg-slate-700 rounded-xl"></div>
+                <div>
+                  <div className="flex justify-between items-center mb-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                  </div>
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    <div className="h-9 flex-1 bg-slate-300 dark:bg-slate-700 rounded-lg"></div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -347,123 +379,115 @@ export default function CoursesClient() {
           /* Grid list of Courses */
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {filteredCourses.map((course, index) => (
-              <div
-                key={course.id || course._id || index}
-                className="premium-card group flex flex-col justify-between h-[520px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-xl dark:border-slate-800 dark:bg-slate-900/60"
-              >
-                {/* Cover Image & badges */}
-                <div className="relative h-48 w-full overflow-hidden bg-slate-100 dark:bg-slate-950">
-                  <Image
-                    src={getCourseImage(course.image)}
-                    alt={course.courseName || "Course Image"}
-                    fill
-                    sizes="(max-w-768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-85" />
+              <div key={course.id || course._id || index} className="h-full">
+                <div className="premium-card group flex flex-col justify-between h-[425px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900/60 rounded-2xl">
+                  {/* Cover Image & badges */}
+                  <div className="relative h-40 w-full overflow-hidden bg-slate-100 dark:bg-slate-950">
+                    <Image
+                      src={getCourseImage(course.image)}
+                      alt={course.courseName || "Course Image"}
+                      fill
+                      sizes="(max-w-768px) 100vw, 33vw"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
 
-                  {/* Floating badge */}
-                  <span
-                    className={`absolute top-4 right-4 rounded-full px-3 py-1 text-[10px] font-bold shadow-md tracking-wide ${getStatusColor(course.status)}`}
-                  >
-                    {course.status}
-                  </span>
-
-                  {course.courseCode && (
-                    <span className="absolute top-4 left-4 rounded-lg bg-black/60 px-2.5 py-1 text-xs font-mono font-bold text-white shadow-sm backdrop-blur-md">
-                      {course.courseCode}
-                    </span>
-                  )}
-
-                  {course.mode && (
+                    {/* Floating badge */}
                     <span
-                      className={`absolute bottom-3 left-4 rounded-full px-2.5 py-0.5 text-xs font-semibold shadow-sm flex items-center gap-1 backdrop-blur-md ${getModeColor(course.mode)}`}
+                      className={`absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm tracking-wide ${getStatusColor(course.status)}`}
                     >
-                      {getModeIcon(course.mode)}
-                      {course.mode}
+                      {course.status}
                     </span>
-                  )}
-                </div>
 
-                {/* Body Content */}
-                <div className="p-6 flex-1 flex flex-col justify-between">
-                  <div>
-                    <h3 className="text-xl font-extrabold text-slate-800 dark:text-white leading-tight group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300">
-                      {course.courseName || "Untitled Course"}
-                    </h3>
-
-                    {/* Star Rating */}
-                    <div className="flex items-center gap-1 mt-2 text-amber-500">
-                      {[...Array(5)].map((_, i) => {
-                        const rating = course.rating || 4.8;
-                        return (
-                          <Star
-                            key={i}
-                            size={14}
-                            className={
-                              i < Math.floor(rating)
-                                ? "fill-amber-500 text-amber-500"
-                                : "text-slate-300 dark:text-slate-700"
-                            }
-                          />
-                        );
-                      })}
-                      <span className="text-xs font-bold text-slate-500 dark:text-slate-400 ml-1.5">
-                        {course.rating ? Number(course.rating).toFixed(1) : "4.8"} ({course.students ? Math.floor(course.students / 5) : 80}+ reviews)
+                    {course.courseCode && (
+                      <span className="absolute top-3 left-3 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-mono font-bold text-white shadow-sm backdrop-blur-md">
+                        {course.courseCode}
                       </span>
-                    </div>
+                    )}
 
-                    <p className="mt-3.5 text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
-                      {course.shortDescription}
-                    </p>
+                    {course.mode && (
+                      <span
+                        className={`absolute bottom-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm flex items-center gap-1 backdrop-blur-md ${getModeColor(course.mode)}`}
+                      >
+                        {getModeIcon(course.mode)}
+                        {course.mode}
+                      </span>
+                    )}
                   </div>
 
-                  <div>
-                    {/* Specifications */}
-                    <div className="mt-5 border-t border-slate-100 dark:border-slate-800 pt-4 flex items-center justify-between">
-                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        <Clock
-                          size={15}
-                          className="text-primary-500 dark:text-primary-400"
-                        />
-                        {course.duration || "N/A"}
+                  {/* Body Content */}
+                  <div className="p-4 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-base md:text-lg font-extrabold text-slate-800 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 line-clamp-1">
+                        {course.courseName || "Untitled Course"}
+                      </h3>
+
+                      {/* Star Rating */}
+                      <div className="flex items-center gap-1 mt-1 text-amber-500">
+                        {[...Array(5)].map((_, i) => {
+                          const rating = course.rating || 4.8;
+                          return (
+                            <Star
+                              key={i}
+                              size={12}
+                              className={
+                                i < Math.floor(rating)
+                                  ? "fill-amber-500 text-amber-500"
+                                  : "text-slate-350 dark:text-slate-700"
+                              }
+                            />
+                          );
+                        })}
+                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 ml-1">
+                          {course.rating ? Number(course.rating).toFixed(1) : "4.8"} ({course.students ? Math.floor(course.students / 5) : 80}+ reviews)
+                        </span>
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                        <Users
-                          size={15}
-                          className="text-indigo-500 dark:text-indigo-400"
-                        />
-                        {course.students && typeof course.students.toLocaleString === "function"
-                          ? `${course.students.toLocaleString()}+`
-                          : "500+"}{" "}
-                        Enrolled
-                      </div>
+                      <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
+                        {course.shortDescription}
+                      </p>
                     </div>
 
-                    {/* Fees and Details Action */}
-                    <div className="mt-5 flex items-center justify-between gap-4">
-                      <div>
-                        <span className="block text-[10px] font-bold uppercase text-slate-400 dark:text-slate-500 tracking-wider">
-                          Course Fee
-                        </span>
-                        <span className="text-lg font-black text-slate-900 dark:text-white">
-                          {formatFees(course.fees)}
-                        </span>
+                    <div>
+                      {/* Specifications */}
+                      <div className="mt-3.5 border-t border-slate-100/60 dark:border-slate-800/40 pt-2.5 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                          <Clock
+                            size={13}
+                            className="text-primary-500 dark:text-primary-400"
+                          />
+                          {course.duration || "N/A"}
+                        </div>
+
+                        <div>
+                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mr-1.5">Fee:</span>
+                          <span className="text-sm font-black text-slate-900 dark:text-white">
+                            {formatFees(course.fees)}
+                          </span>
+                        </div>
                       </div>
 
-                      <button
-                        id={`enquire-btn-${course.courseCode || index}`}
-                        onClick={() => {
-                          setSelectedCourse(course);
-                          setOpenModal(true);
-                        }}
-                        className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 py-3 px-4 text-sm font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95 cursor-pointer"
-                      >
-                        Enquire Now
-                        <ChevronRight size={15} />
-                      </button>
+                      {/* Side-by-side Actions */}
+                      <div className="mt-3 flex items-center gap-2">
+                        <button
+                          onClick={() => openCourseDetails(course)}
+                          className="flex-1 inline-flex items-center justify-center py-2 px-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/80 rounded-xl transition cursor-pointer"
+                        >
+                          View Details
+                        </button>
+                        <button
+                          id={`enquire-btn-${course.courseCode || index}`}
+                          onClick={() => {
+                            setSelectedCourse(course);
+                            setOpenModal(true);
+                          }}
+                          className="flex-1 inline-flex items-center justify-center gap-0.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 py-2 px-2.5 text-xs font-bold text-white shadow-sm hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.01] active:scale-95 cursor-pointer"
+                        >
+                          Enquire
+                          <ChevronRight size={12} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -615,6 +639,192 @@ export default function CoursesClient() {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Detailed Course Specification Modal */}
+      {detailsModalOpen && selectedCourse && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-4xl rounded-3xl bg-white p-6 md:p-8 shadow-2xl border border-slate-200 dark:bg-slate-950 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+            {/* Close Button */}
+            <button
+              onClick={closeCourseDetails}
+              className="absolute right-5 top-5 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-slate-200 transition-all cursor-pointer z-10"
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="space-y-6 text-slate-900 dark:text-slate-100">
+              {/* Header Image */}
+              <div className="relative h-48 sm:h-64 w-full overflow-hidden rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <Image
+                  src={getCourseImage(selectedCourse.image)}
+                  alt={selectedCourse.courseName}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              </div>
+
+              {/* Title & Badges */}
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800/40 pb-4">
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                    {selectedCourse.courseName}
+                  </h2>
+                  <p className="text-xs font-mono font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mt-1">
+                    {selectedCourse.courseCode}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <span className={`rounded-full px-3 py-1 text-xs font-bold shadow-sm ${getStatusColor(selectedCourse.status)}`}>
+                    {selectedCourse.status}
+                  </span>
+                  {selectedCourse.mode && (
+                    <span className={`rounded-full px-3 py-1 text-xs font-bold shadow-sm flex items-center gap-1 ${getModeColor(selectedCourse.mode)}`}>
+                      {getModeIcon(selectedCourse.mode)}
+                      {selectedCourse.mode}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Key Specs Grid */}
+              <div className="grid gap-3 grid-cols-2 sm:grid-cols-4">
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Duration</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.duration || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Eligibility</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.eligibility || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Fees</p>
+                  <h4 className="mt-1 font-extrabold text-slate-855 dark:text-white text-xs">{formatFees(selectedCourse.fees)}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Trainer</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.trainer || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Certificate</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.certificate || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Batch Timing</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.batchTiming || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Seats Available</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.seats || "-"}</h4>
+                </div>
+                <div className="rounded-xl border border-slate-100 bg-slate-50/50 p-3.5 dark:border-slate-800/60 dark:bg-slate-900/40">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rating</p>
+                  <h4 className="mt-1 font-extrabold text-slate-850 dark:text-white text-xs">{selectedCourse.rating ? `${Number(selectedCourse.rating).toFixed(1)} / 5` : "4.8 / 5"}</h4>
+                </div>
+              </div>
+
+              {/* Description & Curriculums */}
+              <div className="grid gap-6 md:grid-cols-2 pt-2">
+                <div className="space-y-4">
+                  {selectedCourse.shortDescription && (
+                    <div>
+                      <h3 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white border-l-4 border-primary-500 pl-2">
+                        Overview
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-350">{selectedCourse.shortDescription}</p>
+                    </div>
+                  )}
+                  {selectedCourse.fullDescription && (
+                    <div>
+                      <h3 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white border-l-4 border-primary-500 pl-2">
+                        Details
+                      </h3>
+                      <p className="mt-2 text-xs leading-relaxed text-slate-600 dark:text-slate-355 whitespace-pre-line">{selectedCourse.fullDescription}</p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  {/* Technologies */}
+                  {selectedCourse.technologies && selectedCourse.technologies.length > 0 && (
+                    <div>
+                      <h3 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white border-l-4 border-primary-500 pl-2">
+                        Technologies Covered
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {selectedCourse.technologies.map((tech, idx) => (
+                          <span key={idx} className="rounded-lg bg-primary-50 px-2 py-1 text-[10px] font-bold uppercase text-primary-700 dark:bg-primary-500/10 dark:text-primary-400">
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Features */}
+                  {selectedCourse.features && selectedCourse.features.length > 0 && (
+                    <div>
+                      <h3 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white border-l-4 border-primary-500 pl-2">
+                        Key Features
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {selectedCourse.features.map((feature, idx) => (
+                          <span key={idx} className="rounded-lg bg-emerald-50 px-2 py-1 text-[10px] font-bold text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
+                            {feature}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Syllabus */}
+                  {selectedCourse.syllabus && selectedCourse.syllabus.length > 0 && (
+                    <div>
+                      <h3 className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white border-l-4 border-primary-500 pl-2">
+                        Syllabus Topics
+                      </h3>
+                      <div className="flex flex-wrap gap-1.5 mt-2">
+                        {selectedCourse.syllabus.map((topic, idx) => (
+                          <span key={idx} className="rounded-lg bg-indigo-50 px-2 py-1 text-[10px] font-bold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400">
+                            {topic}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Bottom Actions inside details modal */}
+              <div className="pt-4 border-t border-slate-100 dark:border-slate-800/40 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={closeCourseDetails}
+                  className="rounded-xl border border-slate-200 bg-white/50 px-5 py-3 text-xs font-bold text-slate-600 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const temp = selectedCourse;
+                    closeCourseDetails();
+                    setTimeout(() => {
+                      setSelectedCourse(temp);
+                      setOpenModal(true);
+                    }, 100);
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 px-6 py-3 text-xs font-bold text-white shadow-md hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.02] active:scale-95 cursor-pointer"
+                >
+                  Enquire Now
+                  <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
           </div>
         </div>

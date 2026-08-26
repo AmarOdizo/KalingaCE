@@ -75,7 +75,7 @@ export default function TopperStudent() {
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.back()}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:text-blue-600 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:bg-slate-850 dark:hover:text-blue-400 text-slate-600 dark:text-slate-350 cursor-pointer transition-all duration-200 shrink-0"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white border border-slate-200/80 shadow-sm hover:bg-slate-50 hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-900/60 dark:hover:bg-slate-850 dark:hover:text-indigo-400 text-slate-600 dark:text-slate-350 cursor-pointer transition-all duration-200 shrink-0"
             title="Go Back"
           >
             <ArrowLeft size={18} />
@@ -91,10 +91,9 @@ export default function TopperStudent() {
         </div>
 
         <div className="flex items-center gap-3 w-full sm:w-auto shrink-0">
-
           <Link
             href="/admin/topper-student/add"
-            className="btn-primary"
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-2.5 text-xs font-extrabold text-white shadow-md hover:from-indigo-700 hover:to-indigo-800 transition active:scale-95 cursor-pointer"
           >
             <Plus size={18} />
             Add Topper

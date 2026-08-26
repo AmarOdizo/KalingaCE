@@ -119,7 +119,7 @@ export default function StudentTable({ students, onDelete, refreshData }) {
               className={`rounded-full px-3 py-1 text-xs font-black ${
                 isPublished
                   ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400"
-                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-450"
+                  : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
               }`}
             >
               {isPublished ? "Published" : "Draft / Hidden"}
@@ -162,7 +162,7 @@ export default function StudentTable({ students, onDelete, refreshData }) {
 
           <button
             onClick={() => onDelete(params.data)}
-            className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
+            className="rounded-xl bg-rose-50 p-2 text-rose-600 dark:bg-rose-500/10 dark:text-rose-455 hover:bg-rose-600 hover:text-white dark:hover:bg-rose-500 dark:hover:text-white transition-all duration-200 active:scale-95 cursor-pointer"
             title="Delete Student"
           >
             <Trash2 size={16} />

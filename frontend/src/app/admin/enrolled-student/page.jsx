@@ -31,7 +31,7 @@ export default function EnrolledStudentsAdminPage() {
       field: "id",
       width: 90,
       valueFormatter: (params) => `#${params.value}`,
-      cellClass: "font-semibold text-slate-800 dark:text-slate-350 flex items-center",
+      cellClass: "font-semibold text-slate-800 dark:text-slate-300 flex items-center",
     },
     {
       headerName: "Student Name",
@@ -42,8 +42,8 @@ export default function EnrolledStudentsAdminPage() {
         const name = params.value || "";
         return (
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-650 dark:text-indigo-400 font-bold text-sm border border-indigo-500/20">
-              {name ? name.charAt(0).toUpperCase() : <User size={16} />}
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500/10 to-purple-500/10 text-indigo-600 dark:text-indigo-400 font-bold text-xs border border-indigo-500/20">
+              {name ? name.charAt(0).toUpperCase() : <User size={14} />}
             </div>
             <span className="font-bold text-slate-900 dark:text-white">
               {name}
@@ -58,9 +58,9 @@ export default function EnrolledStudentsAdminPage() {
       flex: 1,
       minWidth: 150,
       cellRenderer: (params) => (
-        <div className="flex items-center gap-2 text-slate-650 dark:text-slate-350 text-sm">
-          <Mail size={15} className="text-slate-400 shrink-0" />
-          <span>{params.value}</span>
+        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-xs">
+          <Mail size={13} className="text-slate-400 shrink-0" />
+          <span className="truncate">{params.value}</span>
         </div>
       ),
     },
@@ -70,8 +70,8 @@ export default function EnrolledStudentsAdminPage() {
       flex: 1,
       minWidth: 120,
       cellRenderer: (params) => (
-        <div className="flex items-center gap-2 text-slate-650 dark:text-slate-355 text-sm">
-          <Phone size={15} className="text-slate-400 shrink-0" />
+        <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 text-xs">
+          <Phone size={13} className="text-slate-400 shrink-0" />
           <span>{params.value}</span>
         </div>
       ),
@@ -83,7 +83,7 @@ export default function EnrolledStudentsAdminPage() {
       minWidth: 160,
       cellRenderer: (params) => (
         <div className="flex items-center h-full">
-          <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1.5 text-xs font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-200/30 dark:border-indigo-500/10 max-w-xs truncate">
+          <div className="rounded-xl bg-indigo-50 dark:bg-indigo-500/10 px-3 py-1 text-xs font-bold text-indigo-700 dark:text-indigo-400 border border-indigo-200/35 dark:border-indigo-500/15 max-w-xs truncate">
             {params.value}
           </div>
         </div>
@@ -98,16 +98,16 @@ export default function EnrolledStudentsAdminPage() {
             <button
               onClick={() => setSelectedStudent(student)}
               title="View Details"
-              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-650 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 cursor-pointer"
+              className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:bg-slate-50 hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-indigo-400 cursor-pointer"
             >
-              <Eye size={17} />
+              <Eye size={15} />
             </button>
             <button
               onClick={() => handleDelete(student.id)}
               title="Delete"
               className="rounded-xl border border-red-200/50 bg-red-50/30 p-2 text-red-600 transition hover:bg-red-50 hover:text-red-700 dark:border-red-900/30 dark:bg-red-950/20 dark:text-red-400 dark:hover:bg-red-900/30 dark:hover:text-red-400 cursor-pointer"
             >
-              <Trash2 size={17} />
+              <Trash2 size={15} />
             </button>
           </div>
         );
@@ -118,23 +118,17 @@ export default function EnrolledStudentsAdminPage() {
     },
   ], []);
 
-  // =====================================
-  // FETCH ALL ENROLLED STUDENTS
-  // =====================================
   const fetchStudents = async () => {
     try {
-      await Promise.resolve();
       setLoading(true);
       const res = await fetch(API_URL, {
         cache: "no-store",
       });
 
       const result = await res.json();
-
       if (!res.ok) {
         throw new Error(result.message || "Failed to fetch enrolled students");
       }
-
       setStudents(result.data || []);
     } catch (error) {
       console.error("Fetch Enrolled Students Error:", error);
@@ -144,15 +138,9 @@ export default function EnrolledStudentsAdminPage() {
   };
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchStudents();
-    }, 0);
-    return () => clearTimeout(timer);
+    fetchStudents();
   }, []);
 
-  // =====================================
-  // DELETE ENROLLED STUDENT
-  // =====================================
   const handleDelete = async (id) => {
     Swal.fire({
       title: "Delete Student?",
@@ -177,7 +165,6 @@ export default function EnrolledStudentsAdminPage() {
           });
 
           const resData = await res.json();
-
           if (!res.ok) {
             throw new Error(resData.message || "Delete failed");
           }
@@ -207,29 +194,27 @@ export default function EnrolledStudentsAdminPage() {
     });
   };
 
-  // =====================================
-  // SEARCH / FILTER LOGIC
-  // =====================================
-  const filteredStudents = students.filter((student) => {
-    const keyword = search.toLowerCase();
-    const courseName = student.courseName?.courseName || "";
-    const courseCode = student.courseName?.courseCode || "";
+  const filteredStudents = useMemo(() => {
+    return students.filter((student) => {
+      const keyword = search.toLowerCase();
+      const courseName = student.courseName?.courseName || "";
+      const courseCode = student.courseName?.courseCode || "";
 
-    return (
-      student.name?.toLowerCase().includes(keyword) ||
-      student.email?.toLowerCase().includes(keyword) ||
-      student.phone?.toLowerCase().includes(keyword) ||
-      courseName.toLowerCase().includes(keyword) ||
-      courseCode.toLowerCase().includes(keyword)
-    );
-  });
+      return (
+        student.name?.toLowerCase().includes(keyword) ||
+        student.email?.toLowerCase().includes(keyword) ||
+        student.phone?.toLowerCase().includes(keyword) ||
+        courseName.toLowerCase().includes(keyword) ||
+        courseCode.toLowerCase().includes(keyword)
+      );
+    });
+  }, [students, search]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 p-6 transition-colors duration-300">
+    <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/20 p-6 transition-colors duration-300">
       <title>Enrolled Students | Admin Panel</title>
-      {/* =================================
-          HEADER
-      ================================= */}
+      
+      {/* Header */}
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
@@ -241,36 +226,34 @@ export default function EnrolledStudentsAdminPage() {
         </div>
       </div>
 
-      {/* =================================
-          STATS PANELS (UI/UX)
-      ================================= */}
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
+      {/* Stats Deck */}
+      <div className="mb-8 grid gap-6 sm:grid-cols-3">
+        <div className="rounded-2xl border border-slate-205 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-              <GraduationCap size={24} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400 shrink-0 font-bold">
+              <GraduationCap size={22} />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Total Enquiries
               </p>
-              <h3 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">
+              <h3 className="mt-0.5 text-xl font-black text-slate-900 dark:text-white">
                 {loading ? "..." : students.length}
               </h3>
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
+        <div className="rounded-2xl border border-slate-205 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-              <Layers size={24} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 shrink-0 font-bold">
+              <Layers size={22} />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Unique Courses
               </p>
-              <h3 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">
+              <h3 className="mt-0.5 text-xl font-black text-slate-900 dark:text-white">
                 {loading
                   ? "..."
                   : new Set(students.map((s) => s.courseName?.courseName).filter(Boolean))
@@ -280,16 +263,16 @@ export default function EnrolledStudentsAdminPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm dark:border-slate-800/80 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
+        <div className="rounded-2xl border border-slate-205 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900 transition-all duration-300 hover:shadow-md">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400">
-              <Calendar size={24} />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 shrink-0 font-bold">
+              <Calendar size={22} />
             </div>
             <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
                 Recent Added
               </p>
-              <h3 className="mt-1 text-2xl font-black text-slate-950 dark:text-white">
+              <h3 className="mt-0.5 text-xl font-black text-slate-900 dark:text-white">
                 {loading ? "..." : filteredStudents.length > 0 ? "Active" : "None"}
               </h3>
             </div>
@@ -297,10 +280,8 @@ export default function EnrolledStudentsAdminPage() {
         </div>
       </div>
 
-      {/* =================================
-          SEARCH PANEL
-      ================================= */}
-      <div className="mb-6 rounded-2xl border border-slate-200/60 bg-white p-4 shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      {/* Search Filter Toolbar */}
+      <div className="mb-6 rounded-2xl border border-slate-205 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900">
         <div className="relative">
           <Search
             size={20}
@@ -311,15 +292,15 @@ export default function EnrolledStudentsAdminPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by student name, email, phone, or course..."
-            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 dark:border-slate-800 dark:bg-slate-950 dark:text-white dark:focus:border-indigo-400 dark:focus:ring-indigo-500/10"
+            className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-12 pr-4 text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:border-slate-800 dark:bg-slate-950 dark:focus:border-indigo-400"
           />
         </div>
-      </div>      {/* =================================
-          DATA TABLE
-      ================================= */}
-      <div className="overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm dark:border-slate-800/80 dark:bg-slate-900">
+      </div>
+
+      {/* Ag-Grid Table */}
+      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-premium dark:border-slate-800 dark:bg-slate-900/60 transition-all duration-300">
         <AdminAgGrid
-          rowData={students}
+          rowData={filteredStudents}
           columnDefs={columnDefs}
           quickFilterText={search}
           rowHeight={56}
@@ -327,81 +308,74 @@ export default function EnrolledStudentsAdminPage() {
         />
       </div>
 
-      {/* =================================
-          DETAIL MODAL
-      ================================= */}
+      {/* Details View Modal */}
       {selectedStudent && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
-            {/* Close Button */}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-200/80 dark:bg-slate-900 dark:border-slate-800/80 animate-in zoom-in-95 duration-200 text-slate-900 dark:text-slate-100 max-h-[90vh] overflow-y-auto">
+            
             <button
               onClick={() => setSelectedStudent(null)}
-              className="absolute right-5 top-5 rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-white transition-all cursor-pointer"
+              className="absolute right-5 top-5 rounded-full p-2 text-slate-400 hover:bg-slate-50 hover:text-slate-600 dark:hover:bg-slate-800 dark:hover:text-white transition cursor-pointer"
               aria-label="Close modal"
             >
-              <X size={20} />
+              <X size={16} />
             </button>
 
             <div className="mb-6 flex flex-col items-center border-b border-slate-100 dark:border-slate-800/60 pb-5">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-extrabold text-2xl shadow-md border-4 border-white dark:border-slate-900">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-violet-500 text-white font-black text-2xl shadow-md border-4 border-white dark:border-slate-900">
                 {selectedStudent.name ? selectedStudent.name.charAt(0).toUpperCase() : <User size={24} />}
               </div>
-              <h3 className="mt-3 text-xl font-bold text-slate-900 dark:text-white">
+              <h3 className="mt-3 text-lg font-black text-slate-900 dark:text-white leading-tight">
                 {selectedStudent.name}
               </h3>
-              <p className="text-xs text-indigo-500 font-bold uppercase tracking-wider mt-1">
-                Student Enquiry Details
+              <p className="text-[10px] text-indigo-650 dark:text-indigo-400 font-extrabold uppercase tracking-widest mt-1">
+                Student Enquiry
               </p>
             </div>
 
             <div className="space-y-4">
-              {/* Enquiry ID */}
-              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
-                <span className="text-xs font-bold text-slate-400 uppercase">Enquiry ID</span>
-                <span className="text-sm font-extrabold text-slate-800 dark:text-slate-100">#{selectedStudent.id}</span>
+              <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-[9px] font-bold text-slate-400 uppercase">Enquiry ID</span>
+                <span className="text-xs font-black text-slate-800 dark:text-slate-100">#{selectedStudent.id}</span>
               </div>
 
-              {/* Email */}
-              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
-                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
-                  <Mail size={13} /> Email Address
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-[9px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Mail size={12} /> Email Address
                 </span>
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 break-all select-all">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 break-all select-all">
                   {selectedStudent.email}
                 </span>
               </div>
 
-              {/* Phone */}
-              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
-                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
-                  <Phone size={13} /> Phone Number
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-[9px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <Phone size={12} /> Phone Number
                 </span>
-                <span className="text-sm font-semibold text-slate-800 dark:text-slate-100 select-all">
+                <span className="text-xs font-semibold text-slate-800 dark:text-slate-100 select-all">
                   {selectedStudent.phone}
                 </span>
               </div>
 
-              {/* Course */}
-              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
-                <span className="text-xs font-bold text-slate-400 uppercase flex items-center gap-1.5">
-                  <BookOpen size={13} /> Course Enquired
+              <div className="flex flex-col gap-1 bg-slate-50 dark:bg-slate-950/40 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/40">
+                <span className="text-[9px] font-bold text-slate-400 uppercase flex items-center gap-1.5">
+                  <BookOpen size={12} /> Course Enquired
                 </span>
-                <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
                   {selectedStudent.courseName?.courseName || "Unknown Course"}
                 </span>
                 {selectedStudent.courseName?.courseCode && (
-                  <span className="text-[10px] font-mono font-bold text-slate-400 dark:text-slate-500">
+                  <span className="text-[9px] font-mono font-bold text-slate-400 dark:text-slate-500">
                     Code: {selectedStudent.courseName.courseCode}
                   </span>
                 )}
               </div>
-
             </div>
 
-            <div className="mt-6 flex justify-end">
+            <div className="mt-6">
               <button
                 onClick={() => setSelectedStudent(null)}
-                className="w-full rounded-xl bg-slate-100 py-3 text-sm font-bold text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="w-full rounded-xl bg-slate-100 py-3 text-xs font-extrabold text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-350 dark:hover:bg-slate-800 transition cursor-pointer active:scale-97"
               >
                 Close Details
               </button>

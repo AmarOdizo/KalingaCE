@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
   Phone,
@@ -9,7 +9,11 @@ import {
   Send,
   CheckCircle,
   AlertCircle,
+  MapPin,
+  Clock,
+  HelpCircle
 } from "lucide-react";
+import Swal from "sweetalert2";
 
 const API_URL = "https://kalingace-4.onrender.com/api/Contact1";
 
@@ -23,79 +27,53 @@ export default function ContactClient() {
   });
 
   const [loading, setLoading] = useState(false);
-
+  const [campuses, setCampuses] = useState([]);
   const [message, setMessage] = useState({
     type: "",
     text: "",
   });
 
-  // ===============================
-  // HANDLE INPUT
-  // ===============================
+  useEffect(() => {
+    const fetchCampuses = async () => {
+      try {
+        const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+        const url = isLocal
+          ? "http://localhost:5000/api/CampusInformation"
+          : "https://kalingace-4.onrender.com/api/CampusInformation";
+        const res = await fetch(url);
+        if (res.ok) {
+          const json = await res.json();
+          setCampuses(json.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to load campuses for contact page:", err);
+      }
+    };
+    fetchCampuses();
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
   };
 
-  // ===============================
-  // SUBMIT FORM
-  // ===============================
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage({ type: "", text: "" });
 
-    setMessage({
-      type: "",
-      text: "",
-    });
-
-    // Basic validation
-    if (!formData.name.trim()) {
+    if (!formData.name.trim() || !formData.phone.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.description.trim()) {
       setMessage({
         type: "error",
-        text: "Please enter your name.",
-      });
-      return;
-    }
-
-    if (!formData.phone.trim()) {
-      setMessage({
-        type: "error",
-        text: "Please enter your phone number.",
-      });
-      return;
-    }
-
-    if (!formData.email.trim()) {
-      setMessage({
-        type: "error",
-        text: "Please enter your email.",
-      });
-      return;
-    }
-
-    if (!formData.subject.trim()) {
-      setMessage({
-        type: "error",
-        text: "Please enter your subject.",
-      });
-      return;
-    }
-
-    if (!formData.description.trim()) {
-      setMessage({
-        type: "error",
-        text: "Please enter your message description.",
+        text: "Please fill out all required fields.",
       });
       return;
     }
 
     try {
       setLoading(true);
-
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {
@@ -105,18 +83,21 @@ export default function ContactClient() {
       });
 
       const result = await res.json();
+      if (!res.ok) throw new Error(result.message || "Failed to submit contact form");
 
-      if (!res.ok) {
-        throw new Error(result.message || "Failed to submit contact form");
-      }
-
-      // Success
-      setMessage({
-        type: "success",
-        text: "Your message has been submitted successfully!",
+      Swal.fire({
+        title: "Message Sent!",
+        text: "Your message has been sent successfully. We will get back to you soon.",
+        icon: "success",
+        confirmButtonText: "OK",
+        confirmButtonColor: "#4f46e5",
+        background: "#ffffff",
+        customClass: {
+          popup: "rounded-3xl",
+          confirmButton: "rounded-xl px-6 py-3 font-bold"
+        }
       });
 
-      // Reset form
       setFormData({
         name: "",
         phone: "",
@@ -125,8 +106,7 @@ export default function ContactClient() {
         description: "",
       });
     } catch (error) {
-      console.error("Contact1 Submit Error:", error);
-
+      console.error("Contact Submit Error:", error);
       setMessage({
         type: "error",
         text: error.message || "Something went wrong. Please try again.",
@@ -137,204 +117,255 @@ export default function ContactClient() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-16 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50/50 via-white to-slate-50 px-6 py-20 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 transition-colors duration-300">
       <div className="mx-auto max-w-6xl">
-        {/* =================================
-            HEADER
-        ================================= */}
-        <div className="mb-10 text-center">
-          <span className="inline-block rounded-full bg-blue-100 dark:bg-blue-950/40 px-4 py-2 text-sm font-semibold text-blue-700 dark:text-blue-400">
-            Contact Us
-          </span>
-
-          <h1 className="mt-4 text-4xl font-bold text-gray-900 dark:text-white md:text-5xl">
+        
+        {/* Header Section */}
+        <div className="mb-16 text-center space-y-3">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/25 uppercase tracking-widest">
             Get In Touch
+          </span>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-4xl md:text-5xl">
+            Contact Our <span className="gradient-text">Support Hub</span>
           </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-gray-600 dark:text-slate-400">
-            Have a question or need more information? Send us a message and we
-            will get back to you.
+          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto leading-relaxed">
+            Have a question or need admissions assistance? Drop us a line and our representatives will reach out to you shortly.
           </p>
         </div>
 
-        {/* =================================
-            FORM CARD
-        ================================= */}
-        <div className="mx-auto max-w-2xl rounded-3xl bg-white dark:bg-slate-900 p-6 shadow-xl border border-slate-100 dark:border-slate-800/80 md:p-10">
-          {/* MESSAGE */}
-          {message.text && (
-            <div
-              className={`mb-6 flex items-center gap-3 rounded-xl p-4 ${
-                message.type === "success"
-                  ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400"
-                  : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400"
-              }`}
-            >
-              {message.type === "success" ? (
-                <CheckCircle size={22} />
+        {/* 2-Column Responsive Layout */}
+        <div className="grid gap-12 lg:grid-cols-5 items-start">
+          
+          {/* Column 1: Contact Details & Campus Branches */}
+          <div className="lg:col-span-2 space-y-6">
+            
+            {/* Quick Contact Info Card */}
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-premium dark:border-slate-800/80 dark:bg-slate-900/40 backdrop-blur-md space-y-4">
+              <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <HelpCircle size={16} className="text-indigo-600 dark:text-indigo-400" />
+                Contact Info
+              </h3>
+              
+              <div className="space-y-3.5 text-xs font-semibold text-slate-600 dark:text-slate-350">
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-indigo-50 dark:bg-indigo-955/40 p-2 text-indigo-600 dark:text-indigo-400 shrink-0">
+                    <Mail size={14} />
+                  </div>
+                  <a href="mailto:info@kalingacomputer.com" className="hover:underline">info@kalingacomputer.com</a>
+                </div>
+                
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-emerald-50 dark:bg-emerald-950/40 p-2 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <Phone size={14} />
+                  </div>
+                  <a href="tel:+919876543210" className="hover:underline">+91 9876543210</a>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-amber-50 dark:bg-amber-955/40 p-2 text-amber-600 dark:text-amber-400 shrink-0">
+                    <Clock size={14} />
+                  </div>
+                  <span>Mon - Sat: 8:00 AM - 7:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Dynamic Campus Branches Card */}
+            <div className="rounded-3xl border border-slate-200/80 bg-white/70 p-6 shadow-premium dark:border-slate-800/80 dark:bg-slate-900/40 backdrop-blur-md space-y-4">
+              <h3 className="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <MapPin size={16} className="text-indigo-600 dark:text-indigo-400" />
+                Our Locations
+              </h3>
+
+              {campuses.length === 0 ? (
+                <div className="rounded-2xl border border-slate-100 bg-slate-50/50 p-4 text-center text-xs font-semibold text-slate-450 dark:border-slate-800 dark:bg-slate-900/20">
+                  <MapPin size={24} className="mx-auto text-slate-300 mb-2" />
+                  <p>Athagarh Head Office</p>
+                  <p className="text-[10px] text-slate-400 font-normal mt-0.5">Athagarh, Cuttack, Odisha - 754029</p>
+                </div>
               ) : (
-                <AlertCircle size={22} />
+                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin">
+                  {campuses.map((campus) => (
+                    <div
+                      key={campus._id || campus.id}
+                      className="rounded-2xl border border-slate-100 dark:border-slate-800/60 bg-slate-50/50 p-4 dark:bg-slate-950/20 transition hover:border-indigo-100 dark:hover:border-indigo-950"
+                    >
+                      <div className="flex justify-between items-start gap-2">
+                        <h4 className="font-extrabold text-slate-805 dark:text-white text-xs">
+                          {campus.campusName}
+                        </h4>
+                        <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold shrink-0 ${
+                          campus.status === "Active"
+                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                            : "bg-slate-100 text-slate-500 dark:bg-slate-850 dark:text-slate-400"
+                        }`}>
+                          {campus.status}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+                        {campus.address}, {campus.city}, {campus.state} - {campus.pincode}
+                      </p>
+                      {campus.phone && (
+                        <p className="text-[9px] text-slate-400 font-bold mt-1.5 flex items-center gap-1">
+                          <Phone size={10} /> {campus.phone}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               )}
-
-              <p className="text-sm font-medium">{message.text}</p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* =================================
-                NAME
-            ================================= */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                Full Name
-              </label>
+          </div>
 
-              <div className="relative">
-                <User
-                  size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
-                />
-
-                <input
-                  id="contact-name"
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
-                />
+          {/* Column 2: Interactive Contact Inquiry Form */}
+          <div className="lg:col-span-3 rounded-3xl bg-white dark:bg-slate-900/60 p-6 md:p-8 shadow-premium border border-slate-200/80 dark:border-slate-800/80 backdrop-blur-md">
+            
+            {message.text && (
+              <div
+                className={`mb-6 flex items-center gap-3 rounded-2xl p-4 ${
+                  message.type === "success"
+                    ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-200/30"
+                    : "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-455 border border-rose-200/30"
+                }`}
+              >
+                {message.type === "success" ? (
+                  <CheckCircle size={18} className="shrink-0" />
+                ) : (
+                  <AlertCircle size={18} className="shrink-0" />
+                )}
+                <p className="text-xs font-semibold">{message.text}</p>
               </div>
-            </div>
+            )}
 
-            {/* =================================
-                PHONE
-            ================================= */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                Phone Number
-              </label>
-
-              <div className="relative">
-                <Phone
-                  size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
-                />
-
-                <input
-                  id="contact-phone"
-                  type="tel"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Enter your phone number"
-                  maxLength={10}
-                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
-                />
+            <form onSubmit={handleSubmit} className="space-y-5">
+              
+              {/* Full Name */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-405 dark:text-slate-500">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="contact-name"
+                    type="text"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter your full name"
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 py-3 pl-11 pr-4 outline-none text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 focus:bg-white dark:focus:bg-slate-900"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* =================================
-                EMAIL
-            ================================= */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                Email Address
-              </label>
-
-              <div className="relative">
-                <Mail
-                  size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
-                />
-
-                <input
-                  id="contact-email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Enter your email address"
-                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
-                />
+              {/* Phone Number */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-405 dark:text-slate-500">
+                  Phone Number
+                </label>
+                <div className="relative">
+                  <Phone size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="contact-phone"
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter your mobile number"
+                    maxLength={10}
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 py-3 pl-11 pr-4 outline-none text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 focus:bg-white dark:focus:bg-slate-900"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* =================================
-                SUBJECT
-            ================================= */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                Subject
-              </label>
-
-              <div className="relative">
-                <MessageSquare
-                  size={20}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500"
-                />
-
-                <input
-                  id="contact-subject"
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleChange}
-                  placeholder="Enter subject of your message"
-                  className="w-full rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
-                />
+              {/* Email Address */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-405 dark:text-slate-500">
+                  Email Address
+                </label>
+                <div className="relative">
+                  <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="contact-email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter your email address"
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 py-3 pl-11 pr-4 outline-none text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 focus:bg-white dark:focus:bg-slate-900"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* =================================
-                DESCRIPTION
-            ================================= */}
-            <div>
-              <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-slate-300">
-                Message Description
-              </label>
-
-              <div className="relative">
-                <MessageSquare
-                  size={20}
-                  className="absolute left-4 top-4 text-gray-400 dark:text-slate-500"
-                />
-
-                <textarea
-                  id="contact-description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder="Write your message..."
-                  rows={5}
-                  className="w-full resize-none rounded-xl border border-gray-200 dark:border-slate-800 bg-gray-50 dark:bg-slate-950 py-3.5 pl-12 pr-4 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-650 transition focus:border-blue-500 focus:bg-white dark:focus:bg-slate-900 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-900/20"
-                />
+              {/* Subject */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-405 dark:text-slate-500">
+                  Subject
+                </label>
+                <div className="relative">
+                  <MessageSquare size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="contact-subject"
+                    type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    placeholder="Enter enquiry subject"
+                    required
+                    className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/20 py-3 pl-11 pr-4 outline-none text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 focus:bg-white dark:focus:bg-slate-900"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* =================================
-                SUBMIT
-            ================================= */}
-            <button
-              id="contact-submit-btn"
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-4 font-semibold text-white shadow-lg transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
-            >
-              {loading ? (
-                <>
-                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send size={20} />
-                  Send Message
-                </>
-              )}
-            </button>
-          </form>
+              {/* Description */}
+              <div>
+                <label className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-slate-405 dark:text-slate-500">
+                  Message Description
+                </label>
+                <div className="relative">
+                  <MessageSquare size={16} className="absolute left-4 top-3 text-slate-400" />
+                  <textarea
+                    id="contact-description"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    placeholder="Type your query description..."
+                    rows={5}
+                    required
+                    className="w-full resize-none rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-955/20 py-3 pl-11 pr-4 outline-none text-xs text-slate-800 dark:text-slate-200 placeholder:text-slate-400 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition duration-150 focus:bg-white dark:focus:bg-slate-900"
+                  />
+                </div>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                id="contact-submit-btn"
+                type="submit"
+                disabled={loading}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 py-3.5 text-xs font-extrabold text-white shadow-md hover:from-indigo-700 hover:to-indigo-800 transition duration-150 active:scale-97 disabled:cursor-not-allowed disabled:opacity-60 cursor-pointer"
+              >
+                {loading ? (
+                  <>
+                    <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    Sending Message...
+                  </>
+                ) : (
+                  <>
+                    <Send size={14} />
+                    Send Message
+                  </>
+                )}
+              </button>
+
+            </form>
+          </div>
+
         </div>
+
       </div>
     </main>
   );

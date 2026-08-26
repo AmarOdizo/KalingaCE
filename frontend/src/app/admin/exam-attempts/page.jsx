@@ -126,8 +126,12 @@ function ExamAttemptsContent() {
   const [loadingSqa, setLoadingSqa] = useState(false);
   const [gradingMarksMap, setGradingMarksMap] = useState({});
 
+  const selectedAttemptId = selectedAttempt?._id;
+  const selectedExamId = selectedAttempt?.examId?._id || selectedAttempt?.examId;
+  const selectedMobileNumber = selectedAttempt?.mobileNumber;
+
   useEffect(() => {
-    if (!selectedAttempt || !selectedAttempt.examId) {
+    if (!selectedAttemptId || !selectedExamId) {
       setTimeout(() => {
         setSqaDetails(null);
         setGradingMarksMap({});
@@ -137,14 +141,13 @@ function ExamAttemptsContent() {
     const fetchAttemptSqa = async () => {
       try {
         setLoadingSqa(true);
-        const targetExamId = selectedAttempt.examId._id || selectedAttempt.examId;
-        const data = await getSQAByExamId(targetExamId);
+        const data = await getSQAByExamId(selectedExamId);
         setSqaDetails(data);
         
         if (data && data.answers) {
           const initialMarks = {};
           data.answers.forEach(ans => {
-            if (ans.mobileNumber === selectedAttempt.mobileNumber) {
+            if (ans.mobileNumber === selectedMobileNumber) {
               initialMarks[ans._id] = ans.marks || 0;
             }
           });
@@ -157,7 +160,7 @@ function ExamAttemptsContent() {
       }
     };
     fetchAttemptSqa();
-  }, [selectedAttempt]);
+  }, [selectedAttemptId, selectedExamId, selectedMobileNumber]);
 
   const handleGradeSqaAnswer = async (answerId, isCorrect) => {
     if (!sqaDetails) return;
@@ -176,12 +179,20 @@ function ExamAttemptsContent() {
       ) || [];
       const sqaScoreSum = studentSqaAnswers.reduce((acc, ans) => acc + (ans.marks || 0), 0);
       
+      // Calculate MCQ score dynamically to avoid double counting
+      const mcqObtainedScore = selectedAttempt.answers?.reduce((acc, ans) => acc + (ans.isCorrect ? (ans.marks || 0) : 0), 0) || 0;
+      
       // Update ExamAttempt score in backend
-      const newTotalScore = selectedAttempt.score + sqaScoreSum;
+      const newTotalScore = mcqObtainedScore + sqaScoreSum;
       await updateExamAttemptScore(selectedAttempt._id, newTotalScore);
       
-      // Refetch the attempts list so changes show in table
-      await fetchAttempts();
+      // Refetch attempts list and update selectedAttempt to update modal scores in real-time without full page loader
+      const data = await getAllExamAttempts();
+      setAttempts(data || []);
+      const freshAttempt = data?.find(att => att._id === selectedAttempt._id);
+      if (freshAttempt) {
+        setSelectedAttempt(freshAttempt);
+      }
     } catch (err) {
       console.error("Failed to grade SQA response:", err);
       alert("Failed to grade SQA response: " + err.message);
@@ -225,6 +236,14 @@ function ExamAttemptsContent() {
     }
   };
 
+  const mcqObtainedScore = useMemo(() => {
+    return selectedAttempt?.answers?.reduce((acc, ans) => acc + (ans.isCorrect ? (ans.marks || 0) : 0), 0) || 0;
+  }, [selectedAttempt]);
+
+  const mcqPossibleScore = useMemo(() => {
+    return selectedAttempt?.answers?.reduce((acc, ans) => acc + (ans.marks || 0), 0) || 0;
+  }, [selectedAttempt]);
+
   const totalSqaObtainedScore = useMemo(() => {
     const studentSqaAnswers = sqaDetails?.answers?.filter(
       ans => ans.mobileNumber === selectedAttempt?.mobileNumber
@@ -243,15 +262,15 @@ function ExamAttemptsContent() {
     }, 0);
   }, [sqaDetails, selectedAttempt]);
 
-  const fetchAttempts = useCallback(async () => {
+  const fetchAttempts = useCallback(async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading) setLoading(true);
       const data = await getAllExamAttempts();
       setAttempts(data || []);
     } catch (err) {
       console.error("Failed to load attempts:", err);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, []);
 
@@ -419,7 +438,7 @@ function ExamAttemptsContent() {
                     <div className="mt-1 space-y-1 bg-white/70 dark:bg-slate-900/50 p-2.5 rounded-2xl border border-indigo-100/30 dark:border-indigo-950/20">
                       <div className="flex items-center justify-between text-2xs">
                         <span className="font-semibold text-slate-500">MCQ marks:</span>
-                        <span className="font-extrabold text-indigo-650 dark:text-indigo-400">{selectedAttempt.score} / {selectedAttempt.totalPossibleScore}</span>
+                        <span className="font-extrabold text-indigo-655 dark:text-indigo-400">{mcqObtainedScore} / {mcqPossibleScore}</span>
                       </div>
                       {sqaDetails && sqaDetails.questions && sqaDetails.questions.length > 0 && (
                         <>
@@ -429,7 +448,7 @@ function ExamAttemptsContent() {
                           </div>
                           <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200 dark:border-slate-800 font-black">
                             <span className="text-slate-800 dark:text-slate-200">Combined:</span>
-                            <span className="text-indigo-605 dark:text-indigo-400">{selectedAttempt.score + totalSqaObtainedScore} / {selectedAttempt.totalPossibleScore + totalSqaPossibleScore}</span>
+                            <span className="text-indigo-605 dark:text-indigo-400">{mcqObtainedScore + totalSqaObtainedScore} / {mcqPossibleScore + totalSqaPossibleScore}</span>
                           </div>
                         </>
                       )}

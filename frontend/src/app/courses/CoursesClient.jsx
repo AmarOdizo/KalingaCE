@@ -378,121 +378,144 @@ export default function CoursesClient() {
         ) : (
           /* Grid list of Courses */
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredCourses.map((course, index) => (
-              <div key={course.id || course._id || index} className="h-full">
-                <div className="premium-card group flex flex-col justify-between h-[425px] overflow-hidden border border-slate-200/70 bg-white shadow-md transition-all duration-300 hover:-translate-y-1.5 hover:shadow-lg dark:border-slate-800 dark:bg-slate-900/60 rounded-2xl">
-                  {/* Cover Image & badges */}
-                  <div className="relative h-40 w-full overflow-hidden bg-slate-100 dark:bg-slate-950">
-                    <Image
-                      src={getCourseImage(course.image)}
-                      alt={course.courseName || "Course Image"}
-                      fill
-                      sizes="(max-w-768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+            {filteredCourses.map((course, index) => {
+              const ratingVal = course.rating || (4.7 + ((course.id || 0) % 4) * 0.1).toFixed(1);
+              const reviewsVal = 100 + ((course.id || 0) % 5) * 45;
 
-                    {/* Floating badge */}
-                    <span
-                      className={`absolute top-3 right-3 rounded-full px-2 py-0.5 text-[10px] font-bold shadow-sm tracking-wide ${getStatusColor(course.status)}`}
-                    >
-                      {course.status}
-                    </span>
+              return (
+                <div key={course.id || course._id || index} className="h-full">
+                  <div className="group/card flex flex-col justify-between h-[470px] overflow-hidden border border-slate-200/60 bg-gradient-to-b from-white to-white hover:from-white hover:to-indigo-50/10 dark:border-slate-800/60 dark:bg-slate-900/60 dark:hover:to-indigo-950/10 shadow-premium transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl rounded-3xl">
+                    {/* Cover Image & badges */}
+                    <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-950 shrink-0">
+                      <Image
+                        src={getCourseImage(course.image)}
+                        alt={course.courseName || "Course Image"}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                        className="object-cover transition-transform duration-700 ease-out group-hover/card:scale-108"
+                        unoptimized
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-85 transition-opacity duration-500 group-hover/card:opacity-90" />
 
-                    {course.courseCode && (
-                      <span className="absolute top-3 left-3 rounded bg-black/60 px-1.5 py-0.5 text-[10px] font-mono font-bold text-white shadow-sm backdrop-blur-md">
-                        {course.courseCode}
-                      </span>
-                    )}
-
-                    {course.mode && (
+                      {/* Floating badge */}
                       <span
-                        className={`absolute bottom-2.5 left-3 rounded-full px-2 py-0.5 text-[10px] font-semibold shadow-sm flex items-center gap-1 backdrop-blur-md ${getModeColor(course.mode)}`}
+                        className={`absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-[9px] font-bold shadow-2xs tracking-wide backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103 ${getStatusColor(course.status)}`}
                       >
-                        {getModeIcon(course.mode)}
-                        {course.mode}
+                        {course.status}
                       </span>
-                    )}
-                  </div>
 
-                  {/* Body Content */}
-                  <div className="p-4 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-base md:text-lg font-extrabold text-slate-800 dark:text-white leading-snug group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors duration-300 line-clamp-1">
-                        {course.courseName || "Untitled Course"}
-                      </h3>
-
-                      {/* Star Rating */}
-                      <div className="flex items-center gap-1 mt-1 text-amber-500">
-                        {[...Array(5)].map((_, i) => {
-                          const rating = course.rating || 4.8;
-                          return (
-                            <Star
-                              key={i}
-                              size={12}
-                              className={
-                                i < Math.floor(rating)
-                                  ? "fill-amber-500 text-amber-500"
-                                  : "text-slate-350 dark:text-slate-700"
-                              }
-                            />
-                          );
-                        })}
-                        <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 ml-1">
-                          {course.rating ? Number(course.rating).toFixed(1) : "4.8"} ({course.students ? Math.floor(course.students / 5) : 80}+ reviews)
+                      {course.courseCode && (
+                        <span className="absolute top-3 left-3 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-mono font-bold text-white shadow-2xs backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103">
+                          {course.courseCode}
                         </span>
-                      </div>
+                      )}
 
-                      <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
-                        {course.shortDescription}
-                      </p>
+                      {course.mode && (
+                        <span
+                          className={`absolute bottom-2.5 left-3 rounded-full px-2.5 py-0.5 text-[9px] font-semibold shadow-2xs flex items-center gap-1.5 backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103 ${getModeColor(course.mode)}`}
+                        >
+                          {getModeIcon(course.mode)}
+                          {course.mode}
+                        </span>
+                      )}
                     </div>
 
-                    <div>
-                      {/* Specifications */}
-                      <div className="mt-3.5 border-t border-slate-100/60 dark:border-slate-800/40 pt-2.5 flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
-                          <Clock
-                            size={13}
-                            className="text-primary-500 dark:text-primary-400"
-                          />
-                          {course.duration || "N/A"}
-                        </div>
+                    {/* Body Content */}
+                    <div className="p-5.5 flex-1 flex flex-col justify-between">
+                      <div>
+                        {/* Title */}
+                        <h3 className="text-base font-extrabold text-slate-800 dark:text-white leading-snug group-hover/card:text-indigo-600 dark:group-hover/card:text-indigo-400 transition-colors duration-300 line-clamp-1">
+                          {course.courseName || "Untitled Course"}
+                        </h3>
 
-                        <div>
-                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mr-1.5">Fee:</span>
-                          <span className="text-sm font-black text-slate-900 dark:text-white">
-                            {formatFees(course.fees)}
+                        {/* Star Rating */}
+                        <div className="flex items-center gap-1 mt-1.5 text-amber-500">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={11}
+                              className={
+                                i < Math.floor(ratingVal)
+                                  ? "fill-amber-500 text-amber-500 transition-transform duration-300 group-hover/card:scale-110"
+                                  : "text-slate-200 dark:text-slate-700"
+                              }
+                            />
+                          ))}
+                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-1">
+                            {ratingVal} ({reviewsVal}+ reviews)
                           </span>
                         </div>
+
+                        {/* Description */}
+                        <p className="mt-2.5 text-xs text-slate-555 dark:text-slate-455 line-clamp-2 leading-relaxed">
+                          {course.shortDescription}
+                        </p>
+
+                        {/* Tech cover pills */}
+                        {course.technologies && course.technologies.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-3">
+                            {course.technologies.slice(0, 3).map((tech, idx) => (
+                              <span
+                                key={idx}
+                                className="rounded bg-slate-100 hover:bg-indigo-50/50 hover:text-indigo-650 dark:bg-slate-800 dark:hover:bg-slate-750 dark:hover:text-indigo-400 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500 dark:text-slate-400 transition-colors duration-300"
+                              >
+                                {tech}
+                              </span>
+                            ))}
+                            {course.technologies.length > 3 && (
+                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                +{course.technologies.length - 3} More
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
 
-                      {/* Side-by-side Actions */}
-                      <div className="mt-3 flex items-center gap-2">
-                        <button
-                          onClick={() => openCourseDetails(course)}
-                          className="flex-1 inline-flex items-center justify-center py-2 px-2.5 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700/80 rounded-xl transition cursor-pointer"
-                        >
-                          View Details
-                        </button>
-                        <button
-                          id={`enquire-btn-${course.courseCode || index}`}
-                          onClick={() => {
-                            setSelectedCourse(course);
-                            setOpenModal(true);
-                          }}
-                          className="flex-1 inline-flex items-center justify-center gap-0.5 rounded-xl bg-gradient-to-r from-primary-600 to-indigo-600 py-2 px-2.5 text-xs font-bold text-white shadow-sm hover:from-primary-700 hover:to-indigo-700 transition hover:scale-[1.01] active:scale-95 cursor-pointer"
-                        >
-                          Enquire
-                          <ChevronRight size={12} />
-                        </button>
+                      {/* Specifications & CTA */}
+                      <div className="mt-4">
+                        <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-405 dark:text-slate-550">
+                            <Clock
+                              size={12}
+                              className="text-indigo-650 dark:text-indigo-400 group-hover/card:animate-pulse"
+                            />
+                            <span>{course.duration || "N/A"}</span>
+                          </div>
+
+                          <div className="text-xs">
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mr-1.5">Fee:</span>
+                            <span className="font-black text-slate-800 dark:text-white text-sm">
+                              {formatFees(course.fees)}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Side-by-side Actions */}
+                        <div className="mt-4 flex items-center gap-2">
+                          <button
+                            onClick={() => openCourseDetails(course)}
+                            className="flex-1 inline-flex items-center justify-center py-2 px-3 text-2xs font-extrabold text-slate-650 bg-slate-50 hover:bg-indigo-50/40 border border-slate-200/50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-750 dark:border-slate-700 hover:text-indigo-655 dark:hover:text-indigo-400 rounded-xl transition duration-300 cursor-pointer shadow-2xs active:scale-97"
+                          >
+                            View Details
+                          </button>
+                          <button
+                            id={`enquire-btn-${course.courseCode || index}`}
+                            onClick={() => {
+                              setSelectedCourse(course);
+                              setOpenModal(true);
+                            }}
+                            className="group/enquire flex-1 inline-flex items-center justify-center gap-0.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-650 py-2 px-3 text-2xs font-extrabold text-white shadow-sm hover:shadow-[0_4px_12px_rgba(79,70,229,0.3)] dark:hover:shadow-[0_4px_12px_rgba(79,70,229,0.15)] hover:scale-[1.01] transition-all duration-300 active:scale-95 cursor-pointer"
+                          >
+                            Enquire
+                            <ChevronRight size={12} className="group-hover/enquire:translate-x-0.5 transition-transform duration-300" />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

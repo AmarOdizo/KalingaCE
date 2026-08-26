@@ -9,8 +9,15 @@ import {
   Sparkles,
   Laptop,
   X,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft
 } from "lucide-react";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 import { getCourses, getCourseById } from "./courseData";
 import Swal from "sweetalert2";
@@ -238,32 +245,40 @@ export default function AvailableCourses() {
 
   if (!mounted || loading) {
     return (
-      <section className="bg-slate-50 py-20 dark:bg-slate-900 transition-colors duration-300">
+      <section className="bg-slate-50 py-24 dark:bg-slate-900 transition-colors duration-300">
         <div className="mx-auto max-w-7xl px-5">
-          <div className="mb-14">
+          <div className="mb-16">
             <div className="h-4 w-32 bg-slate-200 dark:bg-slate-800 animate-pulse rounded mb-3"></div>
-            <div className="h-10 w-64 bg-slate-300 dark:bg-slate-700 animate-pulse rounded-lg"></div>
+            <div className="h-10 w-64 bg-slate-350 dark:bg-slate-700 animate-pulse rounded-lg"></div>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3].map((item) => (
+          <div className="grid gap-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3].map((item, idx) => (
               <div
                 key={item}
-                className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900 animate-pulse h-[425px] flex flex-col justify-between"
+                className="rounded-3xl border border-slate-200 bg-white shadow-premium dark:border-slate-800 dark:bg-slate-900 animate-pulse h-[480px] flex flex-col overflow-hidden"
               >
-                <div>
-                  <div className="relative h-40 w-full rounded-xl bg-slate-200 dark:bg-slate-800 mb-4"></div>
-                  <div className="h-4 w-1/4 bg-slate-200 dark:bg-slate-800 rounded mb-2"></div>
-                  <div className="h-6 w-3/4 bg-slate-300 dark:bg-slate-700 rounded mb-3"></div>
-                  <div className="h-3 w-full bg-slate-200 dark:bg-slate-800 rounded mb-1.5"></div>
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-4 pt-2 border-t border-slate-100 dark:border-slate-800">
-                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                    <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                {/* Image Skeleton */}
+                <div className="w-full h-48 bg-slate-250 dark:bg-slate-800 shrink-0"></div>
+
+                {/* Content Skeleton */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <div className="h-6 w-2/3 bg-slate-300 dark:bg-slate-700 rounded-lg"></div>
+                    <div className="h-3 w-24 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    <div className="space-y-1.5 pt-1">
+                      <div className="h-4 w-full bg-slate-200 dark:bg-slate-800 rounded"></div>
+                      <div className="h-4 w-5/6 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
-                    <div className="h-9 flex-1 bg-slate-300 dark:bg-slate-700 rounded-lg"></div>
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-4 w-12 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                      <div className="h-4 w-16 bg-slate-200 dark:bg-slate-800 rounded"></div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-16 bg-slate-200 dark:bg-slate-800 rounded-lg"></div>
+                      <div className="h-8 w-16 bg-slate-305 dark:bg-slate-700 rounded-lg"></div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -293,145 +308,183 @@ export default function AvailableCourses() {
           </div>
         </div>
 
-        {/* Grid of Course Cards */}
+        {/* Slider of Course Cards */}
         {courses.length === 0 ? (
           <div className="text-center py-12 text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-900/40 rounded-2xl border border-slate-200 dark:border-slate-800/80">
             No courses available at the moment.
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-6">
-            {courses.map((course) => {
-              const ratingVal = course.rating || (4.7 + ((course.id || 0) % 4) * 0.1).toFixed(1);
-              const reviewsVal = 100 + ((course.id || 0) % 5) * 45;
+          <div className="relative group/slider pb-12">
+            <Swiper
+              modules={[Navigation, Pagination, Autoplay]}
+              spaceBetween={24}
+              slidesPerView={1}
+              navigation={{
+                nextEl: ".course-swiper-next",
+                prevEl: ".course-swiper-prev",
+              }}
+              pagination={{
+                clickable: true,
+                dynamicBullets: true,
+              }}
+              autoplay={{
+                delay: 6000,
+                disableOnInteraction: false,
+              }}
+              breakpoints={{
+                640: {
+                  slidesPerView: 1,
+                },
+                768: {
+                  slidesPerView: 2,
+                },
+                1150: {
+                  slidesPerView: 3,
+                },
+              }}
+              className="py-4"
+            >
+              {courses.map((course, idx) => {
+                const ratingVal = course.rating || (4.7 + ((course.id || 0) % 4) * 0.1).toFixed(1);
+                const reviewsVal = 100 + ((course.id || 0) % 5) * 45;
 
-              return (
-                <div key={course.id || course._id} className="h-full">
-                  <div className="group flex flex-col justify-between h-[425px] overflow-hidden border border-slate-200/80 bg-white shadow-premium transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/60 rounded-2xl">
-                    
-                    {/* Image & Floating Tags */}
-                    <div className="relative h-40 w-full overflow-hidden bg-slate-100 dark:bg-slate-900">
-                      <Image
-                        src={getCourseImage(course.image)}
-                        alt={course.courseName}
-                        fill
-                        sizes="(max-w-768px) 100vw, 33vw"
-                        className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
-                        unoptimized
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
+                return (
+                  <SwiperSlide key={course.id || course._id} className="h-auto py-2">
+                    <div className="group/card flex flex-col h-[480px] overflow-hidden border border-slate-200/60 bg-gradient-to-b from-white to-white hover:from-white hover:to-indigo-50/10 dark:border-slate-800/60 dark:bg-slate-900/60 dark:hover:to-indigo-950/10 shadow-premium transition-all duration-500 hover:-translate-y-1.5 hover:shadow-xl rounded-3xl">
+                      
+                      {/* Image & Floating Tags */}
+                      <div className="relative w-full h-48 overflow-hidden bg-slate-100 dark:bg-slate-900 shrink-0">
+                        <Image
+                          src={getCourseImage(course.image)}
+                          alt={course.courseName}
+                          fill
+                          sizes="(max-width: 768px) 100vw, 33vw"
+                          className="object-cover transition-transform duration-700 ease-out group-hover/card:scale-108"
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-85 transition-opacity duration-500 group-hover/card:opacity-90" />
 
-                      {/* Floating Status Badges */}
-                      <span
-                        className={`absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-[9px] font-bold shadow-2xs tracking-wide backdrop-blur-md ${getStatusColor(course.status)}`}
-                      >
-                        {course.status}
-                      </span>
-
-                      {course.courseCode && (
-                        <span className="absolute top-3 left-3 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-mono font-bold text-white shadow-2xs backdrop-blur-md">
-                          {course.courseCode}
-                        </span>
-                      )}
-
-                      {course.mode && (
+                        {/* Floating Status Badges */}
                         <span
-                          className={`absolute bottom-2.5 left-3 rounded-full px-2.5 py-0.5 text-[9px] font-semibold shadow-2xs flex items-center gap-1.5 backdrop-blur-md ${getModeColor(course.mode)}`}
+                          className={`absolute top-3 right-3 rounded-full px-2.5 py-0.5 text-[9px] font-bold shadow-2xs tracking-wide backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103 ${getStatusColor(course.status)}`}
                         >
-                          {getModeIcon(course.mode)}
-                          {course.mode}
+                          {course.status}
                         </span>
-                      )}
-                    </div>
 
-                    {/* Card Content */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
-                      <div>
-                        {/* Course Title */}
-                        <h3 className="text-base font-extrabold text-slate-800 dark:text-white leading-snug group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-300 line-clamp-1">
-                          {course.courseName}
-                        </h3>
-
-                        {/* Star Rating Section */}
-                        <div className="flex items-center gap-1 mt-1.5 text-amber-500">
-                          {[...Array(5)].map((_, i) => (
-                            <Star
-                              key={i}
-                              size={11}
-                              className={
-                                i < Math.floor(ratingVal)
-                                  ? "fill-amber-500 text-amber-500"
-                                  : "text-slate-200 dark:text-slate-700"
-                              }
-                            />
-                          ))}
-                          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-1">
-                            {ratingVal} ({reviewsVal}+ reviews)
+                        {course.courseCode && (
+                          <span className="absolute top-3 left-3 rounded bg-black/60 px-1.5 py-0.5 text-[9px] font-mono font-bold text-white shadow-2xs backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103">
+                            {course.courseCode}
                           </span>
-                        </div>
+                        )}
 
-                        {/* Description */}
-                        <p className="mt-2.5 text-xs text-slate-550 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                          {course.shortDescription}
-                        </p>
-
-                        {/* Tech cover pills */}
-                        {course.technologies && course.technologies.length > 0 && (
-                          <div className="mt-3.5 flex flex-wrap gap-1">
-                            {course.technologies.slice(0, 3).map((tech, idx) => (
-                              <span
-                                key={idx}
-                                className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold uppercase text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                            {course.technologies.length > 3 && (
-                              <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[9px] font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-400">
-                                +{course.technologies.length - 3} More
-                              </span>
-                            )}
-                          </div>
+                        {course.mode && (
+                          <span
+                            className={`absolute bottom-2.5 left-3 rounded-full px-2.5 py-0.5 text-[9px] font-semibold shadow-2xs flex items-center gap-1.5 backdrop-blur-md transition-transform duration-300 group-hover/card:scale-103 ${getModeColor(course.mode)}`}
+                          >
+                            {getModeIcon(course.mode)}
+                            {course.mode}
+                          </span>
                         )}
                       </div>
 
-                      {/* Footer Specs & CTA */}
-                      <div className="mt-4">
-                        <div className="border-t border-slate-100 dark:border-slate-800 pt-3 flex items-center justify-between">
-                          <div className="flex items-center gap-1 text-[11px] font-bold text-slate-405 dark:text-slate-500">
-                            <Clock size={12} className="text-indigo-650 dark:text-indigo-400" />
-                            <span>{course.duration}</span>
-                          </div>
+                      {/* Card Content */}
+                      <div className="p-6 flex-1 flex flex-col justify-between">
+                        <div className="space-y-3">
+                          {/* Course Title */}
+                          <h3 className="text-base font-extrabold text-slate-800 dark:text-white leading-snug group-hover/card:text-indigo-600 dark:group-hover/card:text-indigo-400 transition-colors duration-300 line-clamp-1">
+                            {course.courseName}
+                          </h3>
 
-                          <div className="text-xs">
-                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mr-1.5">Fee:</span>
-                            <span className="font-black text-slate-800 dark:text-white">
-                              {formatFees(course.fees)}
+                          {/* Star Rating Section */}
+                          <div className="flex items-center gap-1 text-amber-500">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                size={11}
+                                className={
+                                  i < Math.floor(ratingVal)
+                                    ? "fill-amber-500 text-amber-500 transition-transform duration-300 group-hover/card:scale-110"
+                                    : "text-slate-200 dark:text-slate-700"
+                                }
+                              />
+                            ))}
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 ml-1">
+                              {ratingVal} ({reviewsVal}+ reviews)
                             </span>
                           </div>
+
+                          {/* Description */}
+                          <p className="text-xs text-slate-550 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                            {course.shortDescription}
+                          </p>
+
+                          {/* Tech cover pills */}
+                          {course.technologies && course.technologies.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 pt-1">
+                              {course.technologies.slice(0, 3).map((tech, idx) => (
+                                <span
+                                  key={idx}
+                                  className="rounded-lg bg-slate-100 hover:bg-indigo-50/50 hover:text-indigo-600 dark:bg-slate-800 dark:hover:bg-slate-750 dark:hover:text-indigo-400 px-2 py-0.5 text-[9px] font-bold uppercase text-slate-500 dark:text-slate-400 transition-colors duration-300"
+                                >
+                                  {tech}
+                                </span>
+                              ))}
+                              {course.technologies.length > 3 && (
+                                <span className="rounded-lg bg-slate-100 dark:bg-slate-800 px-2 py-0.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                                  +{course.technologies.length - 3} More
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
 
-                        <div className="mt-4 flex items-center gap-2">
-                          <button
-                            onClick={() => openCourseDetails(course)}
-                            className="flex-1 inline-flex items-center justify-center py-2 px-3 text-2xs font-extrabold text-slate-600 bg-slate-50 hover:bg-slate-100 border border-slate-200/50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 rounded-xl transition duration-150 cursor-pointer shadow-2xs active:scale-97"
-                          >
-                            View Details
-                          </button>
-                          <button
-                            onClick={() => openDetails(course)}
-                            className="flex-1 inline-flex items-center justify-center gap-0.5 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 py-2 px-3 text-2xs font-extrabold text-white shadow-sm hover:from-indigo-700 hover:to-indigo-800 transition active:scale-95 cursor-pointer"
-                          >
-                            Enquire
-                            <ChevronRight size={12} />
-                          </button>
+                        {/* Footer Specs & CTA */}
+                        <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1 text-[11px] font-bold text-slate-405 dark:text-slate-550">
+                              <Clock size={12} className="text-indigo-650 dark:text-indigo-400 group-hover/card:animate-pulse" />
+                              <span>{course.duration}</span>
+                            </div>
+
+                            <div className="text-xs">
+                              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 mr-1.5">Fee:</span>
+                              <span className="font-black text-slate-800 dark:text-white text-sm">
+                                {formatFees(course.fees)}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2 w-full sm:w-auto">
+                            <button
+                              onClick={() => openCourseDetails(course)}
+                              className="flex-1 sm:flex-initial inline-flex items-center justify-center py-2 px-3 text-2xs font-extrabold text-slate-650 bg-slate-50 hover:bg-indigo-50/40 border border-slate-200/50 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-750 dark:border-slate-700 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl transition duration-300 cursor-pointer shadow-2xs active:scale-97"
+                            >
+                              Details
+                            </button>
+                            <button
+                              onClick={() => openDetails(course)}
+                              className="group/enquire flex-1 sm:flex-initial inline-flex items-center justify-center gap-1 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-500 hover:to-indigo-650 py-2 px-3.5 text-2xs font-extrabold text-white shadow-sm hover:shadow-[0_4px_12px_rgba(79,70,229,0.3)] dark:hover:shadow-[0_4px_12px_rgba(79,70,229,0.15)] hover:scale-[1.01] transition-all duration-300 active:scale-95 cursor-pointer"
+                            >
+                              Enquire
+                              <ChevronRight size={11} className="group-hover/enquire:translate-x-0.5 transition-transform duration-300" />
+                            </button>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                  </div>
-                </div>
-              );
-            })}
+                    </div>
+                  </SwiperSlide>
+                );
+              })}
+            </Swiper>
+
+            {/* Custom Navigation Arrows */}
+            <button className="course-swiper-prev absolute left-[-20px] top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md text-slate-650 border border-slate-150 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800 cursor-pointer transition active:scale-90 select-none">
+              <ChevronLeft size={16} />
+            </button>
+            <button className="course-swiper-next absolute right-[-20px] top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md text-slate-655 border border-slate-150 hover:bg-slate-50 dark:bg-slate-900 dark:text-slate-300 dark:border-slate-800 cursor-pointer transition active:scale-90 select-none">
+              <ChevronRight size={16} />
+            </button>
           </div>
         )}
       </div>
